@@ -1,17 +1,19 @@
 {{# result}}
-<div class="container">
-  <div class="jumbotron">
-    <ul>
-      <h3>
-        <a href="/cloudsession.php?sid={{ sid }}">{{ sid }}</a>
-      </h3>
-      <h5>
-        </a> [ {{ count }} ] mails accepted at ( {{ time }} )
-      </h5>
-      <h4>
-        from: <span>{{ sender }}</span>
-      </h4>
-    </ul>
+<a href="/cloudsession.php?sid={{ sid }}">
+  <div class="container">
+    <div class="jumbotron">
+      <ul>
+        <h3>
+          sender: {{ sender }
+        </h3>
+        <h4>
+          {{ count }} mails delivered.
+        </h4>
+        <h5>
+          {{ time }}
+        </h5>
+      </ul>
+    </div>
   </div>
-</div>
+</a>
 {{/ result}}
