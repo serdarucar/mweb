@@ -28,6 +28,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/u', function (req, res) {
   r.connect({ db: 'mailsender' }).then(function(c) {
     r.table('session')
+      .filter(function(session) {
+        return session('time')
+          .inTimezone('+03')
+          .date()
+          .eq(r.now()
+            .inTimezone('+03')
+            .date())
+      })
       .without('mail')
       .coerceTo('array')
       .orderBy(r.desc('time'))
@@ -69,18 +77,18 @@ app.get('/m/:sid/:st', function (req, res) {
   var s_st = req.params.st;
   r.connect({ db: 'mailsender' }).then(function(c) {
     r.table('session')
-        .get(s_sid)('mail')
-        .eqJoin(function(uid) {
-          return uid;
-        }, r.table('mail')).zip()
-        .filter({ status: s_st})
-        .pluck('to').limit(100)
-        .run(c).then(function (result) {
-          res.render('mails', { result: result, sid: s_sid, st: s_st });
-        })
-        .finally(function() {
-          c.close();
-        });
+      .get(s_sid)('mail')
+      .eqJoin(function(uid) {
+        return uid;
+      }, r.table('mail')).zip()
+      .filter({ status: s_st})
+      .pluck('to').limit(100)
+      .run(c).then(function (result) {
+        res.render('mails', { result: result, sid: s_sid, st: s_st });
+      })
+      .finally(function() {
+        c.close();
+      });
   });
 });
 
