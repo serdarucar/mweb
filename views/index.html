@@ -2,12 +2,15 @@
 <div class="container">
   <div class="jumbotron">
     <ul>
+      <h3>
+        <a href="/cloudsession.php?sid={{ sid }}">{{ sid }}</a>
+      </h3>
       <h5>
-        <a href="/cloudsession.php?sid={{ sid }}"><span>{{ sid }}</span></a> [ {{ count }} mails sent ] at ( {{ time }} )
+        </a> [ {{ count }} ] mails accepted at ( {{ time }} )
       </h5>
-      <h6>
+      <h4>
         from: <span>{{ sender }}</span>
-      </h6>
+      </h4>
     </ul>
   </div>
 </div>
