@@ -1,10 +1,14 @@
 {{# result}}
 <div class="container">
-  <ul class="text-left">
-    <h5>
-      <a href="/cloudsession.php?sid={{ sid }}">{{ sid }}</span></a> [ {{ count }} mails sent ] at ( {{ time }} )
-    </h5>
-    <h6> from: <span>{{ sender }}</span></h6>
-  </ul>
+  <div class="jumbotron">
+    <ul>
+      <h5>
+        <a href="/cloudsession.php?sid={{ sid }}"><span>{{ sid }}</span></a> [ {{ count }} mails sent ] at ( {{ time }} )
+      </h5>
+      <h6>
+        from: <span>{{ sender }}</span>
+      </h6>
+    </ul>
+  </div>
 </div>
 {{/ result}}
