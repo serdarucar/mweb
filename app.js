@@ -28,6 +28,7 @@ app.get('/u', function (req, res) {
     r.table('session')
       .without('mail')
       .coerceTo('array')
+      .orderBy(r.desc('time'))
       .run(c).then(function (result) {
         res.render('index', { result: result });
       })
