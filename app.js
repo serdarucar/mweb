@@ -56,11 +56,31 @@ app.get('/s/:sid', function (req, res) {
         }
       }).orderBy(r.desc('status'))
         .run(c).then(function (result) {
-          res.render('session', { result: result });
+          res.render('session', { result: result, sid: s_sid });
       })
     .finally(function() {
       c.close();
     });
+  });
+});
+
+app.get('/m/:sid/:st', function (req, res) {
+  var s_sid = req.params.sid;
+  var s_st = req.params.st;
+  r.connect({ db: 'mailsender' }).then(function(c) {
+    r.table('session')
+        .get(s_sid)('mail')
+        .eqJoin(function(uid) {
+          return uid;
+        }, r.table('mail')).zip()
+        .filter({ status: s_st})
+        .pluck('to').limit(100)
+        .run(c).then(function (result) {
+          res.render('mails', { result: result, sid: s_sid, st: s_st });
+        })
+        .finally(function() {
+          c.close();
+        });
   });
 });
 
