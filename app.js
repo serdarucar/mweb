@@ -51,8 +51,9 @@ app.get('/s/:sid', function (req, res) {
           status: doc('group'),
           count: doc('reduction')
         }
-      }).run(c).then(function (result) {
-        res.render('session', { result: result });
+      }).orderBy(r.desc('status'))
+        .run(c).then(function (result) {
+          res.render('session', { result: result });
       })
     .finally(function() {
       c.close();
