@@ -14,6 +14,7 @@ var express = require('express')
 // view engine setup
 app.set('view engine', 'html');
 app.set('views', path.join(__dirname, 'views'));
+app.set('layout', path.join(__dirname, 'layouts/default'));
 app.engine('html', require('hogan-express'));
 app.enable('view cache');
 
@@ -22,6 +23,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride());
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/u', function (req, res) {
   r.connect({ db: 'mailsender' }).then(function(c) {
