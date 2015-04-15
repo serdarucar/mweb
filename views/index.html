@@ -1,10 +1,9 @@
 {{#result}}
 <div class="container">
-  <a href="/cloudsession.php?sid={{sid}}">
   <div class="jumbotron">
     <ul>
       <h1 class="text-center">
-        {{sender}}
+        <a href="/cloudsession.php?sid={{sid}}">{{sender}}</a>
       </h1>
       <p class="text-center">
         Delivered: <a href = "#">{{count}}</a>, Sent: <a href = "/cloudmaillist.php?sid={{sid}}&st=sent">{{sent}}</a>, Deferred: <a href = "/cloudmaillist.php?sid={{sid}}&st=deferred">{{deferred}}</a>, Bounced: <a href = "/cloudmaillist.php?sid={{sid}}&st=bounced">{{bounced}}</a>.
@@ -14,6 +13,5 @@
       </h6>
     </ul>
   </div>
-  </a>
 </div>
 {{/result}}
