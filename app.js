@@ -72,16 +72,25 @@ app.get('/s/:sid', function (req, res) {
   });
 });
 
-app.get('/m/:sid/:st', function (req, res) {
+app.get('/m/:sid/:st/:idx', function (req, res) {
   var s_sid = req.params.sid;
   var s_st = req.params.st;
+  var n_idx = req.params.idx;
+  var n_idx2 = n_idx + 2;
   r.connect({ db: 'mailsender' }).then(function(c) {
     r.table("session")
       .get(s_sid)('mail')
       .filter({st: s_st})
-      .pluck('addr').limit(10)
+      .pluck('addr').orderBy('addr')
+      .slice(n_idx, n_idx2)
     .run(c).then(function (result) {
-      res.render('mails', { result: result, sid: s_sid, st: s_st });
+      res.render('mails', {
+        result: result,
+        sid: s_sid,
+        st: s_st,
+        idx: n_idx,
+        idx2: n_idx2
+      });
     })
     .finally(function() {
       c.close();
