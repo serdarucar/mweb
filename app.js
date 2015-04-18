@@ -78,7 +78,7 @@ app.get('/m/:sid/:st', function (req, res) {
   r.connect({ db: 'mailsender' }).then(function(c) {
     r.table("session")
       .get(s_sid)('mail')
-      .filter({st:'sent'})
+      .filter({st: s_st})
       .pluck('addr').limit(10)
     .run(c).then(function (result) {
       res.render('mails', { result: result, sid: s_sid, st: s_st });
