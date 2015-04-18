@@ -77,6 +77,7 @@ app.get('/m/:sid/:st/:idx', function (req, res) {
   var s_sid = req.params.sid;
   var s_st = req.params.st;
   var n_idx = parseInt(req.params.idx);
+  var n_idx1 = math.subtract(n_idx, 50);
   var n_idx2 = math.add(n_idx, 50);
   r.connect({ db: 'mailsender' }).then(function(c) {
     r.table("session")
@@ -89,7 +90,7 @@ app.get('/m/:sid/:st/:idx', function (req, res) {
         result: result,
         sid: s_sid,
         st: s_st,
-        idx: n_idx,
+        idx: n_idx1,
         idx2: n_idx2
       });
     })
