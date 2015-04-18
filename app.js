@@ -77,7 +77,7 @@ app.get('/m/:sid/:st/:idx', function (req, res) {
   var s_sid = req.params.sid;
   var s_st = req.params.st;
   var n_idx = parseInt(req.params.idx);
-  var n_idx2 = math.add(n_idx, 2);
+  var n_idx2 = math.add(n_idx, 50);
   r.connect({ db: 'mailsender' }).then(function(c) {
     r.table("session")
       .get(s_sid)('mail')
