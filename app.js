@@ -90,7 +90,8 @@ app.get('/m/:sid/:st/:idx', function (req, res) {
         result: result,
         sid: s_sid,
         st: s_st,
-        idx: n_idx1,
+        idx: n_idx,
+        idx1: n_idx1,
         idx2: n_idx2
       });
     })
