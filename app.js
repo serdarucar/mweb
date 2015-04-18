@@ -8,7 +8,8 @@ var express = require('express')
   , path = require('path')
   , cookieParser = require('cookie-parser')
   , bodyParser = require('body-parser')
-  , methodOverride = require('method-override');
+  , methodOverride = require('method-override')
+  , math = require('math');
 
 
 // view engine setup
@@ -75,8 +76,8 @@ app.get('/s/:sid', function (req, res) {
 app.get('/m/:sid/:st/:idx', function (req, res) {
   var s_sid = req.params.sid;
   var s_st = req.params.st;
-  var n_idx = req.params.idx;
-  var n_idx2 = n_idx + 2;
+  var n_idx = parseInt(req.params.idx);
+  var n_idx2 = math.sum(n_idx, 2);
   r.connect({ db: 'mailsender' }).then(function(c) {
     r.table("session")
       .get(s_sid)('mail')
