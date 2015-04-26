@@ -51,7 +51,6 @@ app.get('/u', function (req, res) {
     .run().then(function (result) {
       res.render('index', { result: result });
     })
-  .error();
 });
 
 app.get('/s/:sid', function (req, res) {
@@ -71,7 +70,6 @@ app.get('/s/:sid', function (req, res) {
       .run().then(function (result) {
         res.render('session', { result: result, sid: s_sid });
     })
-  .error();
 });
 
 app.get('/m/:sid/:st/:idx', function (req, res) {
@@ -95,7 +93,6 @@ app.get('/m/:sid/:st/:idx', function (req, res) {
       idx2: n_idx2
     });
   })
-  .error();
 });
 
 app.set('port', process.env.PORT || 3300);
