@@ -3,7 +3,7 @@
 
 var express = require('express')
   , app = express()
-  , r  = require('rethinkdbdash')({
+  , r  = require('rethinkdbdash')(/*{
       servers: [
         {host: '10.131.166.209', port: 28015},
         {host: '10.131.166.209', port: 28016},
@@ -12,7 +12,7 @@ var express = require('express')
       ],
       buffer: 500,
       max: 5000
-    })
+    }*/)
   , debug = require('debug')('smw.tashimasu.info')
   , path = require('path')
   , cookieParser = require('cookie-parser')
