@@ -36,14 +36,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/u', function (req, res) {
+  var timeFilter = new Date();
+  timeFilter.setDate(timeFilter.getDate()-1);
   r.db('mailsender').table('session')
     .filter(function(session) {
-      return session('time')
-        .inTimezone('+03')
-        .date()
-        .eq(r.now()
-          .inTimezone('+03')
-          .date())
+      return session('time').gt(timeFilter)
     })
     .without('mail')
     .coerceTo('array')

@@ -23,6 +23,8 @@
     <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css">
+    <link rel="stylesheet" media="screen" href="//cloud-cdn-digitalocean-com.global.ssl.fastly.net/assets/vendor-69a8d394f36944f5233dc4baffe95a8e.css" />
+    <link rel="stylesheet" media="screen" href="//cloud-cdn-digitalocean-com.global.ssl.fastly.net/assets/application-ab34b00badb231d7438d6f5af94ea6e5.css" />
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -56,8 +58,29 @@
     <!--[if lt IE 7]>
       <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
     <![endif]-->
+    <div id='container'>
+    <div id='content'>
+    <div class='contents'>
+    <nav>
+    <div class='nav_controls'>
+    <div class='logo-wrapper'>
+    <!--<a class="logo" href="/">sMail</a>-->
+    </div>
+
+    <a class="navLink droplets current" href="#">Mail Statuses</a>
+    <a class="navLink images " href="#">Mail Lists</a>
+    <!--<a class="navLink dns " href="#">Test1</a>
+    <a class="navLink api " href="#">Test2</a>
+    <a class="navLink support " href="#">Test3</a>-->
+    <a class="create_droplet" href="#">Create sMail</a>
+    </div>
+    </nav>
 
     {{{ yield }}}
+
+    </div>
+    </div>
+    </div>
 
     <script src="/js/bootstrap.js"></script>
 
