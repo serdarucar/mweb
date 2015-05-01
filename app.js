@@ -35,7 +35,7 @@ app.use(methodOverride());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/u', function (req, res) {
+app.get('/', function (req, res) {
   var timeFilter = new Date();
   timeFilter.setDate(timeFilter.getDate()-1);
   r.db('mailsender').table('session')
@@ -45,9 +45,25 @@ app.get('/u', function (req, res) {
     .without('mail')
     .coerceTo('array')
     .orderBy(r.desc('time'))
+    .pluck('sid','sender','count','sent','deferred','bounced','time')
+    .merge(function(doc) {
+      return {
+        hh: doc('time').hours(),
+        mi: doc('time').minutes(),
+        process: doc('sent').add(doc('deferred')).add(doc('bounced'))
+      };
+    })
     .run().then(function (result) {
       res.render('index', { result: result });
     })
+});
+
+app.get('/list', function (req, res) {
+  res.render('list');
+});
+
+app.get('/new', function (req, res) {
+  res.render('new');
 });
 
 app.get('/s/:sid', function (req, res) {

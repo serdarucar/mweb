@@ -1,40 +1,54 @@
+<div id='container'>
+<div id='content'>
+<div class='contents'>
+<nav>
+<div class='nav_controls'>
+<!--
+<div class='logo-wrapper'>
+<a class="logo" href="#"></a>
+</div>
+-->
+
+<a class="navLink droplets current" href="/"><i class="fa fa-paper-plane"></i> Mailing Stats</a>
+<a class="navLink images " href="/list"><i class="fa fa-bars"></i> Mailing Lists</a>
+<!--<a class="navLink dns " href="#">Test1</a>
+<a class="navLink api " href="#">Test2</a>
+<a class="navLink support " href="#">Test3</a>-->
+<a class="create_droplet" href="/new"><i class="fa fa-envelope-o"></i>  Create New</a>
+</div>
+</nav>
+
 <div id='main'>
 <header>
 
-<h1>Mail Statuses</h1>
+<h1>Mailing Stats</h1>
 
 </header>
-
 <table class='droplet-listing'>
 <thead>
 <tr>
+<th class='disk'>Time</th>
 <th class='name'>Sender</th>
-<th class='ip'>Accepted</th>
-<th class='status'>Sent</th>
-<th class='memory'>Deferred</th>
+<th class='disk'>Processed / Accepted</th>
+<th class='disk'>Sent</th>
+<th class='disk'>Deferred</th>
 <th class='disk'>Bounced</th>
 </tr>
 </thead>
 <tbody>
 {{#result}}
 <tr>
-<td class='name' title='{{time}}'>
-{{sender}}
-</td>
-<td class='ip'>
-{{count}}
-</td>
-<td class='active status'>
-{{sent}}
-</td>
-<td class='memory'>
-{{deferred}}
-</td>
-<td class='disk'>
-{{bounced}}
-</td>
+<td class='disk' title='{{time}}'>{{hh}}:{{mi}}</td>
+<td class='name'><a href="#">{{sender}}</a></td>
+<td class='disk' title='{{sid}}'>{{process}} / {{count}}</td>
+<td class='disk'>{{sent}}</td>
+<td class='disk'>{{deferred}}</td>
+<td class='disk'>{{bounced}}</td>
 </tr>
 {{/result}}
 </tbody>
 </table>
+</div>
+</div>
+</div>
 </div>
