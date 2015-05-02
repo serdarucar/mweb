@@ -82,19 +82,18 @@ app.get('/s/:sid/:lim', function (req, res) {
       return left.merge(right);
     }).default(null)
     .run().then(function (result) {
-      res.render('session', { result: result, sid: s_sid, aft_lim: n_lim_next });
+      res.render('session', { result: result, aft_lim: n_lim_next });
     })
 });
 
 app.get('/d/:qid/:addr', function (req, res) {
-  var ref = req.header('Referer') || '/';
   var s_qid = req.params.qid;
   var s_addr = req.params.addr;
   var s_uid = s_qid + '/' + s_addr;
   r.db('mailsender').table('mail')
     .get(s_uid).default(null)
     .run().then(function (result) {
-      res.render('log', { result: result, ref: ref });
+      res.render('log', { result: result });
     })
 });
 
