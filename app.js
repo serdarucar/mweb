@@ -66,13 +66,15 @@ app.get('/new', function (req, res) {
   res.render('new');
 });
 
-app.get('/s/:sid', function (req, res) {
+app.get('/s/:sid/:lim', function (req, res) {
   var s_sid = req.params.sid;
+  var n_lim = parseInt(req.params.lim);
+  var n_lim_next = n_lim * 10;
   r.db('mailsender').table('mail')
     .getAll(s_sid, {index: 'sid'})
     .group('status')
     .pluck('to','uid')
-    .limit(10).orderBy('time')
+    .limit(n_lim).orderBy('time')
     .ungroup().map(function (doc) {
       return r.object(doc('group'), doc('reduction'));
     }).default([{sent: [], deferred: [], bounced: []}])
@@ -80,18 +82,19 @@ app.get('/s/:sid', function (req, res) {
       return left.merge(right);
     }).default(null)
     .run().then(function (result) {
-      res.render('session', { result: result, sid: s_sid });
+      res.render('session', { result: result, sid: s_sid, aft_lim: n_lim_next, ref: ref });
     })
 });
 
 app.get('/d/:qid/:addr', function (req, res) {
+  var ref = req.header('Referrer') || '/';
   var s_qid = req.params.qid;
   var s_addr = req.params.addr;
   var s_uid = s_qid + '/' + s_addr;
   r.db('mailsender').table('mail')
     .get(s_uid).default(null)
     .run().then(function (result) {
-      res.render('log', { result: result });
+      res.render('log', { result: result, ref: ref });
     })
 });
 
