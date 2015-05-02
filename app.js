@@ -38,6 +38,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/u', function (req, res) {
   var timeFilter = new Date();
   timeFilter.setDate(timeFilter.getDate()-2);
+
+  function n(n){
+    return n > 9 ? "" + n: "0" + n;
+  }
+  
   r.db('mailsender').table('session')
     .filter(function(session) {
       return session('time').gt(timeFilter)
@@ -48,8 +53,16 @@ app.get('/u', function (req, res) {
     .pluck('sid','sender','count','sent','deferred','bounced','time')
     .merge(function(doc) {
       return {
-        hh: doc('time').hours(),
-        mi: doc('time').minutes(),
+        hh: r.branch(
+          doc('time').hours().gt(9),
+          doc('time').hours().coerceTo('string'),
+          r.expr('0').add(doc('time').hours().coerceTo('string'))
+        ),
+        mi: r.branch(
+          doc('time').minutes().gt(9),
+          doc('time').minutes().coerceTo('string'),
+          r.expr('0').add(doc('time').minutes().coerceTo('string'))
+        ),
         process: doc('sent').add(doc('deferred')).add(doc('bounced'))
       };
     })
