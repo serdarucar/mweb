@@ -1,0 +1,51 @@
+<div id='container'>
+<div id='content'>
+<div class='contents'>
+<nav>
+<div class='nav_controls'>
+<!--
+<div class='logo-wrapper'>
+<a class="logo" href="#"></a>
+</div>
+-->
+
+<a class="navLink droplets" href="/cloudmail.php"><i class="fa fa-paper-plane"></i> Mailing Stats</a>
+<a class="navLink images" href="#"><i class="fa fa-bars"></i> Mailing Lists</a>
+<a class="navLink dns" href="#"><i class="fa fa-calendar"></i> Calendar</a>
+<!--<a class="navLink api " href="#">Test2</a>
+<a class="navLink support " href="#">Test3</a>-->
+<a class="create_droplet" href="#"><i class="fa fa-envelope-o"></i>  Create New</a>
+</div>
+</nav>
+
+<div id='main'>
+<header>
+
+<h1>Mailing Stats</h1>
+
+</header>
+{{#result}}
+<table class='droplet-listing'>
+<thead>
+<tr>
+<th class='name'>MAIL STATUS DETAIL / {{to}}</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class='name'>
+<b>To:</b> {{to}}<br>
+<b>Status:</b> {{status}}<br>
+<b>Time:</b> {{time}}<br>
+<b>Delay:</b> {{delay}}<br>
+<b>DSN:</b> {{dsn}}<br>
+<b>Message:</b> {{message}}<br>
+</td>
+</tr>
+{{/result}}
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>

@@ -37,7 +37,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/u', function (req, res) {
   var timeFilter = new Date();
-  timeFilter.setDate(timeFilter.getDate()-1);
+  timeFilter.setDate(timeFilter.getDate()-2);
   r.db('mailsender').table('session')
     .filter(function(session) {
       return session('time').gt(timeFilter)
@@ -68,44 +68,31 @@ app.get('/new', function (req, res) {
 
 app.get('/s/:sid', function (req, res) {
   var s_sid = req.params.sid;
-  r.db('mailsender').table('session')
-    .get(s_sid)('mail')
-    .eqJoin(function(uid) {
-      return uid;
-    }, r.table('mail')).zip()
-    .group('status').count()
-    .ungroup().map(function(doc) {
-      return {
-        status: doc('group'),
-        count: doc('reduction')
-      }
-    }).orderBy(r.desc('status'))
-      .run().then(function (result) {
-        res.render('session', { result: result, sid: s_sid });
+  r.db('mailsender').table('mail')
+    .getAll(s_sid, {index: 'sid'})
+    .group('status')
+    .pluck('to','uid')
+    .limit(10).orderBy('time')
+    .ungroup().map(function (doc) {
+      return r.object(doc('group'), doc('reduction'));
+    }).default([{sent: [], deferred: [], bounced: []}])
+    .reduce(function (left, right) {
+      return left.merge(right);
+    }).default(null)
+    .run().then(function (result) {
+      res.render('session', { result: result, sid: s_sid });
     })
 });
 
-app.get('/m/:sid/:st/:idx', function (req, res) {
-  var s_sid = req.params.sid;
-  var s_st = req.params.st;
-  var n_idx = parseInt(req.params.idx);
-  var n_idx1 = math.subtract(n_idx, 50);
-  var n_idx2 = math.add(n_idx, 50);
-  r.db('mailsender').table("session")
-    .get(s_sid)('mail')
-    .filter({st: s_st})
-    .pluck('addr').orderBy('addr')
-    .slice(n_idx, n_idx2)
-  .run().then(function (result) {
-    res.render('mails', {
-      result: result,
-      sid: s_sid,
-      st: s_st,
-      idx: n_idx,
-      idx1: n_idx1,
-      idx2: n_idx2
-    });
-  })
+app.get('/d/:qid/:addr', function (req, res) {
+  var s_qid = req.params.qid;
+  var s_addr = req.params.addr;
+  var s_uid = s_qid + '/' + s_addr;
+  r.db('mailsender').table('mail')
+    .get(s_uid).default(null)
+    .run().then(function (result) {
+      res.render('log', { result: result });
+    })
 });
 
 app.set('port', process.env.PORT || 3300);
