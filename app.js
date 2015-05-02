@@ -82,7 +82,7 @@ app.get('/s/:sid/:lim', function (req, res) {
       return left.merge(right);
     }).default(null)
     .run().then(function (result) {
-      res.render('session', { result: result, aft_lim: n_lim_next });
+      res.render('session', { result: result, sid: s_sid, aft_lim: n_lim_next });
     })
 });
 
