@@ -119,7 +119,7 @@ app.get('/', passwordless.restricted({
 }), function (req, res) {
   
   var timeFilter = new Date();
-  timeFilter.setDate(timeFilter.getDate()-3);
+  timeFilter.setDate(timeFilter.getDate()-1);
 
   r
   .db('mailsender').table('session')
