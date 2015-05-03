@@ -9,7 +9,7 @@
 </div>
 -->
 
-<a class="navLink droplets current" href="/cloudmail.php"><i class="fa fa-paper-plane"></i> Mailing Stats</a>
+<a class="navLink droplets current" href="/"><i class="fa fa-paper-plane"></i> Mailing Stats</a>
 <a class="navLink images " href="#"><i class="fa fa-bars"></i> Mailing Lists</a>
 <a class="navLink dns " href="#"><i class="fa fa-calendar"></i> Calendar</a>
 <!--<a class="navLink api " href="#">Test2</a>
@@ -40,7 +40,7 @@
 {{#result}}
 <tr>
 <td class='disk' title='{{time}}'>{{hh}}:{{mi}}</td>
-<td class='name'><a href="/cloudsession.php?sid={{sid}}&limit=10">{{sender}}</a></td>
+<td class='name'><a href="/session/{{sid}}/10">{{sender}}</a></td>
 <td class='disk' title='{{process}}'>{{count}}</td>
 <td id='{{sid}}:sent' class='disk'>{{sent}}</td>
 <td id='{{sid}}:deferred' class='disk'>{{deferred}}</td>
