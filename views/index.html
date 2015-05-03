@@ -28,12 +28,12 @@
 <table class='droplet-listing'>
 <thead>
 <tr>
-<th class='disk'>Time</th>
+<th class='disk'>&nbsp;&nbsp;Time</th>
 <th class='name'>Sender</th>
-<th class='disk'>Processed / Accepted</th>
-<th class='disk'>Sent</th>
-<th class='disk'>Deferred</th>
-<th class='disk'>Bounced</th>
+<th class='disk'>&nbsp;&nbsp;&nbsp;Accepted</th>
+<th class='disk'>&nbsp;&nbsp;Sent</th>
+<th class='disk'>&nbsp;&nbsp;&nbsp;Deferred</th>
+<th class='disk'>&nbsp;&nbsp;&nbsp;Bounced</th>
 </tr>
 </thead>
 <tbody>
@@ -41,15 +41,25 @@
 <tr>
 <td class='disk' title='{{time}}'>{{hh}}:{{mi}}</td>
 <td class='name'><a href="/cloudsession.php?sid={{sid}}&limit=10">{{sender}}</a></td>
-<td class='disk' title='{{sid}}'>{{process}} / {{count}}</td>
-<td class='disk'>{{sent}}</td>
-<td class='disk'>{{deferred}}</td>
-<td class='disk'>{{bounced}}</td>
+<td class='disk' title='{{process}}'>{{count}}</td>
+<td id='{{sid}}:sent' class='disk'>{{sent}}</td>
+<td id='{{sid}}:deferred' class='disk'>{{deferred}}</td>
+<td id='{{sid}}:bounced' class='disk'>{{bounced}}</td>
 </tr>
 {{/result}}
 </tbody>
 </table>
 </div>
+
+<script>
+    var io = io.connect();
+    io.on("mailstats", function(data) {
+    	document.getElementById(data.new_val.sid+':sent').innerHTML = data.new_val.sent;
+    	document.getElementById(data.new_val.sid+':deferred').innerHTML = data.new_val.deferred;
+    	document.getElementById(data.new_val.sid+':bounced').innerHTML = data.new_val.bounced;
+    });
+</script>
+
 </div>
 </div>
 </div>

@@ -1,7 +1,7 @@
 /*jslint unparam: true, node: true*/
 // app.js
 
-var express = require('express.io')
+var express = require('express')
   , app = express()
   , io = require('socket.io').listen(app.listen(3300))
   , r  = require('rethinkdbdash')(/*{
@@ -21,9 +21,6 @@ var express = require('express.io')
   , methodOverride = require('method-override')
   , math = require('mathjs');
 
-// Express.IO setup
-//app.http().io();
-
 // view engine setup
 app.set('view engine', 'html');
 app.set('views', path.join(__dirname, 'views'));
@@ -38,40 +35,7 @@ app.use(methodOverride());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-var timeFilter = new Date();
-timeFilter.setDate(timeFilter.getDate()-2);
-
-// TESTING AREA //
-
-io.on('connection', function(socket) {
-
-  r
-  .db('mailsender').table('session').get('E1tgIM2z')
-  .pluck('sid','sender','count','sent','deferred','bounced','time')
-  .merge(function(doc) {
-    return {
-      hh: r.branch(
-        doc('time').hours().gt(9),
-        doc('time').hours().coerceTo('string'),
-        r.expr('0').add(doc('time').hours().coerceTo('string'))
-      ),
-      mi: r.branch(
-        doc('time').minutes().gt(9),
-        doc('time').minutes().coerceTo('string'),
-        r.expr('0').add(doc('time').minutes().coerceTo('string'))
-      ),
-      process: doc('sent').add(doc('deferred')).add(doc('bounced'))
-    };
-  })
-  .run().then(function (result) {
-    socket.emit("init", result);
-  })
-  .error(function(err) {
-    console.log("Failure:", err); 
-  })
-
-});
-
+// SOCKET.IO EMITTERS
 r
 .db('mailsender').table('session')
 .pluck('sid','sent','deferred','bounced')
@@ -82,10 +46,12 @@ r
   });
 });
 
-// TESTING AREA //
-
+// EXPRESS ROUTES
 app.get('/u', function (req, res) {
   
+  var timeFilter = new Date();
+  timeFilter.setDate(timeFilter.getDate()-2);
+
   r
   .db('mailsender').table('session')
   .filter(function(session) {
@@ -120,39 +86,6 @@ app.get('/list', function (req, res) {
 
 app.get('/new', function (req, res) {
   res.render('new');
-});
-
-app.get('/test', function (req, res) {
-
-  r
-  .db('mailsender').table('session')
-  .filter(function(session) {
-    return session('time').gt(timeFilter)
-  })
-  .orderBy(r.desc('time'))
-  .pluck('sid','sender','count','sent','deferred','bounced','time')
-  .merge(function(doc) {
-    return {
-      hh: r.branch(
-        doc('time').hours().gt(9),
-        doc('time').hours().coerceTo('string'),
-        r.expr('0').add(doc('time').hours().coerceTo('string'))
-      ),
-      mi: r.branch(
-        doc('time').minutes().gt(9),
-        doc('time').minutes().coerceTo('string'),
-        r.expr('0').add(doc('time').minutes().coerceTo('string'))
-      ),
-      process: doc('sent').add(doc('deferred')).add(doc('bounced'))
-    };
-  })
-  .run().then(function (result) {
-    res.render('test', { result: result });
-  })
-  .error(function(err) {
-    console.log("Failure:", err); 
-  })
-
 });
 
 app.get('/s/:sid/:lim', function (req, res) {
