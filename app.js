@@ -62,9 +62,9 @@ app.get('/u', function (req, res) {
   .merge(function(doc) {
     return {
       hh: r.branch(
-        doc('time').hours().gt(9),
-        doc('time').hours().coerceTo('string'),
-        r.expr('0').add(doc('time').hours().coerceTo('string'))
+        doc('time').inTimezone('+03:00').hours().gt(9),
+        doc('time').inTimezone('+03:00').hours().coerceTo('string'),
+        r.expr('0').add(doc('time').inTimezone('+03:00').hours().coerceTo('string'))
       ),
       mi: r.branch(
         doc('time').minutes().gt(9),
