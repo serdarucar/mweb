@@ -1,0 +1,69 @@
+<div id='container'>
+<div id='content'>
+<div class='contents'>
+<nav>
+<div class='nav_controls'>
+<!--
+<div class='logo-wrapper'>
+<a class="logo" href="#"></a>
+</div>
+-->
+
+<a class="navLink droplets" href="/"><i class="fa fa-paper-plane"></i> Mailing Stats</a>
+<a class="navLink images " href="/list"><i class="fa fa-bars"></i> Mailing Lists</a>
+<a class="navLink dns " href="#"><i class="fa fa-calendar"></i> Calendar</a>
+<!--<a class="navLink dns " href="#">Test1</a>
+<a class="navLink api " href="#">Test2</a>
+<a class="navLink support " href="#">Test3</a>-->
+<a class="create_droplet" href="/new"><i class="fa fa-envelope-o"></i>  Create New</a>
+</div>
+</nav>
+
+<div id='main'>
+<header>
+
+<h1>Socket.IO Testing</h1>
+
+</header>
+
+<table class='droplet-listing'>
+<thead>
+<tr>
+<th class='disk'>Time</th>
+<th class='name'>Sender</th>
+<th class='disk'>Processed / Accepted</th>
+<th class='disk'>Sent</th>
+<th class='disk'>Deferred</th>
+<th class='disk'>Bounced</th>
+</tr>
+</thead>
+
+<tbody>
+{{#result}}
+<tr>
+<td class='disk' title='{{time}}'>{{hh}}:{{mi}}</td>
+<td class='name'><a href="/cloudsession.php?sid={{sid}}&limit=10">{{sender}}</a></td>
+<td class='disk' title='{{sid}}'>{{process}} / {{count}}</td>
+<td id='{{sid}}:sent' class='disk'>{{sent}}</td>
+<td id='{{sid}}:deferred' class='disk'>{{deferred}}</td>
+<td id='{{sid}}:bounced' class='disk'>{{bounced}}</td>
+</tr>
+{{/result}}
+</tbody>
+</table>
+
+</div>
+
+<script>
+    var io = io.connect();
+
+    io.on("mailstats", function(data) {
+    	document.getElementById(data.new_val.sid+':sent').innerHTML = data.new_val.sent;
+    	document.getElementById(data.new_val.sid+':deferred').innerHTML = data.new_val.deferred;
+    	document.getElementById(data.new_val.sid+':bounced').innerHTML = data.new_val.bounced;
+    });
+</script>
+
+</div>
+</div>
+</div>
