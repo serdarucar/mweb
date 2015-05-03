@@ -50,7 +50,7 @@ r
 app.get('/u', function (req, res) {
   
   var timeFilter = new Date();
-  timeFilter.setDate(timeFilter.getDate()-2);
+  timeFilter.setDate(timeFilter.getDate()-1);
 
   r
   .db('mailsender').table('session')
