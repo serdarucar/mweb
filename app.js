@@ -1,6 +1,6 @@
 /*jslint unparam: true, node: true*/
 // app.js
-
+require('pmx').init();
 var express = require('express')
   , app = express()
   , io = require('socket.io').listen(app.listen(3300))
@@ -19,7 +19,8 @@ var express = require('express')
   , cookieParser = require('cookie-parser')
   , bodyParser = require('body-parser')
   , methodOverride = require('method-override')
-  , math = require('mathjs');
+  , math = require('mathjs')
+  , pmx = require('pmx');
 
 // view engine setup
 app.set('view engine', 'html');
@@ -126,6 +127,8 @@ app.get('/d/:qid/:addr', function (req, res) {
   })
 
 });
+
+app.use(pmx.expressErrorHandler());
 
 //app.set('port', process.env.PORT || 3300);
 
