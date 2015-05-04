@@ -1,12 +1,9 @@
 <html>
     <body>
-    	<div class="container">
-        <h2>Login</h2>
-        <form action="/sendtoken" method="POST">
-            Email:
-            <br><input name="user" type="text">
-            <input type="hidden" name="origin" value="">
-            <br><input type="submit" value="Login">
+        <form class="new_snapshot" action="/sendtoken" accept-charset="UTF-8" method="post">
+            <input name="origin" type="hidden" value="" />
+            <input placeholder="Enter Your E-Mail" type="text" name="user" id="user" />
+            <input type="submit" name="login" value="Login" class="button" />
         </form>
         </div>
     </body>
