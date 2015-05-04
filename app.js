@@ -4,16 +4,7 @@ require('pmx').init();
 var express = require('express')
   , app = express()
   , io = require('socket.io').listen(app.listen(80))
-  , r  = require('rethinkdbdash')(/*{
-      servers: [
-        {host: '10.131.166.209', port: 28015},
-        {host: '10.131.166.209', port: 28016},
-        {host: '10.131.166.238', port: 28015},
-        {host: '10.131.166.238', port: 28016}
-      ],
-      buffer: 500,
-      max: 5000
-    }*/)
+  , r  = require('rethinkdbdash')({servers:[{host: '127.0.0.1', port: 28015}]})
   , debug = require('debug')('smw.tashimasu.info')
   , path = require('path')
   , cookieParser = require('cookie-parser')
