@@ -175,6 +175,7 @@ app.get('/session/:sid/:lim', passwordless.restricted({
   r
   .db('mailsender').table('mail')
   .getAll(s_sid, {index: 'sid'})
+  .hasFields('status')
   .group('status')
   .pluck('to','uid')
   .limit(n_lim).orderBy('time')
