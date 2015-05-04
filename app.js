@@ -53,7 +53,7 @@ r
 
 // PASSWORDLESS TOKEN DELIVERY SETUP
 var smtpServer  = email.server.connect({
-   host:    '127.0.0.1', 
+   host:    '178.62.101.203',
    ssl:     false
 });
 
