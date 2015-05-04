@@ -3,7 +3,7 @@
 require('pmx').init();
 var express = require('express')
   , app = express()
-  , io = require('socket.io').listen(app.listen(3300))
+  , io = require('socket.io').listen(app.listen(80))
   , r  = require('rethinkdbdash')(/*{
       servers: [
         {host: '10.131.166.209', port: 28015},
@@ -63,7 +63,7 @@ passwordless.init(new RethinkDBStore({host: '127.0.0.1', port: 28015, db: 'mails
 // PASSWORDLESS TOKEN DELIVERY SERVICE
 passwordless.addDelivery(
   function(tokenToSend, uidToSend, recipient, callback) {
-    var host = 'tashimasu.net:3300';
+    var host = 'tashimasu.net';
     smtpServer.send({
       text:    'Hello!\nAccess your account here: http://' 
       + host + '?token=' + tokenToSend + '&uid=' 
