@@ -1,6 +1,12 @@
 /*jslint unparam: true, node: true*/
 // app.js
-require('pmx').init();
+// 
+require('pmx').init({
+  ignore_routes : [/socket\.io/],
+  errors        : true,
+  custom_probes : true
+});
+
 var express = require('express')
   , app = express()
   , io = require('socket.io').listen(app.listen(80))
