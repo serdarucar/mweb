@@ -41,7 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 r
 .db('mailsender').table('session')
 .pluck('sid','sent','deferred','bounced')
-.changes().run()
+.changes().run({cursor:true})
 .then(function(cursor) {
   cursor.each(function(err, data) {
     io.sockets.emit("mailstats", data);
