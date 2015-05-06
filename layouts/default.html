@@ -14,31 +14,20 @@
     <!-- Prevent favicon to be requested -->
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,700|Josefin+Sans&subset=latin-ext" type="text/css">
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Raleway:100,500&subset=latin" type="text/css">
+    <!-- SIO theme -->
+    <link rel="stylesheet" media="screen" href="/assets/vendor.css" />
+    <link rel="stylesheet" media="screen" href="/assets/application.css" />
+    <!-- SIO scripts -->
+    <script src="/assets/vendor.js"></script>
+    <script src="/assets/application.js"></script>
+    <!-- <script src="/assets/help.js"></script> -->
 
-    <!-- Bootstrap -->
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css">
-    <!-- DO theme -->
-    <link rel="stylesheet" media="screen" href="//cloud-cdn-digitalocean-com.global.ssl.fastly.net/assets/vendor-69a8d394f36944f5233dc4baffe95a8e.css" />
-    <link rel="stylesheet" media="screen" href="//cloud-cdn-digitalocean-com.global.ssl.fastly.net/assets/application-ab34b00badb231d7438d6f5af94ea6e5.css" />
     <!-- FA -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-    <!-- DO scripts -->
-    <script src="//cloud-cdn-digitalocean-com.global.ssl.fastly.net/assets/vendor-cdb38e6fa664ad166c7239370caa9827.js"></script>
-    <script src="//cloud-cdn-digitalocean-com.global.ssl.fastly.net/assets/application-94a40a08cb48594feb281bc639e52132.js"></script>
-    <script src="//cloud-cdn-digitalocean-com.global.ssl.fastly.net/assets/help-58132c81799d7876d1fb98a9c4e1e944.js"></script>
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
     <!-- Socket.IO related scripts -->
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
-
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -46,7 +35,7 @@
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
   </head>
-  <body>
+  <body class='control_panel droplets index'>
     <!--[if lt IE 7]>
       <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
     <![endif]-->
@@ -54,8 +43,6 @@
 
     {{{ yield }}}
 
-
-    <script src="/js/bootstrap.js"></script>
 
   </body>
 </html>

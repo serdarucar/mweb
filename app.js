@@ -1,26 +1,27 @@
 /*jslint unparam: true, node: true*/
 // app.js
-require('pmx').init();
+// 
+require('pmx').init({
+  ignore_routes : [/socket\.io/],
+  errors        : true,
+  custom_probes : true
+});
+
 var express = require('express')
   , app = express()
-  , io = require('socket.io').listen(app.listen(3300))
-  , r  = require('rethinkdbdash')(/*{
-      servers: [
-        {host: '10.131.166.209', port: 28015},
-        {host: '10.131.166.209', port: 28016},
-        {host: '10.131.166.238', port: 28015},
-        {host: '10.131.166.238', port: 28016}
-      ],
-      buffer: 500,
-      max: 5000
-    }*/)
+  , io = require('socket.io').listen(app.listen(80))
+  , r  = require('rethinkdbdash')({servers:[{host: '127.0.0.1', port: 28015}]})
   , debug = require('debug')('smw.tashimasu.info')
   , path = require('path')
   , cookieParser = require('cookie-parser')
   , bodyParser = require('body-parser')
   , methodOverride = require('method-override')
+  , session = require('express-session')
   , math = require('mathjs')
-  , pmx = require('pmx');
+  , pmx = require('pmx')
+  , passwordless = require('passwordless')
+  , RethinkDBStore = require('passwordless-rethinkdbstore')
+  , email   = require("emailjs");
 
 // view engine setup
 app.set('view engine', 'html');
@@ -40,15 +41,80 @@ app.use(express.static(path.join(__dirname, 'public')));
 r
 .db('mailsender').table('session')
 .pluck('sid','sent','deferred','bounced')
-.changes().run()
+.changes().run({cursor:true})
 .then(function(cursor) {
   cursor.each(function(err, data) {
     io.sockets.emit("mailstats", data);
   });
 });
 
+// PASSWORDLESS TOKEN DELIVERY SETUP
+var smtpServer  = email.server.connect({
+   host:    '178.62.101.203',
+   ssl:     false
+});
+
+// PASSWORDLESS INIT
+passwordless.init(new RethinkDBStore({host: '127.0.0.1', port: 28015, db: 'mailsender'}));
+
+// PASSWORDLESS TOKEN DELIVERY SERVICE
+passwordless.addDelivery(
+  function(tokenToSend, uidToSend, recipient, callback) {
+    var host = 'tashimasu.net';
+    smtpServer.send({
+      text:    'Hello!\nAccess your account here: http://' 
+      + host + '?token=' + tokenToSend + '&uid=' 
+      + encodeURIComponent(uidToSend), 
+      from:    'nobody@tashimasu.net', 
+      to:      recipient,
+      subject: 'Token for ' + host
+  }, function(err, message) {
+    if(err) {
+        console.log(err);
+    }
+    callback(err);
+  });
+});
+
+// PASSWORDLESS ACCEPT / SESSION
+app.use(session({ secret: 'janalicibaqishlary', resave: true, saveUninitialized: true })); // session secret
+app.use(passwordless.sessionSupport());
+app.use(passwordless.acceptToken({ successRedirect: '/', enableOriginRedirect: true }));
+
+// PASSWORDLESS ROUTES
+/* GET login screen. */
+app.get('/login', function(req, res) {
+   res.render('login');
+});
+
+/* Static users for now. */
+var users = [
+    { id: 1, email: 'serdarn@me.com' },
+    { id: 2, email: 'sio@doruk.net.tr' },
+    { id: 3, email: 'slmkrnz@gmail.com' }
+];
+
+/* POST login details. */
+app.post('/sendtoken', 
+  passwordless.requestToken(
+    function(user, delivery, callback) {
+      for (var i = users.length - 1; i >= 0; i--) {
+        if(users[i].email === user.toLowerCase()) {
+          return callback(null, users[i].id);
+        }
+      }
+      callback(null, null);
+    }, { originField: 'origin' }), 
+function(req, res) {
+  // success!
+  res.render('sent');
+});
+
 // EXPRESS ROUTES
-app.get('/u', function (req, res) {
+app.get('/', passwordless.restricted({
+  originField: 'origin',
+  failureRedirect: '/login'
+}), function (req, res) {
   
   var timeFilter = new Date();
   timeFilter.setDate(timeFilter.getDate()-1);
@@ -81,15 +147,24 @@ app.get('/u', function (req, res) {
 
 });
 
-app.get('/list', function (req, res) {
+app.get('/list', passwordless.restricted({
+  originField: 'origin',
+  failureRedirect: '/login'
+}), function (req, res) {
   res.render('list');
 });
 
-app.get('/new', function (req, res) {
+app.get('/new', passwordless.restricted({
+  originField: 'origin',
+  failureRedirect: '/login'
+}), function (req, res) {
   res.render('new');
 });
 
-app.get('/s/:sid/:lim', function (req, res) {
+app.get('/session/:sid/:lim', passwordless.restricted({
+  originField: 'origin',
+  failureRedirect: '/login'
+}), function (req, res) {
 
   var s_sid = req.params.sid;
   var n_lim = parseInt(req.params.lim);
@@ -98,6 +173,7 @@ app.get('/s/:sid/:lim', function (req, res) {
   r
   .db('mailsender').table('mail')
   .getAll(s_sid, {index: 'sid'})
+  .hasFields('status')
   .group('status')
   .pluck('to','uid')
   .limit(n_lim).orderBy('time')
@@ -113,7 +189,10 @@ app.get('/s/:sid/:lim', function (req, res) {
 
 });
 
-app.get('/d/:qid/:addr', function (req, res) {
+app.get('/detail/:qid/:addr', passwordless.restricted({
+  originField: 'origin',
+  failureRedirect: '/login'
+}), function (req, res) {
 
   var s_qid = req.params.qid;
   var s_addr = req.params.addr;
