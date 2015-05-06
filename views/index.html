@@ -1,17 +1,69 @@
-{{#result}}
-<div class="container">
-  <div class="jumbotron">
-    <ul>
-      <h1 class="text-center">
-        {{sender}}
-      </h1>
-      <p class="text-center">
-        Delivered: <a href = "#">{{count}}</a>, Sent: <a href = "/cloudmaillist.php?sid={{sid}}&st=sent&idx=0">{{sent}}</a>, Deferred: <a href = "/cloudmaillist.php?sid={{sid}}&st=deferred&idx=0">{{deferred}}</a>, Bounced: <a href = "/cloudmaillist.php?sid={{sid}}&st=bounced&idx=0">{{bounced}}</a>.
-      </p>
-      <h6 class="text-center">
-        {{time}}
-      </h6>
-    </ul>
-  </div>
+<div id='container'>
+<div id='content'>
+<div class='contents'>
+<nav>
+<div class='nav_controls'>
+<!--
+<div class='logo-wrapper'>
+<a class="logo" href="#"></a>
 </div>
+-->
+
+<a class="navLink droplets current" href="/"><i class="fa fa-paper-plane"></i> Mailing Stats</a>
+<a class="navLink images " href="#"><i class="fa fa-bars"></i> Mailing Lists</a>
+<a class="navLink dns " href="#"><i class="fa fa-calendar"></i> Calendar</a>
+<!--<a class="navLink api " href="#">Test2</a>
+<a class="navLink support " href="#">Test3</a>-->
+<div class='account-dropdown'></div>
+<a class="create_droplet" href="#"><i class="fa fa-envelope-o"></i>  Create New</a>
+</div>
+</nav>
+
+<div id='main'>
+<header>
+
+<h1>Mailing Stats</h1>
+
+</header>
+<table class='droplet-listing'>
+<thead>
+<tr>
+<th class='disk'>&nbsp;&nbsp;Time</th>
+<th class='name'>Sender</th>
+<th class='disk'>&nbsp;&nbsp;&nbsp;Accepted</th>
+<th class='disk'>&nbsp;&nbsp;Sent</th>
+<th class='disk'>&nbsp;&nbsp;&nbsp;Deferred</th>
+<th class='disk'>&nbsp;&nbsp;&nbsp;Bounced</th>
+</tr>
+</thead>
+<tbody>
+{{#result}}
+<tr>
+<td class='disk' title='{{time}}'>{{hh}}:{{mi}}</td>
+<td class='name'><a href="/session/{{sid}}/10">{{sender}}</a></td>
+<td class='disk' title='{{process}}'>{{count}}</td>
+<td id='{{sid}}:sent' class='disk'>{{sent}}</td>
+<td id='{{sid}}:deferred' class='disk'>{{deferred}}</td>
+<td id='{{sid}}:bounced' class='disk'>{{bounced}}</td>
+</tr>
 {{/result}}
+</tbody>
+</table>
+
+<div class='pagination-holder'>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+<script>
+    var io = io.connect();
+    io.on("mailstats", function(data) {
+    	document.getElementById(data.new_val.sid+':sent').innerHTML = data.new_val.sent;
+    	document.getElementById(data.new_val.sid+':deferred').innerHTML = data.new_val.deferred;
+    	document.getElementById(data.new_val.sid+':bounced').innerHTML = data.new_val.bounced;
+    });
+</script>

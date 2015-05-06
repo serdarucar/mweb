@@ -1,13 +1,59 @@
-<div><h2 class="text-center"><a href="/cloudmail.php"><<<</a></h2></div>
-<div class="jumbotron">
-  <div class="container">
+<div id='container'>
+<div id='content'>
+<div class='contents'>
+<nav>
+<div class='nav_controls'>
+<!--
+<div class='logo-wrapper'>
+<a class="logo" href="#"></a>
+</div>
+-->
+
+<a class="navLink droplets" href="/"><i class="fa fa-paper-plane"></i> Mailing Stats</a>
+<a class="navLink images" href="#"><i class="fa fa-bars"></i> Mailing Lists</a>
+<a class="navLink dns " href="#"><i class="fa fa-calendar"></i> Calendar</a>
+<!--<a class="navLink dns " href="#">Test1</a>
+<a class="navLink api " href="#">Test2</a>
+<a class="navLink support " href="#">Test3</a><--></-->
+<a class="create_droplet" href="#"><i class="fa fa-envelope-o"></i>  Create New</a>
+</div>
+</nav>
+
+<div id='main'>
+<header>
+
+<h1><a href="/"><i class="fa fa-angle-double-left"></i></a> Session Details</h1>
+
+</header>
+
+
+<table class='droplet-listing'>
+<thead>
+<tr>
+<th class='name'>Sent</th>
+<th class='name'>Deferred</th>
+<th class='name'>Bounced</th>
+</tr>
+</thead>
+<tfoot>
+<tr>
+<td></td>
+<td><a href="/session/{{sid}}/{{aft_lim}}"><h4><i class="fa fa-angle-double-down"></i></h4></a></td>
+<td></td>
+</tr>
+</tfoot>
+<tbody>
 {{#result}}
-    <div class="col-xs-4">
-      <a href = "/cloudmaillist.php?sid={{sid}}&st={{status}}">
-        <h1 class="text-center">{{count}}</h1>
-        <h3 class="text-center">{{status}}</h3>
-      </a>
-    </div>
+<tr>
+<td valign='top' class='name'>{{#sent}}<a href="/detail/{{uid}}">{{to}}</a><br>{{/sent}}</td>
+<td valign='top' class='name'>{{#deferred}}<a href="/detail/{{uid}}">{{to}}</a><br>{{/deferred}}</td>
+<td valign='top' class='name'>{{#bounced}}<a href="/detail/{{uid}}">{{to}}</a><br>{{/bounced}}</td>
+</tr>
 {{/result}}
-  </div>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
 </div>
