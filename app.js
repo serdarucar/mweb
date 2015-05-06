@@ -199,13 +199,6 @@ app.get('/:y/:m/:d', passwordless.restricted({
   tomorrow.setDate(tomorrow.getDate()+1);
   yesterday.setDate(yesterday.getDate()-1);
 
-  console.log('today');
-  console.log(today);
-  console.log('tomorrow');
-  console.log(tomorrow);
-  console.log('yesterday');
-  console.log(yesterday);
-
   var d_tom_year = tomorrow.getUTCFullYear();
   var d_tom_month = tomorrow.getUTCMonth() + 1;
   var d_tom_day = tomorrow.getUTCDate() + 1;
