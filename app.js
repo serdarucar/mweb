@@ -9,7 +9,7 @@ require('pmx').init({
 
 var express = require('express')
   , app = express()
-  , io = require('socket.io').listen(app.listen(80))
+  , io = require('socket.io').listen(app.listen(process.env.PORT || 80))
   , r  = require('rethinkdbdash')({servers:[{host: '127.0.0.1', port: 28015}]})
   , debug = require('debug')('smw.tashimasu.info')
   , path = require('path')
@@ -111,19 +111,33 @@ function(req, res) {
 });
 
 // EXPRESS ROUTES
-app.get('/', passwordless.restricted({
+app.get('/', function (req, res) {
+  res.redirect('/today');
+});
+
+app.get('/today', function (req, res) {
+  res.redirect('/2015/5/6');
+});
+
+app.get('/:y/:m/:d', passwordless.restricted({
   originField: 'origin',
   failureRedirect: '/login'
 }), function (req, res) {
   
-  var timeFilter = new Date();
-  timeFilter.setDate(timeFilter.getDate()-1);
+  var n_year  = parseInt(req.params.y);
+  var n_month = parseInt(req.params.m);
+  var n_day   = parseInt(req.params.d);
+  var n_day_1 = math.add(parseInt(req.params.d), 1);
+  var s_date  = n_day + '.' + n_month + '.' + n_year;
 
   r
   .db('mailsender').table('session')
-  .filter(function(session) {
-    return session('time').gt(timeFilter)
-  })
+  .filter(
+    r.row('time').during(
+      r.time(n_year, n_month, n_day, '+03'),
+      r.time(n_year, n_month, n_day_1, '+03')
+    )
+  )
   .orderBy(r.desc('time'))
   .pluck('sid','sender','count','sent','deferred','bounced','time')
   .merge(function(doc) {
@@ -142,7 +156,7 @@ app.get('/', passwordless.restricted({
     };
   })
   .run().then(function (result) {
-    res.render('index', { result: result });
+    res.render('index', { result: result, date: s_date });
   })
 
 });
