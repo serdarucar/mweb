@@ -195,8 +195,8 @@ app.get('/:y/:m/:d', passwordless.restricted({
 
   var today = new Date(n_tod_year, n_tod_month-1, n_tod_day);
 
-  tomorrow.setDate(today.getDate()+1);
-  yesterday.setDate(today.getDate()-1);
+  var tomorrow = setDate(today.getDate()+1);
+  var yesterday = setDate(today.getDate()-1);
 
   console.log('today');
   console.log(today);
