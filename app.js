@@ -208,11 +208,11 @@ app.get('/:y/:m/:d', passwordless.restricted({
 
   var d_tom_year = tomorrow.getUTCFullYear();
   var d_tom_month = tomorrow.getUTCMonth() + 1;
-  var d_tom_day = tomorrow.getUTCDate();
+  var d_tom_day = tomorrow.getUTCDate() + 1;
 
   var d_yes_year = yesterday.getUTCFullYear();
   var d_yes_month = yesterday.getUTCMonth() + 1;
-  var d_yes_day = yesterday.getUTCDate();
+  var d_yes_day = yesterday.getUTCDate() + 1;
 
   r
   .db('mailsender').table('session')
