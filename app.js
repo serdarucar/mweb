@@ -90,7 +90,8 @@ app.get('/login', function(req, res) {
 /* Static users for now. */
 var users = [
     { id: 1, email: 'serdarn@me.com' },
-    { id: 2, email: 'sio@doruk.net.tr' }
+    { id: 2, email: 'sio@doruk.net.tr' },
+    { id: 3, email: 'slmkrnz@gmail.com' }
 ];
 
 /* POST login details. */
