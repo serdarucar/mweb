@@ -25,7 +25,7 @@
 <h1>Mailing Stats</h1>
 </header>
 <table class='droplet-listing'>
-{{#yesterday}}<a href="/{{year}}/{{month}}/{{day}}">{{/yesterday}}<i class="fa fa-caret-left"></i></a><h3> {{date}} </h3>{{#tomorrow}}<a href="/{{year}}/{{month}}/{{day}}">{{/tomorrow}}<i class="fa fa-caret-right"></i></a>
+<h3><a href="/{{yesterday.year}}/{{yesterday.month}}/{{yesterday.day}}"><i class="fa fa-caret-left"></i></a> {{date}} <a href="/{{tomorrow.year}}/{{tomorrow.month}}/{{tomorrow.day}}"><i class="fa fa-caret-right"></i></a></h3>
 <thead>
 <tr>
 <th class='disk'>&nbsp;&nbsp;Time</th>
