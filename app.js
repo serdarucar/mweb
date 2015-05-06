@@ -194,8 +194,10 @@ app.get('/:y/:m/:d', passwordless.restricted({
   var s_tod_date  = n_tod_day + '.' + n_tod_month + '.' + n_tod_year;
 
   var today = new Date(n_tod_year, n_tod_month-1, n_tod_day);
-  var tomorrow = new Date(today.getDate()+1);
-  var yesterday = new Date(today.getDate()-1);
+  var tomorrow = new Date(n_tod_year, n_tod_month-1, n_tod_day);
+  var yesterday = new Date(n_tod_year, n_tod_month-1, n_tod_day);
+  tomorrow.setDate(tomorrow.getDate()+1);
+  yesterday.setDate(yesterday.getDate()-1);
 
   console.log('today');
   console.log(today);
