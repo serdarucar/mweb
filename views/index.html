@@ -26,7 +26,6 @@
 </header>
 <table class='droplet-listing'>
 <h3><a href="/{{yesterday.year}}/{{yesterday.month}}/{{yesterday.day}}"><i class="fa fa-caret-left"></i></a> {{date}} <a href="/{{tomorrow.year}}/{{tomorrow.month}}/{{tomorrow.day}}"><i class="fa fa-caret-right"></i></a></h3>
-{{#result}}
 <thead>
 <tr>
 <th class='disk'>&nbsp;&nbsp;Time</th>
@@ -38,6 +37,7 @@
 </tr>
 </thead>
 <tbody>
+{{#result}}
 <tr>
 <td class='disk' title='{{time}}'>{{hh}}:{{mi}}</td>
 <td class='name'><a href="/session/{{sid}}/10">{{sender}}</a></td>
@@ -47,10 +47,10 @@
 <td id='{{sid}}:bounced' class='disk'>{{bounced}}</td>
 </tr>
 {{/result}}
+</tbody>
 {{^result}}
 <h3 align="center">No mail has been sent for today.</h3>
 {{/result}}
-</tbody>
 </table>
 
 <div class='pagination-holder'>
