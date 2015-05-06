@@ -116,7 +116,11 @@ app.get('/', function (req, res) {
 });
 
 app.get('/today', function (req, res) {
-  res.redirect('/2015/5/6');
+  var dateObj = new Date();
+  var year    = dateObj.getUTCFullYear();
+  var month   = dateObj.getUTCMonth() + 1;
+  var day     = dateObj.getUTCDate();
+  res.redirect('/' + year + '/' + month + '/' + day);
 });
 
 app.get('/list', passwordless.restricted({
