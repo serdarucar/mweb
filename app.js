@@ -119,48 +119,6 @@ app.get('/today', function (req, res) {
   res.redirect('/2015/5/6');
 });
 
-app.get('/:y/:m/:d', passwordless.restricted({
-  originField: 'origin',
-  failureRedirect: '/login'
-}), function (req, res) {
-  
-  var n_year  = parseInt(req.params.y);
-  var n_month = parseInt(req.params.m);
-  var n_day   = parseInt(req.params.d);
-  var n_day_1 = math.add(parseInt(req.params.d), 1);
-  var s_date  = n_day + '.' + n_month + '.' + n_year;
-
-  r
-  .db('mailsender').table('session')
-  .filter(
-    r.row('time').during(
-      r.time(n_year, n_month, n_day, '+03'),
-      r.time(n_year, n_month, n_day_1, '+03')
-    )
-  )
-  .orderBy(r.desc('time'))
-  .pluck('sid','sender','count','sent','deferred','bounced','time')
-  .merge(function(doc) {
-    return {
-      hh: r.branch(
-        doc('time').inTimezone('+03:00').hours().gt(9),
-        doc('time').inTimezone('+03:00').hours().coerceTo('string'),
-        r.expr('0').add(doc('time').inTimezone('+03:00').hours().coerceTo('string'))
-      ),
-      mi: r.branch(
-        doc('time').minutes().gt(9),
-        doc('time').minutes().coerceTo('string'),
-        r.expr('0').add(doc('time').minutes().coerceTo('string'))
-      ),
-      process: doc('sent').add(doc('deferred')).add(doc('bounced'))
-    };
-  })
-  .run().then(function (result) {
-    res.render('index', { result: result, date: s_date });
-  })
-
-});
-
 app.get('/list', passwordless.restricted({
   originField: 'origin',
   failureRedirect: '/login'
@@ -217,6 +175,48 @@ app.get('/detail/:qid/:addr', passwordless.restricted({
   .get(s_uid).default(null)
   .run().then(function (result) {
     res.render('log', { result: result });
+  })
+
+});
+
+app.get('/:y/:m/:d', passwordless.restricted({
+  originField: 'origin',
+  failureRedirect: '/login'
+}), function (req, res) {
+  
+  var n_year  = parseInt(req.params.y);
+  var n_month = parseInt(req.params.m);
+  var n_day   = parseInt(req.params.d);
+  var n_day_1 = math.add(parseInt(req.params.d), 1);
+  var s_date  = n_day + '.' + n_month + '.' + n_year;
+
+  r
+  .db('mailsender').table('session')
+  .filter(
+    r.row('time').during(
+      r.time(n_year, n_month, n_day, '+03'),
+      r.time(n_year, n_month, n_day_1, '+03')
+    )
+  )
+  .orderBy(r.desc('time'))
+  .pluck('sid','sender','count','sent','deferred','bounced','time')
+  .merge(function(doc) {
+    return {
+      hh: r.branch(
+        doc('time').inTimezone('+03:00').hours().gt(9),
+        doc('time').inTimezone('+03:00').hours().coerceTo('string'),
+        r.expr('0').add(doc('time').inTimezone('+03:00').hours().coerceTo('string'))
+      ),
+      mi: r.branch(
+        doc('time').minutes().gt(9),
+        doc('time').minutes().coerceTo('string'),
+        r.expr('0').add(doc('time').minutes().coerceTo('string'))
+      ),
+      process: doc('sent').add(doc('deferred')).add(doc('bounced'))
+    };
+  })
+  .run().then(function (result) {
+    res.render('index', { result: result, date: s_date });
   })
 
 });
