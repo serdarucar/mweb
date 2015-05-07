@@ -87,27 +87,30 @@ app.get('/login', function(req, res) {
    res.render('login');
 });
 
-/* Static users for now. */
-var users = [
-    { id: 1, email: 'serdarn@me.com' },
-    { id: 2, email: 'sio@doruk.net.tr' },
-    { id: 3, email: 'slmkrnz@gmail.com' }
-];
-
-/* POST login details. */
 app.post('/sendtoken', 
-  passwordless.requestToken(
-    function(user, delivery, callback) {
-      for (var i = users.length - 1; i >= 0; i--) {
-        if(users[i].email === user.toLowerCase()) {
-          return callback(null, users[i].id);
-        }
-      }
-      callback(null, null);
-    }, { originField: 'origin' }), 
-function(req, res) {
-  // success!
-  res.render('sent');
+    passwordless.requestToken(
+        // Turn the email address into an user ID
+        function(user, delivery, callback, req) {
+            // usually you would want something like:
+            r
+            .db('mailsender').table('user')
+            .getAll(user, {index: 'email'}).nth(0)
+            .run().then(function(ret) {
+               if(ret) {
+                  console.log(ret);
+                  console.log(ret.id);
+                  return callback(null, ret.id);
+                  }
+               else
+                  return callback(null, null)
+          })
+          // but you could also do the following 
+          // if you want to allow anyone:
+          // callback(null, user);
+        }, { originField: 'origin' }),
+    function(req, res) {
+       // success!
+          res.render('sent');
 });
 
 // EXPRESS ROUTES
