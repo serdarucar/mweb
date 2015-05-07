@@ -23,9 +23,9 @@
 <header>
 
 <h1>Mailing Stats</h1>
-
 </header>
 <table class='droplet-listing'>
+<h3><a href="/{{yesterday.year}}/{{yesterday.month}}/{{yesterday.day}}"><i class="fa fa-caret-left"></i></a> {{date}} <a href="/{{tomorrow.year}}/{{tomorrow.month}}/{{tomorrow.day}}"><i class="fa fa-caret-right"></i></a></h3>
 <thead>
 <tr>
 <th class='disk'>&nbsp;&nbsp;Time</th>
@@ -49,6 +49,9 @@
 {{/result}}
 </tbody>
 </table>
+{{^result}}
+<h3 align="center"><br>No mail has been sent for today.</h3>
+{{/result}}
 
 <div class='pagination-holder'>
 
