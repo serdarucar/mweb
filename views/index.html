@@ -1,50 +1,32 @@
-<div id='container'>
-<div id='content'>
-<div class='contents'>
-<nav>
-<div class='nav_controls'>
-<!--
-<div class='logo-wrapper'>
-<a class="logo" href="#"></a>
+<div class="container">
+<div class="row">
+<div class="col-lg-12">
+<div class="page-header">
+  <h1 id="navbar"><br>Statistics</h1>
+  <h3><a href="/{{yesterday.year}}/{{yesterday.month}}/{{yesterday.day}}"><i class="fa fa-caret-left"></i></a> {{date}} <a href="/{{tomorrow.year}}/{{tomorrow.month}}/{{tomorrow.day}}"><i class="fa fa-caret-right"></i></a></h3>
 </div>
--->
-
-<a class="navLink droplets current" href="/"><i class="fa fa-paper-plane"></i> Mailing Stats</a>
-<a class="navLink images " href="#"><i class="fa fa-bars"></i> Mailing Lists</a>
-<a class="navLink dns " href="#"><i class="fa fa-calendar"></i> Calendar</a>
-<!--<a class="navLink api " href="#">Test2</a>
-<a class="navLink support " href="#">Test3</a>-->
-<div class='account-dropdown'></div>
-<a class="create_droplet" href="#"><i class="fa fa-envelope-o"></i>  Create New</a>
-</div>
-</nav>
-
-<div id='main'>
-<header>
-
-<h1>Mailing Stats</h1>
-</header>
-<table class='droplet-listing'>
-<h3><a href="/{{yesterday.year}}/{{yesterday.month}}/{{yesterday.day}}"><i class="fa fa-caret-left"></i></a> {{date}} <a href="/{{tomorrow.year}}/{{tomorrow.month}}/{{tomorrow.day}}"><i class="fa fa-caret-right"></i></a></h3>
+<table class='table table-hover '>
 <thead>
 <tr>
-<th class='disk'>&nbsp;&nbsp;Time</th>
-<th class='name'>Sender</th>
-<th class='disk'>&nbsp;&nbsp;&nbsp;Accepted</th>
-<th class='disk'>&nbsp;&nbsp;Sent</th>
-<th class='disk'>&nbsp;&nbsp;&nbsp;Deferred</th>
-<th class='disk'>&nbsp;&nbsp;&nbsp;Bounced</th>
+<th>Time</th>
+<th>Sender</th>
+<th>Accepted</th>
+<th>Sent</th>
+<th>Deferred</th>
+<th>Bounced</th>
+<th>Status</th>
 </tr>
 </thead>
 <tbody>
 {{#result}}
 <tr>
-<td class='disk' title='{{time}}'>{{hh}}:{{mi}}</td>
-<td class='name'><a href="/session/{{sid}}/10">{{sender}}</a></td>
-<td class='disk' title='{{process}}'>{{count}}</td>
-<td id='{{sid}}:sent' class='disk'>{{sent}}</td>
-<td id='{{sid}}:deferred' class='disk'>{{deferred}}</td>
-<td id='{{sid}}:bounced' class='disk'>{{bounced}}</td>
+<td title='{{time}}'>{{hh}}:{{mi}}</td>
+<td><a href="/session/{{sid}}/10">{{sender}}</a></td>
+<td title='{{process}}'>{{count}}</td>
+<td id='{{sid}}:sent'>{{sent}}</td>
+<td id='{{sid}}:deferred'>{{deferred}}</td>
+<td id='{{sid}}:bounced'>{{bounced}}</td>
+<td><span class="label label-success">Finished</span></td>
 </tr>
 {{/result}}
 </tbody>
@@ -52,12 +34,6 @@
 {{^result}}
 <h3 align="center"><br>No mail has been sent for today.</h3>
 {{/result}}
-
-<div class='pagination-holder'>
-
-</div>
-
-</div>
 </div>
 </div>
 </div>

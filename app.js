@@ -1,6 +1,6 @@
 /*jslint unparam: true, node: true*/
 // app.js
-// 
+//
 require('pmx').init({
   ignore_routes : [/socket\.io/],
   errors        : true,
@@ -21,7 +21,7 @@ var express = require('express')
   , pmx = require('pmx')
   , passwordless = require('passwordless')
   , RethinkDBStore = require('passwordless-rethinkdbstore')
-  , email   = require("emailjs");
+  , email   = require('emailjs');
 
 // view engine setup
 app.set('view engine', 'html');
@@ -50,7 +50,8 @@ r
 
 // PASSWORDLESS TOKEN DELIVERY SETUP
 var smtpServer  = email.server.connect({
-   host:    '178.62.101.203',
+  host:    '178.62.101.203',
+  //host:    '127.0.0.1',
    ssl:     false
 });
 
@@ -62,10 +63,10 @@ passwordless.addDelivery(
   function(tokenToSend, uidToSend, recipient, callback) {
     var host = 'tashimasu.net';
     smtpServer.send({
-      text:    'Hello!\nAccess your account here: http://' 
-      + host + '?token=' + tokenToSend + '&uid=' 
-      + encodeURIComponent(uidToSend), 
-      from:    'nobody@tashimasu.net', 
+      text:    'Hello!\nAccess your account here: http://'
+      + host + '?token=' + tokenToSend + '&uid='
+      + encodeURIComponent(uidToSend),
+      from:    'nobody@tashimasu.net',
       to:      recipient,
       subject: 'Token for ' + host
   }, function(err, message) {
@@ -87,7 +88,13 @@ app.get('/login', function(req, res) {
    res.render('login');
 });
 
-app.post('/sendtoken', 
+/* Logout and redirect to root. */
+app.get('/logout', passwordless.logout(),
+  function(req, res) {
+    res.redirect('/login');
+});
+
+app.post('/sendtoken',
     passwordless.requestToken(
         // Turn the email address into an user ID
         function(user, delivery, callback, req) {
@@ -97,14 +104,12 @@ app.post('/sendtoken',
             .getAll(user, {index: 'email'}).nth(0)
             .run().then(function(ret) {
                if(ret) {
-                  console.log(ret);
-                  console.log(ret.id);
                   return callback(null, ret.id);
                   }
                else
                   return callback(null, null)
           })
-          // but you could also do the following 
+          // but you could also do the following
           // if you want to allow anyone:
           // callback(null, user);
         }, { originField: 'origin' }),
@@ -126,24 +131,45 @@ app.get('/today', function (req, res) {
   res.redirect('/' + year + '/' + month + '/' + day);
 });
 
-app.get('/list', passwordless.restricted({
+app.get('/list',
+
+  passwordless.restricted({
   originField: 'origin',
   failureRedirect: '/login'
-}), function (req, res) {
-  res.render('list');
+  }),
+
+  function (req, res) {
+
+  r
+  .db('mailsender').table('user')
+  .get(req.user)
+  .run().then(function (result) {
+    res.render('list', {
+      list: JSON.stringify(result),
+      user: req.user
+    });
+  })
 });
 
-app.get('/new', passwordless.restricted({
+app.get('/new',
+
+  passwordless.restricted({
   originField: 'origin',
   failureRedirect: '/login'
-}), function (req, res) {
-  res.render('new');
+  }),
+
+  function (req, res) {
+  res.render('new', {user: req.user});
 });
 
-app.get('/session/:sid/:lim', passwordless.restricted({
+app.get('/session/:sid/:lim',
+
+  passwordless.restricted({
   originField: 'origin',
   failureRedirect: '/login'
-}), function (req, res) {
+  }),
+
+  function (req, res) {
 
   var s_sid = req.params.sid;
   var n_lim = parseInt(req.params.lim);
@@ -163,15 +189,24 @@ app.get('/session/:sid/:lim', passwordless.restricted({
     return left.merge(right);
   }).default(null)
   .run().then(function (result) {
-    res.render('session', { result: result, sid: s_sid, aft_lim: n_lim_next });
+    res.render('session', {
+      result: result,
+      sid: s_sid,
+      aft_lim: n_lim_next,
+      user: req.user
+    });
   })
 
 });
 
-app.get('/detail/:qid/:addr', passwordless.restricted({
+app.get('/detail/:qid/:addr',
+
+  passwordless.restricted({
   originField: 'origin',
   failureRedirect: '/login'
-}), function (req, res) {
+  }),
+
+  function (req, res) {
 
   var s_qid = req.params.qid;
   var s_addr = req.params.addr;
@@ -181,16 +216,23 @@ app.get('/detail/:qid/:addr', passwordless.restricted({
   .db('mailsender').table('mail')
   .get(s_uid).default(null)
   .run().then(function (result) {
-    res.render('log', { result: result });
+    res.render('log', {
+      result: result,
+      user: req.user
+    });
   })
 
 });
 
-app.get('/:y/:m/:d', passwordless.restricted({
+app.get('/:y/:m/:d',
+
+  passwordless.restricted({
   originField: 'origin',
   failureRedirect: '/login'
-}), function (req, res) {
-  
+  }),
+
+  function (req, res) {
+
   var n_tod_year  = parseInt(req.params.y);
   var n_tod_month = parseInt(req.params.m);
   var n_tod_day   = parseInt(req.params.d);
@@ -212,6 +254,7 @@ app.get('/:y/:m/:d', passwordless.restricted({
 
   r
   .db('mailsender').table('session')
+  //.getAll(req.user, {index: 'user'})
   .filter(
     r.row('time').during(
       r.time(n_tod_year, n_tod_month, n_tod_day, '+03'),
@@ -248,7 +291,8 @@ app.get('/:y/:m/:d', passwordless.restricted({
         year: d_tom_year,
         month: d_tom_month,
         day: d_tom_day
-      }
+      },
+      user: req.user
     });
   })
 
