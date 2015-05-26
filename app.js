@@ -236,30 +236,14 @@ app.get('/:y/:m/:d',
   var n_tod_year  = parseInt(req.params.y);
   var n_tod_month = parseInt(req.params.m);
   var n_tod_day   = parseInt(req.params.d);
-  var s_tod_date  = n_tod_day + '.' + n_tod_month + '.' + n_tod_year;
-
-  var today = new Date(n_tod_year, n_tod_month-1, n_tod_day);
-  var tomorrow = new Date(n_tod_year, n_tod_month-1, n_tod_day);
-  var yesterday = new Date(n_tod_year, n_tod_month-1, n_tod_day);
-  tomorrow.setDate(tomorrow.getDate()+1);
-  yesterday.setDate(yesterday.getDate()-1);
-
-  var d_tom_year = tomorrow.getUTCFullYear();
-  var d_tom_month = tomorrow.getUTCMonth() + 1;
-  var d_tom_day = tomorrow.getUTCDate() + 1;
-
-  var d_yes_year = yesterday.getUTCFullYear();
-  var d_yes_month = yesterday.getUTCMonth() + 1;
-  var d_yes_day = yesterday.getUTCDate() + 1;
 
   r
   .db('mailsender').table('session')
   //.getAll(req.user, {index: 'user'})
   .filter(
-    r.row('time').during(
-      r.time(n_tod_year, n_tod_month, n_tod_day, '+03'),
-      r.time(d_tom_year, d_tom_month, d_tom_day, '+03')
-    )
+    r.row('time').year().eq(n_tod_year)
+    .and(r.row('time').month().eq(n_tod_month))
+    .and(r.row('time').day().eq(n_tod_day))
   )
   .orderBy(r.desc('time'))
   .pluck('sid','sender','count','sent','deferred','bounced','time')
@@ -281,16 +265,10 @@ app.get('/:y/:m/:d',
   .run().then(function (result) {
     res.render('index', {
       result: result,
-      date: s_tod_date,
-      yesterday: {
-        year: d_yes_year,
-        month: d_yes_month,
-        day: d_yes_day
-      },
-      tomorrow: {
-        year: d_tom_year,
-        month: d_tom_month,
-        day: d_tom_day
+      date: {
+        year: n_tod_year,
+        month: n_tod_month,
+        day: n_tod_day
       },
       user: req.user
     });
