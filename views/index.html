@@ -9,23 +9,28 @@
 <tr>
 <th>Time</th>
 <th>Sender</th>
-<th>Accepted</th>
-<th>Sent</th>
-<th>Deferred</th>
-<th>Bounced</th>
+<th>Processed / Accepted</th>
 <th>Status</th>
 </tr>
 </thead>
 <tbody>
 {{#result}}
-<tr>
+<tr data-toggle="collapse" data-target="#{{sid}}" class="accordion-toggle">
 <td title='{{time}}'>{{hh}}:{{mi}}</td>
 <td><a href="/session/{{sid}}/10">{{sender}}</a></td>
-<td title='{{process}}'>{{count}}</td>
-<td id='{{sid}}:sent'>{{sent}}</td>
-<td id='{{sid}}:deferred'>{{deferred}}</td>
-<td id='{{sid}}:bounced'>{{bounced}}</td>
+<td title='{{process}}'>{{process}} / {{count}}</td>
 <td><span class="label label-success">Finished</span></td>
+</tr>
+<tr>
+<td colspan="12" class="hiddenRow">
+<div class="accordion-body collapse" id="{{sid}}">
+<tr>
+<td id='{{sid}}:sent'><h2>{{sent}}</h2></td>
+<td id='{{sid}}:deferred'><h2>{{deferred}}</h2></td>
+<td id='{{sid}}:bounced'><h2>{{bounced}}</h2></td>
+</tr>
+</div>
+</td>
 </tr>
 {{/result}}
 </tbody>
