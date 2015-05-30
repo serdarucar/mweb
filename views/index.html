@@ -5,36 +5,22 @@
         <h1 id="navbar">
           <br>Statistics</h1>
       </div>
-      <div class="row">
-        <div class="col-lg-3">
-          <h4 align="center">Time</h4>
-        </div>
-        <div class="col-lg-3">
-          <h4 align="center">Sender</h4>
-        </div>
-        <div class="col-lg-3">
-          <h4 align="center">Recipient</h4>
-        </div>
-        <div class="col-lg-3">
-          <h4 align="center">Processed / Accepted</h4>
-        </div>
-      </div>
       <div class="panel-group" id="accordion">
         {{#result}}
         <div class="panel panel-default">
           <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" data-target="#session{{@index}}">
             <div class="row">
               <div class="col-lg-3">
-                <h5 align="center">{{hh}}:{{mi}}</h5>
+                <h5 align="center"><i class="fa fa-clock-o"></i>{{hh}}:{{mi}}</h5>
               </div>
               <div class="col-lg-3">
-                <h5 align="center"><a href="/session/{{sid}}/10">{{sender}}</a></h5>
+                <h5 align="center"><i class="fa fa-user"></i><a href="/session/{{sid}}/10">{{sender}}</a></h5>
               </div>
               <div class="col-lg-3">
-                <h5 align="center">Some List {{@index}}</h5>
+                <h5 align="center"><i class="fa fa-users"></i>Some List {{@index}}</h5>
               </div>
               <div class="col-lg-3">
-                <h5 align="center">{{process}} / {{count}}</h5>
+                <h5 align="center"><i class="fa fa-tachometer"></i>{{process}} / {{count}}</h5>
               </div>
             </div>
           </div>
