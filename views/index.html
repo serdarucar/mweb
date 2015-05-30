@@ -65,4 +65,8 @@
     $(".collapse").collapse('hide');
     $("#session0").collapse('show');
   });
+
+  $('.panel-heading').on('click', function () {
+    $($(this).data('target')).collapse('toggle');
+  });
 </script>
