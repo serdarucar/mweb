@@ -1,52 +1,85 @@
 <div class="container">
-<div class="row">
-<div class="col-lg-12">
-<div class="page-header">
-  <h1 id="navbar"><br>Statistics</h1>
-</div>
-<table class='table table-hover '>
-<thead>
-<tr>
-<th>Time</th>
-<th>Sender</th>
-<th>Processed / Accepted</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody>
-{{#result}}
-<tr data-toggle="collapse" data-target="#{{sid}}" class="accordion-toggle">
-<td title='{{time}}'>{{hh}}:{{mi}}</td>
-<td><a href="/session/{{sid}}/10">{{sender}}</a></td>
-<td title='{{process}}'>{{process}} / {{count}}</td>
-<td><span class="label label-success">Finished</span></td>
-</tr>
-<tr>
-<td colspan="12" class="hiddenRow">
-<div class="accordion-body collapse" id="{{sid}}">
-<tr>
-<td id='{{sid}}:sent'><h2>{{sent}}</h2></td>
-<td id='{{sid}}:deferred'><h2>{{deferred}}</h2></td>
-<td id='{{sid}}:bounced'><h2>{{bounced}}</h2></td>
-</tr>
-</div>
-</td>
-</tr>
-{{/result}}
-</tbody>
-</table>
-{{^result}}
-<h3 align="center"><br>No mail has been sent for today.</h3>
-{{/result}}
-</div>
-</div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="page-header">
+        <h1 id="navbar">
+          <br>Statistics</h1>
+      </div>
+      <div class="row">
+        <div class="col-lg-3">
+          <h4 align="center">Time</h4>
+        </div>
+        <div class="col-lg-3">
+          <h4 align="center">Sender</h4>
+        </div>
+        <div class="col-lg-3">
+          <h4 align="center">Recipient</h4>
+        </div>
+        <div class="col-lg-3">
+          <h4 align="center">Processed / Accepted</h4>
+        </div>
+      </div>
+      <div class="panel-group" id="accordion">
+        {{#result}}
+        <div class="panel panel-default">
+          <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" data-target="#{{sid}}">
+            <div class="row">
+              <div class="col-lg-3">
+                <h5 align="center">{{hh}}:{{mi}}</h5>
+              </div>
+              <div class="col-lg-3">
+                <h5 align="center">{{sender}}</h5>
+              </div>
+              <div class="col-lg-3">
+                <h5 align="center">Some List</h5>
+              </div>
+              <div class="col-lg-3">
+                <h5 align="center">{{process}} / {{count}}</h5>
+              </div>
+            </div>
+          </div>
+          <div id="{{sid}}" class="panel-collapse collapse">
+            <div class="panel-body">
+            <div class="row">
+              <div class="col-lg-4">
+                <h6 align="center">SENT</h6>
+              </div>
+              <div class="col-lg-4">
+                <h6 align="center">DEFERRED</h6>
+              </div>
+              <div class="col-lg-4">
+                <h6 align="center">BOUNCED</h6>
+              </div>
+            </div>
+              <div class="row">
+                <div class="col-lg-4">
+                  <h1 id="{{sid}}:sent" align="center">{{sent}}</h1>
+                </div>
+                <div class="col-lg-4">
+                  <h1 id="{{sid}}:deferred" align="center">{{deferred}}</h1>
+                </div>
+                <div class="col-lg-4">
+                  <h1 id="{{sid}}:bounced" align="center">{{bounced}}</h1>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {{/result}}
+      </div>
+      {{^result}}
+      <h3 align="center">
+        <br>No mail has been sent for today.</h3>
+      {{/result}}
+    </div>
+  </div>
 </div>
 
 <script>
-    var io = io.connect();
-    io.on("mailstats", function(data) {
-    	document.getElementById(data.new_val.sid+':sent').innerHTML = data.new_val.sent;
-    	document.getElementById(data.new_val.sid+':deferred').innerHTML = data.new_val.deferred;
-    	document.getElementById(data.new_val.sid+':bounced').innerHTML = data.new_val.bounced;
-    });
+  var io = io.connect();
+  io.on("mailstats", function(data) {
+    document.getElementById(data.new_val.sid + ':sent').innerHTML = data.new_val.sent;
+    document.getElementById(data.new_val.sid + ':deferred').innerHTML = data.new_val.deferred;
+    document.getElementById(data.new_val.sid + ':bounced').innerHTML = data.new_val.bounced;
+  });
 </script>
