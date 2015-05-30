@@ -22,44 +22,36 @@
       <div class="panel-group" id="accordion">
         {{#result}}
         <div class="panel panel-default">
-          <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" data-target="#{{sid}}">
+          <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" data-target="#session{{@index}}">
             <div class="row">
               <div class="col-lg-3">
                 <h5 align="center">{{hh}}:{{mi}}</h5>
               </div>
               <div class="col-lg-3">
-                <h5 align="center">{{sender}}</h5>
+                <h5 align="center"><a href="/session/{{sid}}/10">{{sender}}</a></h5>
               </div>
               <div class="col-lg-3">
-                <h5 align="center">Some List</h5>
+                <h5 align="center">Some List {{@index}}</h5>
               </div>
               <div class="col-lg-3">
                 <h5 align="center">{{process}} / {{count}}</h5>
               </div>
             </div>
           </div>
-          <div id="{{sid}}" class="panel-collapse collapse">
-            <div class="panel-body">
-            <div class="row">
-              <div class="col-lg-4">
-                <h6 align="center">SENT</h6>
-              </div>
-              <div class="col-lg-4">
-                <h6 align="center">DEFERRED</h6>
-              </div>
-              <div class="col-lg-4">
-                <h6 align="center">BOUNCED</h6>
-              </div>
-            </div>
+          <div id="session{{@index}}" class="panel-collapse collapse">
+            <div class="panel-body jumbotron">
               <div class="row">
-                <div class="col-lg-4">
+                <div class="col-lg-4 mail-sent">
                   <h1 id="{{sid}}:sent" align="center">{{sent}}</h1>
+                  <h6 align="center">SENT</h6>
                 </div>
-                <div class="col-lg-4">
+                <div class="col-lg-4 mail-deferred">
                   <h1 id="{{sid}}:deferred" align="center">{{deferred}}</h1>
+                  <h6 align="center">DEFERRED</h6>
                 </div>
-                <div class="col-lg-4">
+                <div class="col-lg-4 mail-bounced">
                   <h1 id="{{sid}}:bounced" align="center">{{bounced}}</h1>
+                  <h6 align="center">BOUNCED</h6>
                 </div>
               </div>
             </div>
@@ -81,5 +73,10 @@
     document.getElementById(data.new_val.sid + ':sent').innerHTML = data.new_val.sent;
     document.getElementById(data.new_val.sid + ':deferred').innerHTML = data.new_val.deferred;
     document.getElementById(data.new_val.sid + ':bounced').innerHTML = data.new_val.bounced;
+  });
+
+  $(document).ready(function() {
+    $(".collapse").collapse('hide');
+    $("#session0").collapse('show');
   });
 </script>

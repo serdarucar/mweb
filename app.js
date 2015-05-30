@@ -11,6 +11,7 @@ var express = require('express')
   , app = express()
   , io = require('socket.io').listen(app.listen(process.env.PORT || 80))
   , r  = require('rethinkdbdash')({servers:[{host: '127.0.0.1', port: 28015}]})
+  , exphbs = require('express-handlebars')
   , debug = require('debug')('smw.tashimasu.info')
   , path = require('path')
   , cookieParser = require('cookie-parser')
@@ -24,10 +25,10 @@ var express = require('express')
   , email   = require('emailjs');
 
 // view engine setup
+//app.set('layout', path.join(__dirname, 'layouts/default'));
+app.engine('html', exphbs({defaultLayout: 'default', extname: '.html'}));
 app.set('view engine', 'html');
 app.set('views', path.join(__dirname, 'views'));
-app.set('layout', path.join(__dirname, 'layouts/default'));
-app.engine('html', require('hogan-express'));
 app.enable('view cache');
 
 // express application initialize
@@ -62,6 +63,7 @@ passwordless.init(new RethinkDBStore({host: '127.0.0.1', port: 28015, db: 'mails
 passwordless.addDelivery(
   function(tokenToSend, uidToSend, recipient, callback) {
     var host = 'tashimasu.net';
+    //var host = 'localhost:8888';
     smtpServer.send({
       text:    'Hello!\nAccess your account here: http://'
       + host + '?token=' + tokenToSend + '&uid='
