@@ -9,7 +9,7 @@ require('pmx').init({
 
 var express = require('express')
   , app = express()
-  , io = require('socket.io').listen(app.listen(process.env.PORT || 80))
+  , io = require('socket.io').listen(app.listen(process.env.PORT || 8080))
   , r  = require('rethinkdbdash')({servers:[{host: '127.0.0.1', port: 28015}]})
   , exphbs = require('express-handlebars')
   , debug = require('debug')('smw.tashimasu.info')
