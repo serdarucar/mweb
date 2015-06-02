@@ -260,22 +260,13 @@ app.get('/:y/:m/:d',
     .and(r.row('time').day().eq(n_tod_day))
   )
   .orderBy(r.desc('time'))
-  .pluck('sid','sender','count','sent','deferred','bounced','time')
   .merge(function(doc) {
     return {
-      hh: r.branch(
-        doc('time').inTimezone('+03:00').hours().gt(9),
-        doc('time').inTimezone('+03:00').hours().coerceTo('string'),
-        r.expr('0').add(doc('time').inTimezone('+03:00').hours().coerceTo('string'))
-      ),
-      mi: r.branch(
-        doc('time').minutes().gt(9),
-        doc('time').minutes().coerceTo('string'),
-        r.expr('0').add(doc('time').minutes().coerceTo('string'))
-      ),
+      timestamp: doc('time').inTimezone('+05:00'),
       process: doc('sent').add(doc('deferred')).add(doc('bounced'))
-    };
+    }
   })
+  .pluck('sid','sender','count','sent','deferred','bounced','timestamp','process')
   .run().then(function (result) {
     res.render('index', {
       result: result,
