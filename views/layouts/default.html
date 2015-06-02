@@ -52,6 +52,15 @@
       .panel-heading:hover {
         background-color: #3d4954 !important;
       }
+      .mail-sent {
+        color: #5cb85c;
+      }
+      .mail-deferred {
+        color: #eea236;
+      }
+      .mail-bounced {
+        color: #d44a45;
+      }
     </style>
   </head>
   <body>
@@ -84,7 +93,7 @@
       </div>
     </div>
 
-    {{{ yield }}}
+    {{{ body }}}
 
 
   </body>

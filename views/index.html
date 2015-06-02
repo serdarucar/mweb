@@ -1,48 +1,72 @@
 <div class="container">
-<div class="row">
-<div class="col-lg-12">
-<div class="page-header">
-  <h1 id="navbar"><br>Statistics</h1>
-  <h3><a href="/{{yesterday.year}}/{{yesterday.month}}/{{yesterday.day}}"><i class="fa fa-caret-left"></i></a> {{date}} <a href="/{{tomorrow.year}}/{{tomorrow.month}}/{{tomorrow.day}}"><i class="fa fa-caret-right"></i></a></h3>
-</div>
-<table class='table table-hover '>
-<thead>
-<tr>
-<th>Time</th>
-<th>Sender</th>
-<th>Accepted</th>
-<th>Sent</th>
-<th>Deferred</th>
-<th>Bounced</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody>
-{{#result}}
-<tr>
-<td title='{{time}}'>{{hh}}:{{mi}}</td>
-<td><a href="/session/{{sid}}/10">{{sender}}</a></td>
-<td title='{{process}}'>{{count}}</td>
-<td id='{{sid}}:sent'>{{sent}}</td>
-<td id='{{sid}}:deferred'>{{deferred}}</td>
-<td id='{{sid}}:bounced'>{{bounced}}</td>
-<td><span class="label label-success">Finished</span></td>
-</tr>
-{{/result}}
-</tbody>
-</table>
-{{^result}}
-<h3 align="center"><br>No mail has been sent for today.</h3>
-{{/result}}
-</div>
-</div>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="page-header">
+        <h1 id="navbar">
+          <br>Statistics / {{prettifyDate date}}</h1>
+      </div>
+      <div class="panel-group" id="accordion">
+        {{#result}}
+        <div class="panel panel-default">
+          <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" data-target="#session{{@index}}">
+            <div class="row">
+              <div class="col-lg-3">
+                <h5 align="center"><i class="fa fa-clock-o"></i>   {{prettifyTime timestamp}}</h5>
+              </div>
+              <div class="col-lg-3">
+                <h5 align="center"><i class="fa fa-user"></i>   {{sender}}</h5>
+              </div>
+              <div class="col-lg-3">
+                <h5 align="center"><i class="fa fa-users"></i>   Some List {{@index}}</h5>
+              </div>
+              <div class="col-lg-3">
+                <h5 align="center"><i class="fa fa-tachometer"></i>   {{process}} / {{count}}</h5>
+              </div>
+            </div>
+          </div>
+          <div id="session{{@index}}" class="panel-collapse collapse">
+            <div class="panel-body jumbotron">
+              <div class="row" onclick="location='/session/{{sid}}/10'">
+                <div class="col-lg-4 mail-sent">
+                  <h1 id="{{sid}}:sent" align="center">{{sent}}</h1>
+                  <h6 align="center">SENT</h6>
+                </div>
+                <div class="col-lg-4 mail-deferred">
+                  <h1 id="{{sid}}:deferred" align="center">{{deferred}}</h1>
+                  <h6 align="center">DEFERRED</h6>
+                </div>
+                <div class="col-lg-4 mail-bounced">
+                  <h1 id="{{sid}}:bounced" align="center">{{bounced}}</h1>
+                  <h6 align="center">BOUNCED</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {{/result}}
+      </div>
+      {{^result}}
+      <h3 align="center">
+        <br>No mail has been sent for today.</h3>
+      {{/result}}
+    </div>
+  </div>
 </div>
 
 <script>
-    var io = io.connect();
-    io.on("mailstats", function(data) {
-    	document.getElementById(data.new_val.sid+':sent').innerHTML = data.new_val.sent;
-    	document.getElementById(data.new_val.sid+':deferred').innerHTML = data.new_val.deferred;
-    	document.getElementById(data.new_val.sid+':bounced').innerHTML = data.new_val.bounced;
-    });
+  var io = io.connect();
+  io.on("mailstats", function(data) {
+    document.getElementById(data.new_val.sid + ':sent').innerHTML = data.new_val.sent;
+    document.getElementById(data.new_val.sid + ':deferred').innerHTML = data.new_val.deferred;
+    document.getElementById(data.new_val.sid + ':bounced').innerHTML = data.new_val.bounced;
+  });
+
+  $(document).ready(function() {
+    $(".collapse").collapse('hide');
+    $("#session0").collapse('show');
+  });
+
+  $('.panel-heading').on('click', function () {
+    $($(this).data('target')).collapse('toggle');
+  });
 </script>
