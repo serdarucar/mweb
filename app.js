@@ -160,6 +160,7 @@ app.get('/list',
       user: req.user
     });
   });
+
 });
 
 app.get('/new',
@@ -245,33 +246,17 @@ app.get('/:y/:m/:d',
   function (req, res) {
 
   var today = new Date();
-  var n_tod_year  = parseInt(req.params.y);
-  var n_tod_month = parseInt(req.params.m);
-  var n_tod_day   = parseInt(req.params.d);
+  var year  = parseInt(req.params.y);
+  var month = parseInt(req.params.m);
+  var day   = parseInt(req.params.d);
 
-  r
-  .db('mailsender').table('session')
-  //.getAll(req.user, {index: 'user'})
-  .filter(
-    r.row('time').year().eq(n_tod_year)
-    .and(r.row('time').month().eq(n_tod_month))
-    .and(r.row('time').day().eq(n_tod_day))
-  )
-  .orderBy(r.desc('time'))
-  .merge(function(doc) {
-    return {
-      timestamp: doc('time').inTimezone('+03:00'),
-      process: doc('sent').add(doc('deferred')).add(doc('bounced'))
-    }
-  })
-  .pluck('sid','sender','count','sent','deferred','bounced','timestamp','process')
-  .run().then(function (result) {
+  db.getMailIndex(req.user, year, month, day, function (err, result) {
     res.render('index', {
       result: result,
       date: today,
       user: req.user
     });
-  })
+  });
 
 });
 
