@@ -51,12 +51,20 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // SOCKET.IO EMITTERS
+/*
 r
 .db('mailsender').table('session')
 .pluck('sid','sent','deferred','bounced')
 .changes().run({cursor:true})
 .then(function(cursor) {
   cursor.each(function(err, data) {
+    io.sockets.emit("mailstats", data);
+  });
+});
+*/
+
+db.mailStatChanges(function (err, cursor) {
+  cursor.each(function (err, data) {
     io.sockets.emit("mailstats", data);
   });
 });
@@ -99,7 +107,7 @@ app.use(passwordless.acceptToken({ successRedirect: '/', enableOriginRedirect: t
 // PASSWORDLESS ROUTES
 /* GET login screen. */
 app.get('/login', function(req, res) {
-   res.render('login');
+  res.render('login');
 });
 
 /* Logout and redirect to root. */
@@ -109,24 +117,24 @@ app.get('/logout', passwordless.logout(),
 });
 
 app.post('/sendtoken',
-    passwordless.requestToken(
-        // Turn the email address into an user ID
-        function(user, delivery, callback, req) {
-          // usually you would want something like:
-          db.findUserByMail(user, function (err, result) {
-             if(result) {
-                return callback(null, result.id);
-                }
-             else
-                return callback(null, null);
-          })
-          // but you could also do the following
-          // if you want to allow anyone:
-          // callback(null, user);
-        }, { originField: 'origin' }),
-    function(req, res) {
-       // success!
-          res.render('sent');
+  passwordless.requestToken(
+    // Turn the email address into an user ID
+    function(user, delivery, callback, req) {
+      // usually you would want something like:
+      db.findUserByMail(user, function (err, result) {
+        if(result) {
+          return callback(null, result.id);
+        }
+        else
+          return callback(null, null);
+      })
+      // but you could also do the following
+      // if you want to allow anyone:
+      // callback(null, user);
+    }, { originField: 'origin' }
+  ), function(req, res) {
+      // success!
+      res.render('sent');
 });
 
 // EXPRESS ROUTES
