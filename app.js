@@ -11,8 +11,9 @@ require('pmx').init({
 
 var express = require('express')
   , app = express()
-  , io = require('socket.io').listen(app.listen(process.env.PORT || 8080))
+  , io = require('socket.io').listen(app.listen(process.env.PORT || 8888))
   , r  = require('rethinkdbdash')({servers:[{host: '127.0.0.1', port: 28015}]})
+  , db = require('./lib/db')
   , exphbs = require('express-handlebars')
   , helpers = require('./lib/helpers')
   , debug = require('debug')('smw.tashimasu.info')
