@@ -212,19 +212,14 @@ app.get('/detail/:qid/:addr',
 
   function (req, res) {
 
-  var s_qid = req.params.qid;
-  var s_addr = req.params.addr;
-  var s_uid = s_qid + '/' + s_addr;
+  var s_uid = req.params.qid + '/' + req.params.addr;
 
-  r
-  .db('mailsender').table('mail')
-  .get(s_uid).default(null)
-  .run().then(function (result) {
+  db.getMailDetail(s_uid, function (err, result) {
     res.render('log', {
       result: result,
       user: req.user
     });
-  })
+  });
 
 });
 
@@ -253,7 +248,3 @@ app.get('/:y/:m/:d',
 });
 
 app.use(pmx.expressErrorHandler());
-
-//app.set('port', process.env.PORT || 3300);
-
-//app.listen(app.get('port'));
