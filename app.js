@@ -134,15 +134,7 @@ app.post('/sendtoken',
 
 // EXPRESS ROUTES
 app.get('/', function (req, res) {
-  res.redirect('/today');
-});
-
-app.get('/today', function (req, res) {
-  var dateObj = new Date();
-  var year    = dateObj.getUTCFullYear();
-  var month   = dateObj.getUTCMonth() + 1;
-  var day     = dateObj.getUTCDate();
-  res.redirect('/' + year + '/' + month + '/' + day);
+  res.redirect(moment().format('/YYYY/MM/DD'));
 });
 
 app.get('/list',
