@@ -154,15 +154,12 @@ app.get('/list',
 
   function (req, res) {
 
-  r
-  .db('mailsender').table('user')
-  .get(req.user)
-  .run().then(function (result) {
+  db.getUsersLists(req.user, function (err, result) {
     res.render('list', {
       list: JSON.stringify(result),
       user: req.user
     });
-  })
+  });
 });
 
 app.get('/new',
