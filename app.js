@@ -1,4 +1,6 @@
 /*jslint unparam: true, node: true*/
+'use strict';
+
 // app.js
 //
 require('pmx').init({
@@ -12,6 +14,7 @@ var express = require('express')
   , io = require('socket.io').listen(app.listen(process.env.PORT || 8080))
   , r  = require('rethinkdbdash')({servers:[{host: '127.0.0.1', port: 28015}]})
   , exphbs = require('express-handlebars')
+  , helpers = require('./lib/helpers')
   , debug = require('debug')('smw.tashimasu.info')
   , path = require('path')
   , cookieParser = require('cookie-parser')
@@ -19,14 +22,22 @@ var express = require('express')
   , methodOverride = require('method-override')
   , session = require('express-session')
   , math = require('mathjs')
+  , moment = require('moment')
   , pmx = require('pmx')
   , passwordless = require('passwordless')
   , RethinkDBStore = require('passwordless-rethinkdbstore')
   , email   = require('emailjs');
 
+// `ExpressHandlebars` instance creation.
+var hbs = exphbs.create({
+  defaultLayout: 'default',
+  helpers : helpers,
+  extname: '.html'
+});
+
 // view engine setup
 //app.set('layout', path.join(__dirname, 'layouts/default'));
-app.engine('html', exphbs({defaultLayout: 'default', extname: '.html'}));
+app.engine('html', hbs.engine);
 app.set('view engine', 'html');
 app.set('views', path.join(__dirname, 'views'));
 app.enable('view cache');
@@ -62,7 +73,7 @@ passwordless.init(new RethinkDBStore({host: '127.0.0.1', port: 28015, db: 'mails
 // PASSWORDLESS TOKEN DELIVERY SERVICE
 passwordless.addDelivery(
   function(tokenToSend, uidToSend, recipient, callback) {
-    var host = 'tashimasu.net';
+    var host = 'tashimasu.net:8888';
     //var host = 'localhost:8888';
     smtpServer.send({
       text:    'Hello!\nAccess your account here: http://'
