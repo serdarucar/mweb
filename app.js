@@ -12,7 +12,6 @@ require('pmx').init({
 var express = require('express')
   , app = express()
   , io = require('socket.io').listen(app.listen(process.env.PORT || 8888))
-  , r  = require('rethinkdbdash')({servers:[{host: '127.0.0.1', port: 28015}]})
   , db = require('./lib/db')
   , exphbs = require('express-handlebars')
   , helpers = require('./lib/helpers')
@@ -51,18 +50,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // SOCKET.IO EMITTERS
-/*
-r
-.db('mailsender').table('session')
-.pluck('sid','sent','deferred','bounced')
-.changes().run({cursor:true})
-.then(function(cursor) {
-  cursor.each(function(err, data) {
-    io.sockets.emit("mailstats", data);
-  });
-});
-*/
-
 db.mailStatChanges(function (err, cursor) {
   cursor.each(function (err, data) {
     io.sockets.emit("mailstats", data);
