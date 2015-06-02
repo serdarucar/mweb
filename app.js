@@ -179,27 +179,14 @@ app.get('/session/:sid/:lim',
   var n_lim = parseInt(req.params.lim);
   var n_lim_next = n_lim * 10;
 
-  r
-  .db('mailsender').table('mail')
-  .getAll(s_sid, {index: 'sid'})
-  .hasFields('status')
-  .group('status')
-  .pluck('to','uid')
-  .limit(n_lim).orderBy('time')
-  .ungroup().map(function (doc) {
-    return r.object(doc('group'), doc('reduction'));
-  }).default([{sent: [], deferred: [], bounced: []}])
-  .reduce(function (left, right) {
-    return left.merge(right);
-  }).default(null)
-  .run().then(function (result) {
+  db.getSessionMails(s_sid, n_lim, function (err, result) {
     res.render('session', {
       result: result,
       sid: s_sid,
       aft_lim: n_lim_next,
       user: req.user
     });
-  })
+  });
 
 });
 
