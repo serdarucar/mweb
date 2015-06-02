@@ -278,11 +278,7 @@ app.get('/:y/:m/:d',
   .run().then(function (result) {
     res.render('index', {
       result: result,
-      date: {
-        year: n_tod_year,
-        month: n_tod_month,
-        day: n_tod_day
-      },
+      date: dateObj,
       user: req.user
     });
   })
