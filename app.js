@@ -112,16 +112,13 @@ app.post('/sendtoken',
     passwordless.requestToken(
         // Turn the email address into an user ID
         function(user, delivery, callback, req) {
-            // usually you would want something like:
-            r
-            .db('mailsender').table('user')
-            .getAll(user, {index: 'email'}).nth(0)
-            .run().then(function(ret) {
-               if(ret) {
-                  return callback(null, ret.id);
-                  }
-               else
-                  return callback(null, null)
+          // usually you would want something like:
+          db.findUserByMail(user, function (err, result) {
+             if(result) {
+                return callback(null, result.id);
+                }
+             else
+                return callback(null, null);
           })
           // but you could also do the following
           // if you want to allow anyone:
