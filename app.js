@@ -237,10 +237,10 @@ app.get('/:y/:m/:d',
 
   function (req, res) {
 
-  var today = new Date();
   var year  = parseInt(req.params.y);
   var month = parseInt(req.params.m);
   var day   = parseInt(req.params.d);
+  var today = moment(year + month + day, 'YYYYMMDD');
 
   db.getMailIndex(req.user, year, month, day, function (err, result) {
     res.render('index', {
