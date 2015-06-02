@@ -246,6 +246,7 @@ app.get('/:y/:m/:d',
 
   function (req, res) {
 
+  var today = new Date();
   var n_tod_year  = parseInt(req.params.y);
   var n_tod_month = parseInt(req.params.m);
   var n_tod_day   = parseInt(req.params.d);
@@ -278,7 +279,7 @@ app.get('/:y/:m/:d',
   .run().then(function (result) {
     res.render('index', {
       result: result,
-      date: dateObj,
+      date: today,
       user: req.user
     });
   })
