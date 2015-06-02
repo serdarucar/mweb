@@ -262,7 +262,7 @@ app.get('/:y/:m/:d',
   .orderBy(r.desc('time'))
   .merge(function(doc) {
     return {
-      timestamp: doc('time').inTimezone('+05:00'),
+      timestamp: doc('time').inTimezone('+03:00'),
       process: doc('sent').add(doc('deferred')).add(doc('bounced'))
     }
   })
