@@ -19,7 +19,10 @@
               <div class="col-lg-3">
                 <h5 align="center"><i class="fa fa-users"></i>   Some List {{@index}}</h5>
               </div>
-              <div class="col-lg-3">
+              <div class="col-lg-1">
+                <h5 id="{{sid}}:total" align="center">{{process}}</h5>
+              </div>
+              <div class="col-lg-2">
                 <h5 align="center"><i class="fa fa-tachometer"></i>   {{process}} / {{count}}</h5>
               </div>
             </div>
@@ -59,6 +62,8 @@
     document.getElementById(data.new_val.sid + ':sent').innerHTML = data.new_val.sent;
     document.getElementById(data.new_val.sid + ':deferred').innerHTML = data.new_val.deferred;
     document.getElementById(data.new_val.sid + ':bounced').innerHTML = data.new_val.bounced;
+
+    document.getElementById(data.new_val.sid + ':total').innerHTML = data.new_val.sent + data.new_val.deferred + data.new_val.bounced;
   });
 
   $(document).ready(function() {
