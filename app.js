@@ -57,14 +57,14 @@ db.mailStatChanges(function(err, cursor) {
 
 // PASSWORDLESS TOKEN DELIVERY SETUP
 var smtpServer = email.server.connect({
-  host: '178.62.101.203',
-  //host:    '127.0.0.1',
+  //host: '178.62.101.203',
+  host:    '127.0.0.1',
   ssl: false
 });
 
 // PASSWORDLESS INIT
 passwordless.init(new RethinkDBStore({
-  host: '127.0.0.1',
+  host: 'mdbs1-priv',
   port: 28015,
   db: 'mailsender'
 }));
