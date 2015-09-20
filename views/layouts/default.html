@@ -49,10 +49,6 @@
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <style>
-      #editor {overflow:scroll; max-height:300px}
-      .panel-heading:hover {
-        background-color: #CFCFCF !important;
-      }
       .mail-sent {
         color: #5cb85c;
       }
@@ -74,9 +70,20 @@
       <a class="navbar-brand" href="/"><b>RELYMAIL</b></a>
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-left">
-          <li><a href="#" id="dp3" data-date="{{prettifyDate date}}"><i class="fa fa-calendar fa-lg"></i><b>    {{prettifyDate date}}</b>  <i class="fa fa-caret-down"></i></a></li>
+          <li><a href="#" id="dp3" data-date="{{prettifyDate date}}"><i class="fa fa-calendar fa-lg"></i><b>    {{prettifyDate date}}</b> <span class="caret"></span></a></li>
           {{#if result}}
-          <li><a href="#"><i class="fa fa-clock-o fa-lg"></i><b>   {{prettifyTime result.time}}</b>  <i class="fa fa-caret-down"></i></a></li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-clock-o fa-lg"></i><b>   {{prettifyTime result.time}}</b> <span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else here</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Separated link</a></li>
+              <li class="divider"></li>
+              <li><a href="#">One more separated link</a></li>
+            </ul>
+          </li>
           {{/if}}
         </ul>
       </div>
@@ -105,11 +112,11 @@
     {{{ body }}}
 
     <script>
+
       $(document).ready(function() {
         $('#dp3').datepicker({
           autoclose: true,
           format: "dd.mm.yyyy",
-          todayBtn: true,
           todayHighlight: true,
           weekStart: 1
         });
@@ -130,8 +137,7 @@
             mo = "0" + mo;
           }
 
-          console.log('/date/' + yea + mo + day);
-          window.location = '/date/' + yea + mo + day;
+          window.location = '/' + yea + mo + day;
         });
       });
 

@@ -53,8 +53,8 @@ db.mailStatChanges(function(err, cursor) {
 
 // EXPRESS ROUTES
 app.get('/', function(req, res) {
-  var home = moment().format('YYYYMMDD');
-  res.redirect('/date/' + home);
+  var today = moment().format('YYYYMMDD');
+  res.redirect('/' + today);
 });
 
 app.get('/list', function(req, res) {
@@ -74,19 +74,7 @@ app.get('/new', function(req, res) {
     });
   });
 
-app.get('/:sid', function(req, res) {
-
-    db.getMailBySID(req.params.sid, function(err, result) {
-      res.render('index', {
-        result: result,
-        date: result.time,
-        user: req.user
-      });
-    });
-
-  });
-
-app.get('/date/:date', function(req, res) {
+app.get('/:date', function(req, res) {
 
     var year = parseInt(req.params.date.substring(0, 4));
     var month = parseInt(req.params.date.substring(4, 6));
@@ -94,10 +82,22 @@ app.get('/date/:date', function(req, res) {
 
     db.getLatestMailByDate(req.user, year, month, day, function(err, result) {
       if (result.length > 0) {
-        res.redirect('/' + result);
+        res.redirect('/' + req.params.date + '/' + result);
       } else {
         res.render('index', { nomail: true, date: moment(req.params.date, "YYYYMMDD") });
       }
+    });
+
+  });
+
+app.get('/:date/:sid', function(req, res) {
+
+    db.getMailBySID(req.params.sid, function(err, result) {
+      res.render('index', {
+        result: result,
+        date: result.time,
+        user: req.user
+      });
     });
 
   });

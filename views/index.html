@@ -1,87 +1,162 @@
 <div class="container">
-  <br><br><br>
+  <br><br><br><br>
   <div class="row">
     <div class="col-lg-12">
+      {{#if nomail}}
+      <div class="row">
+        <h3 align="center">THERE ARE NO MAILS SENT FOR THIS DAY.</h3>
+      </div>
+      <div id="session-id" style="display: none;">0</div>
+      <div id="0:total" style="display: none;"></div>
+      <div id="0:sent" style="display: none;"></div>
+      <div id="0:deferred" style="display: none;"></div>
+      <div id="0:bounced" style="display: none;"></div>
+      <div id="0:sprog" style="display: none; width: 0%"></div>
+      <div id="0:dprog" style="display: none; width: 0%"></div>
+      <div id="0:bprog" style="display: none; width: 0%"></div>
+      {{else}}
       <div class="panel panel-default">
+        <div class="panel-heading">
+          <h2 align="center">MAIL PROGRESS</h2>
+        </div>
         <div class="panel-body">
-          <h2 align="center"><b>MAIL SENDING PROGRESS</b></h2>
-          {{#if nomail}}
-          <div class="jumbotron">
-            <div class="row">
-              <h3 align="center">THERE ARE NO MAILS SENT FOR THIS DAY.</h3>
-            </div>
-          {{else}}
+          <div class="row">
+            <h5 align="center">
+              <i class="fa fa-envelope-o"></i>   <b>SUBJECT: {{result.subject}}</b>
+              (<a id="mailDetails" class="btn-link mail-detail-btn" onclick="toggleMailDetails()">More details</a>)
+            </h5>
+          </div>
+          <div id="mail-detail" style="display: none;">
+            <h6 align="center"><b>Sender:</b> {{result.sender}}</h6>
+            <h6 align="center"><b>Recipents:</b> List1, List2, List6</h6>
+            <h6 align="center"><b>Date/Time:</b> {{prettifyDate result.time}} {{prettifyTime result.time}}</h6>
+            <h6 align="center"><b>Processed:</b> <span id="{{result.sid}}:process">{{result.process}}</span></h6>
+            <h6 align="center"><b>Total:</b> {{result.count}}</h6>
+          </div>
+          <br>
           <div class="jumbotron">
             <div class="row" onclick="location='/session/{{result.sid}}/10'">
               <div class="col-lg-4 mail-sent">
                 <h1 id="{{result.sid}}:sent" align="center">{{result.sent}}</h1>
-                <h6 align="center">SENT</h6>
+                <h6 align="center"><b>SENT</b></h6>
               </div>
               <div class="col-lg-4 mail-deferred">
                 <h1 id="{{result.sid}}:deferred" align="center">{{result.deferred}}</h1>
-                <h6 align="center">DEFERRED</h6>
+                <h6 align="center"><b>TRYING</b></h6>
               </div>
               <div class="col-lg-4 mail-bounced">
                 <h1 id="{{result.sid}}:bounced" align="center">{{result.bounced}}</h1>
-                <h6 align="center">BOUNCED</h6>
+                <h6 align="center"><b>UNSENT</b></h6>
               </div>
             </div>
             <br>
-            <div class="progress">
-              <div class="progress-bar progress-bar-success" style="width: 35%"></div>
-              <div class="progress-bar progress-bar-warning" style="width: 20%"></div>
-              <div class="progress-bar progress-bar-danger" style="width: 10%"></div>
-            </div>
-            <br>
-            <div class="row">
-              <div class="col-lg-3">
-                <h5 align="center"><i class="fa fa-clock-o"></i>   {{prettifyTime result.time}}</h5>
-              </div>
-              <div class="col-lg-3" title="Sender">
-                <h5 align="center"><i class="fa fa-user"></i>   {{result.sender}}</h5>
-              </div>
-              <div class="col-lg-3" title="Recipient">
-                <h5 align="center"><i class="fa fa-users"></i>   Some List</h5>
-              </div>
-              <div class="col-lg-3" title="Processed / Accepted">
-                <h5 align="center"><i class="fa fa-tachometer"></i>   <span id="{{result.sid}}:total">{{result.process}}</span> / {{result.count}} ({{result.sid}})</h5>
-              </div>
+              <div class="progress progress-striped active mail-prog-bar">
+              <div id="{{result.sid}}:sprog" class="progress-bar progress-bar-success sent-mail-prog-bar" style="width: 0%"></div>
+              <div id="{{result.sid}}:dprog" class="progress-bar progress-bar-warning defer-mail-prog-bar" style="width: 0%"></div>
+              <div id="{{result.sid}}:bprog" class="progress-bar progress-bar-danger bounce-mail-prog-bar" style="width: 0%"></div>
             </div>
           </div>
+          <div id="mailButton" class="btn btn-default btn-block" onclick="toggleMailBody()"><b>SHOW MAIL</b></div>
         </div>
       </div>
-      <div class="well">
+      <div id="mail-content" class="well" style="display: none;">
         {{{result.mbody}}}
       </div>
+      <div id="session-id" style="display: none;">{{result.sid}}</div>
+      <div id="{{result.sid}}:total" style="display: none;">{{result.count}}</div>
       {{/if}}
     </div>
   </div>
 </div>
 
 <script>
-/*
-  var mbody = document.getElementById("hidden-mail-body").innerHTML;
-  console.log(mbody);
-  var reg = /\<body[^>]*\>([^]*)\<\/body/m;
-  var nbody = mbody.match( reg )[1];
-  console.log(nbody);
-  document.write(nbody);
-  //document.getElementById('visible-mail-body').innerHTML = $mbody.match( reg )[1];
-
 
   $(document).ready(function() {
-    $mbody = this().getElementById('hidden-mail-body').innerHTML;
-    var reg = /\<body[^>]*\>([^]*)\<\/body/m;
-    this().getElementById('visible-mail-body').innerHTML = $mbody.match( reg )[1];
+    var ssid = document.getElementById("session-id").innerHTML;
+    var total = document.getElementById(ssid + ':total').innerHTML;
+    var sent = document.getElementById(ssid + ':sent').innerHTML;
+    var defer = document.getElementById(ssid + ':deferred').innerHTML;
+    var bounce = document.getElementById(ssid + ':bounced').innerHTML;
+
+    var sentPer = Math.round(sent / total * 100);
+    var deferPer = Math.round(defer / total * 100);
+    var bouncePer = Math.round(bounce / total * 100);
+
+    var procPer = sentPer + deferPer + bouncePer;
+
+    if (procPer > 100) {
+      bouncePer = bouncePer - 1;
+      procPer = procPer - 1;
+    }
+
+    if (procPer == 100)
+      $('.mail-prog-bar').toggleClass('active progress-striped');
+
+    document.getElementById(ssid + ':sprog').style.width = sentPer + '%';
+    document.getElementById(ssid + ':dprog').style.width = deferPer + '%';
+    document.getElementById(ssid + ':bprog').style.width = bouncePer + '%';
   });
-*/
 
   var io = io.connect();
   io.on("mailstats", function(data) {
     document.getElementById(data.new_val.sid + ':sent').innerHTML = data.new_val.sent;
     document.getElementById(data.new_val.sid + ':deferred').innerHTML = data.new_val.deferred;
     document.getElementById(data.new_val.sid + ':bounced').innerHTML = data.new_val.bounced;
-    document.getElementById(data.new_val.sid + ':total').innerHTML = data.new_val.sent + data.new_val.deferred + data.new_val.bounced;
+    document.getElementById(data.new_val.sid + ':process').innerHTML = data.new_val.sent + data.new_val.deferred + data.new_val.bounced;
+
+    var totalCount = data.new_val.count;
+    var sentPerc = Math.round(data.new_val.sent / totalCount * 100);
+    var deferPerc = Math.round(data.new_val.deferred / totalCount * 100);
+    var bouncePerc = Math.round(data.new_val.bounced / totalCount * 100);
+
+    var procPerc = sentPerc + deferPerc + bouncePerc;
+
+    if (procPerc > 100) {
+      bouncePerc = bouncePerc - 1;
+      procPerc = procPerc - 1;
+    }
+
+    if (procPerc == 100)
+      $('.mail-prog-bar').toggleClass('active progress-striped');
+
+    document.getElementById(data.new_val.sid + ':sprog').style.width = sentPerc + '%';
+    document.getElementById(data.new_val.sid + ':dprog').style.width = deferPerc + '%';
+    document.getElementById(data.new_val.sid + ':bprog').style.width = bouncePerc + '%';
+
+    // console.log('sent %: ' + sentPerc + ' - defer %: ' + deferPerc + ' - bounce %: ' + bouncePerc + ' - proc %:' + procPerc);
+
   });
+
+  function toggleMailBody() {
+    var myMail = document.getElementById('mail-content');
+    var displaySetting = myMail.style.display;
+    var mailButton = document.getElementById('mailButton');
+
+    if (displaySetting == 'block') {
+      myMail.style.display = 'none';
+      mailButton.innerHTML = '<b>SHOW MAIL</b>';
+    }
+    else {
+      myMail.style.display = 'block';
+      mailButton.innerHTML = '<b>HIDE MAIL</b>';
+    }
+  }
+
+  function toggleMailDetails() {
+    var myDetail = document.getElementById('mail-detail');
+    var displaySetting = myDetail.style.display;
+    var detailLink = document.getElementById('mailDetails');
+
+    if (displaySetting == 'block') {
+      myDetail.style.display = 'none';
+      detailLink.innerHTML = 'More Details';
+    }
+    else {
+      myDetail.style.display = 'block';
+      detailLink.innerHTML = 'Hide Details';
+    }
+  }
+
+  this.$('.mail-detail-btn').css('cursor', 'pointer');
 
 </script>
