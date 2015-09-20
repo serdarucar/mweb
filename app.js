@@ -20,10 +20,7 @@ var express = require('express'),
   session = require('express-session'),
   math = require('mathjs'),
   moment = require('moment'),
-  pmx = require('pmx'),
-  passwordless = require('passwordless'),
-  RethinkDBStore = require('passwordless-rethinkdbstore'),
-  email = require('emailjs');
+  pmx = require('pmx');
 
 // `ExpressHandlebars` instance creation.
 var hbs = exphbs.create({
@@ -33,7 +30,6 @@ var hbs = exphbs.create({
 });
 
 // view engine setup
-//app.set('layout', path.join(__dirname, 'layouts/default'));
 app.engine('html', hbs.engine);
 app.set('view engine', 'html');
 app.set('views', path.join(__dirname, 'views'));
@@ -55,98 +51,13 @@ db.mailStatChanges(function(err, cursor) {
   });
 });
 
-// PASSWORDLESS TOKEN DELIVERY SETUP
-var smtpServer = email.server.connect({
-  //host: '178.62.101.203',
-  host:    '127.0.0.1',
-  ssl: false
-});
-
-// PASSWORDLESS INIT
-passwordless.init(new RethinkDBStore({
-  host: 'mdbs1-priv',
-  port: 28015,
-  db: 'mailsender'
-}));
-
-// PASSWORDLESS TOKEN DELIVERY SERVICE
-passwordless.addDelivery(
-  function(tokenToSend, uidToSend, recipient, callback) {
-    var host = 'tashimasu.net:8888';
-    //var host = 'localhost:8888';
-    smtpServer.send({
-      text: 'Hello!\nAccess your account here: http://' + host + '?token=' + tokenToSend + '&uid=' + encodeURIComponent(uidToSend),
-      from: 'nobody@tashimasu.net',
-      to: recipient,
-      subject: 'Token for ' + host
-    }, function(err, message) {
-      if (err) {
-        console.log(err);
-      }
-      callback(err);
-    });
-  });
-
-// PASSWORDLESS ACCEPT / SESSION
-app.use(session({
-  secret: 'janalicibaqishlary',
-  resave: true,
-  saveUninitialized: true
-})); // session secret
-app.use(passwordless.sessionSupport());
-app.use(passwordless.acceptToken({
-  successRedirect: '/',
-  enableOriginRedirect: true
-}));
-
-// PASSWORDLESS ROUTES
-/* GET login screen. */
-app.get('/login', function(req, res) {
-  res.render('login');
-});
-
-/* Logout and redirect to root. */
-app.get('/logout', passwordless.logout(),
-  function(req, res) {
-    res.redirect('/login');
-  });
-
-app.post('/sendtoken',
-  passwordless.requestToken(
-    // Turn the email address into an user ID
-    function(user, delivery, callback, req) {
-      // usually you would want something like:
-      db.findUserByMail(user, function(err, result) {
-          if (result) {
-            return callback(null, result.id);
-          } else
-            return callback(null, null);
-        })
-        // but you could also do the following
-        // if you want to allow anyone:
-        // callback(null, user);
-    }, {
-      originField: 'origin'
-    }
-  ),
-  function(req, res) {
-    // success!
-    res.render('sent');
-  });
-
 // EXPRESS ROUTES
 app.get('/', function(req, res) {
-  res.redirect(moment().format('/YYYY/MM/DD'));
+  var home = moment().format('YYYYMMDD');
+  res.redirect('/date/' + home);
 });
 
-app.get('/list',
-
-  passwordless.restricted({
-    originField: 'origin',
-    failureRedirect: '/login'
-  }),
-
-  function(req, res) {
+app.get('/list', function(req, res) {
 
     db.getUsersLists(req.user, function(err, result) {
       res.render('list', {
@@ -157,27 +68,41 @@ app.get('/list',
 
   });
 
-app.get('/new',
-
-  passwordless.restricted({
-    originField: 'origin',
-    failureRedirect: '/login'
-  }),
-
-  function(req, res) {
+app.get('/new', function(req, res) {
     res.render('new', {
       user: req.user
     });
   });
 
-app.get('/session/:sid/:lim',
+app.get('/:sid', function(req, res) {
 
-  passwordless.restricted({
-    originField: 'origin',
-    failureRedirect: '/login'
-  }),
+    db.getMailBySID(req.params.sid, function(err, result) {
+      res.render('index', {
+        result: result,
+        date: result.time,
+        user: req.user
+      });
+    });
 
-  function(req, res) {
+  });
+
+app.get('/date/:date', function(req, res) {
+
+    var year = parseInt(req.params.date.substring(0, 4));
+    var month = parseInt(req.params.date.substring(4, 6));
+    var day = parseInt(req.params.date.substring(6, 8));
+
+    db.getLatestMailByDate(req.user, year, month, day, function(err, result) {
+      if (result.length > 0) {
+        res.redirect('/' + result);
+      } else {
+        res.render('index', { nomail: true, date: moment(req.params.date, "YYYYMMDD") });
+      }
+    });
+
+  });
+
+app.get('/session/:sid/:lim', function(req, res) {
 
     var s_sid = req.params.sid;
     var n_lim = parseInt(req.params.lim);
@@ -194,44 +119,13 @@ app.get('/session/:sid/:lim',
 
   });
 
-app.get('/detail/:qid/:addr',
-
-  passwordless.restricted({
-    originField: 'origin',
-    failureRedirect: '/login'
-  }),
-
-  function(req, res) {
+app.get('/detail/:qid/:addr', function(req, res) {
 
     var s_uid = req.params.qid + '/' + req.params.addr;
 
     db.getMailDetail(s_uid, function(err, result) {
       res.render('log', {
         result: result,
-        user: req.user
-      });
-    });
-
-  });
-
-app.get('/:y/:m/:d',
-
-  passwordless.restricted({
-    originField: 'origin',
-    failureRedirect: '/login'
-  }),
-
-  function(req, res) {
-
-    var year = parseInt(req.params.y);
-    var month = parseInt(req.params.m);
-    var day = parseInt(req.params.d);
-    var today = moment(year + '-' + month + '-' + day, 'YYYY-MM-DD');
-
-    db.getMailIndex(req.user, year, month, day, function(err, result) {
-      res.render('index', {
-        result: result,
-        date: today,
         user: req.user
       });
     });
