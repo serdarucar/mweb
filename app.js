@@ -1,214 +1,200 @@
-/*jslint unparam: true, node: true*/
-// app.js
-// 
+'use strict';
+
 require('pmx').init({
-  ignore_routes : [/socket\.io/],
-  errors        : true,
-  custom_probes : true
+  ignore_routes: [/socket\.io/],
+  errors: true,
+  custom_probes: true
 });
 
-var express = require('express')
-  , app = express()
-  , io = require('socket.io').listen(app.listen(80))
-  , r  = require('rethinkdbdash')({servers:[{host: '127.0.0.1', port: 28015}]})
-  , debug = require('debug')('smw.tashimasu.info')
-  , path = require('path')
-  , cookieParser = require('cookie-parser')
-  , bodyParser = require('body-parser')
-  , methodOverride = require('method-override')
-  , session = require('express-session')
-  , math = require('mathjs')
-  , pmx = require('pmx')
-  , passwordless = require('passwordless')
-  , RethinkDBStore = require('passwordless-rethinkdbstore')
-  , email   = require("emailjs");
+var express = require('express'),
+  app = express(),
+  io = require('socket.io').listen(app.listen(process.env.PORT || 8888)),
+  db = require('./lib/db'),
+  exphbs = require('express-handlebars'),
+  helpers = require('./lib/helpers'),
+  debug = require('debug')('smw.tashimasu.info'),
+  path = require('path'),
+  cookieParser = require('cookie-parser'),
+  bodyParser = require('body-parser'),
+  methodOverride = require('method-override'),
+  session = require('express-session'),
+  math = require('mathjs'),
+  moment = require('moment'),
+  pmx = require('pmx');
+
+// `ExpressHandlebars` instance creation.
+var hbs = exphbs.create({
+  defaultLayout: 'default',
+  helpers: helpers,
+  extname: '.html'
+});
 
 // view engine setup
+app.engine('html', hbs.engine);
 app.set('view engine', 'html');
 app.set('views', path.join(__dirname, 'views'));
-app.set('layout', path.join(__dirname, 'layouts/default'));
-app.engine('html', require('hogan-express'));
 app.enable('view cache');
 
 // express application initialize
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.use(methodOverride());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // SOCKET.IO EMITTERS
-r
-.db('mailsender').table('session')
-.pluck('sid','sent','deferred','bounced')
-.changes().run({cursor:true})
-.then(function(cursor) {
+db.mailStatChanges(function(err, cursor) {
   cursor.each(function(err, data) {
     io.sockets.emit("mailstats", data);
   });
 });
 
-// PASSWORDLESS TOKEN DELIVERY SETUP
-var smtpServer  = email.server.connect({
-   host:    '178.62.101.203',
-   ssl:     false
-});
-
-// PASSWORDLESS INIT
-passwordless.init(new RethinkDBStore({host: '127.0.0.1', port: 28015, db: 'mailsender'}));
-
-// PASSWORDLESS TOKEN DELIVERY SERVICE
-passwordless.addDelivery(
-  function(tokenToSend, uidToSend, recipient, callback) {
-    var host = 'tashimasu.net';
-    smtpServer.send({
-      text:    'Hello!\nAccess your account here: http://' 
-      + host + '?token=' + tokenToSend + '&uid=' 
-      + encodeURIComponent(uidToSend), 
-      from:    'nobody@tashimasu.net', 
-      to:      recipient,
-      subject: 'Token for ' + host
-  }, function(err, message) {
-    if(err) {
-        console.log(err);
-    }
-    callback(err);
+// MIDDLEWARE (get user)
+app.use(function(req, res, next) {
+  db.getUser('b95eeb70-4768-4720-8b41-af15ea6ed0c3', function(err, user) {
+    req.user = user;
+    next();
   });
 });
 
-// PASSWORDLESS ACCEPT / SESSION
-app.use(session({ secret: 'janalicibaqishlary', resave: true, saveUninitialized: true })); // session secret
-app.use(passwordless.sessionSupport());
-app.use(passwordless.acceptToken({ successRedirect: '/', enableOriginRedirect: true }));
-
-// PASSWORDLESS ROUTES
-/* GET login screen. */
-app.get('/login', function(req, res) {
-   res.render('login');
-});
-
-/* Static users for now. */
-var users = [
-    { id: 1, email: 'serdarn@me.com' },
-    { id: 2, email: 'sio@doruk.net.tr' },
-    { id: 3, email: 'slmkrnz@gmail.com' }
-];
-
-/* POST login details. */
-app.post('/sendtoken', 
-  passwordless.requestToken(
-    function(user, delivery, callback) {
-      for (var i = users.length - 1; i >= 0; i--) {
-        if(users[i].email === user.toLowerCase()) {
-          return callback(null, users[i].id);
-        }
-      }
-      callback(null, null);
-    }, { originField: 'origin' }), 
-function(req, res) {
-  // success!
-  res.render('sent');
-});
-
 // EXPRESS ROUTES
-app.get('/', passwordless.restricted({
-  originField: 'origin',
-  failureRedirect: '/login'
-}), function (req, res) {
-  
-  var timeFilter = new Date();
-  timeFilter.setDate(timeFilter.getDate()-1);
-
-  r
-  .db('mailsender').table('session')
-  .filter(function(session) {
-    return session('time').gt(timeFilter)
-  })
-  .orderBy(r.desc('time'))
-  .pluck('sid','sender','count','sent','deferred','bounced','time')
-  .merge(function(doc) {
-    return {
-      hh: r.branch(
-        doc('time').inTimezone('+03:00').hours().gt(9),
-        doc('time').inTimezone('+03:00').hours().coerceTo('string'),
-        r.expr('0').add(doc('time').inTimezone('+03:00').hours().coerceTo('string'))
-      ),
-      mi: r.branch(
-        doc('time').minutes().gt(9),
-        doc('time').minutes().coerceTo('string'),
-        r.expr('0').add(doc('time').minutes().coerceTo('string'))
-      ),
-      process: doc('sent').add(doc('deferred')).add(doc('bounced'))
-    };
-  })
-  .run().then(function (result) {
-    res.render('index', { result: result });
-  })
-
+app.get('/', function(req, res) {
+  var today = moment().format('YYYYMMDD');
+  res.redirect('/' + today);
 });
 
-app.get('/list', passwordless.restricted({
-  originField: 'origin',
-  failureRedirect: '/login'
-}), function (req, res) {
-  res.render('list');
+app.post('/mailsender', function(req, res) {
+  console.log(req.body);
 });
 
-app.get('/new', passwordless.restricted({
-  originField: 'origin',
-  failureRedirect: '/login'
-}), function (req, res) {
-  res.render('new');
+app.post('/savelist', function(req, res) {
+  console.log(req.body);
 });
 
-app.get('/session/:sid/:lim', passwordless.restricted({
-  originField: 'origin',
-  failureRedirect: '/login'
-}), function (req, res) {
+app.post('/deletelist', function(req, res) {
+  console.log(req.body);
+});
+
+app.get('/:date', function(req, res) {
+
+  var m = moment(req.params.date, 'YYYYMMDD');
+
+  var year = parseInt(req.params.date.substring(0, 4));
+  var month = parseInt(req.params.date.substring(4, 6));
+  var day = parseInt(req.params.date.substring(6, 8));
+
+  if (m.isValid()) {
+    db.getLatestMailByDate(req.user, year, month, day, function(err, result) {
+      if (result.length > 0) {
+        res.redirect('/' + req.params.date + '/' + result);
+      } else {
+        res.render('index', { nomail: true, date: moment(req.params.date, "YYYYMMDD"), user: req.user });
+      }
+    });
+  } else {
+    res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+  }
+});
+
+app.get('/:date/:sid', function(req, res) {
+
+  var m = moment(req.params.date, 'YYYYMMDD');
+
+  var year = parseInt(req.params.date.substring(0, 4));
+  var month = parseInt(req.params.date.substring(4, 6));
+  var day = parseInt(req.params.date.substring(6, 8));
+
+  if (m.isValid()) {
+    db.getMailBySID(req.params.sid, year, month, day, function(err, result) {
+      if (result) {
+        res.render('index', {
+          result: result,
+          date: result.time,
+          user: req.user
+        });
+      } else {
+        res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+      }
+    });
+  } else {
+    res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+  }
+});
+
+app.get('/session/:sid/:lim', function(req, res) {
 
   var s_sid = req.params.sid;
   var n_lim = parseInt(req.params.lim);
   var n_lim_next = n_lim * 10;
 
-  r
-  .db('mailsender').table('mail')
-  .getAll(s_sid, {index: 'sid'})
-  .hasFields('status')
-  .group('status')
-  .pluck('to','uid')
-  .limit(n_lim).orderBy('time')
-  .ungroup().map(function (doc) {
-    return r.object(doc('group'), doc('reduction'));
-  }).default([{sent: [], deferred: [], bounced: []}])
-  .reduce(function (left, right) {
-    return left.merge(right);
-  }).default(null)
-  .run().then(function (result) {
-    res.render('session', { result: result, sid: s_sid, aft_lim: n_lim_next });
-  })
+  db.getSessionMails(s_sid, n_lim, function(err, result) {
+    if (result) {
+      res.render('session', {
+        result: result,
+        sid: s_sid,
+        aft_lim: n_lim_next,
+        user: req.user
+      });
+    } else {
+      res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+    }
+  });
 
 });
 
-app.get('/detail/:qid/:addr', passwordless.restricted({
-  originField: 'origin',
-  failureRedirect: '/login'
-}), function (req, res) {
+app.get('/detail/:qid/:addr', function(req, res) {
 
-  var s_qid = req.params.qid;
-  var s_addr = req.params.addr;
-  var s_uid = s_qid + '/' + s_addr;
+  var s_uid = req.params.qid + '/' + req.params.addr;
 
-  r
-  .db('mailsender').table('mail')
-  .get(s_uid).default(null)
-  .run().then(function (result) {
-    res.render('log', { result: result });
-  })
+  db.getMailDetail(s_uid, function(err, result) {
+    if (result) {
+      res.render('log', {
+        result: result,
+        user: req.user
+      });
+    } else {
+      res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+    }
+  });
 
+});
+
+app.use(function (req, res, next) {
+  res.status(404);
+
+  // respond with html page
+  if (req.accepts('html')) {
+    res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+    return;
+  }
+
+  // respond with json
+  if (req.accepts('json')) {
+    res.send({ error: 'Not found' });
+    return;
+  }
+
+  // default to plain-text. send()
+  res.type('txt').send('Not found');
+});
+
+/// error handlers
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+  app.use(function (err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', { message: err.message, error: err, title: 'Fatal Error', user: req.user });
+  });
+}
+
+// production error handler
+// no stacktraces leaked to user
+app.use(function (err, req, res, next) {
+  res.status(err.status || 500);
+  res.render('error', { message: err.message, error: {}, title: 'Page Error', user: req.user });
 });
 
 app.use(pmx.expressErrorHandler());
-
-//app.set('port', process.env.PORT || 3300);
-
-//app.listen(app.get('port'));
