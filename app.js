@@ -51,85 +51,150 @@ db.mailStatChanges(function(err, cursor) {
   });
 });
 
+// MIDDLEWARE (get user)
+app.use(function(req, res, next) {
+  db.getUser('b95eeb70-4768-4720-8b41-af15ea6ed0c3', function(err, user) {
+    req.user = user;
+    next();
+  });
+});
+
 // EXPRESS ROUTES
 app.get('/', function(req, res) {
   var today = moment().format('YYYYMMDD');
   res.redirect('/' + today);
 });
 
-app.get('/list', function(req, res) {
+app.post('/mailsender', function(req, res) {
+  console.log(req.body);
+});
 
-    db.getUsersLists(req.user, function(err, result) {
-      res.render('list', {
-        list: JSON.stringify(result),
-        user: req.user
-      });
-    });
+app.post('/savelist', function(req, res) {
+  console.log(req.body);
+});
 
-  });
-
-app.get('/new', function(req, res) {
-    res.render('new', {
-      user: req.user
-    });
-  });
+app.post('/deletelist', function(req, res) {
+  console.log(req.body);
+});
 
 app.get('/:date', function(req, res) {
 
-    var year = parseInt(req.params.date.substring(0, 4));
-    var month = parseInt(req.params.date.substring(4, 6));
-    var day = parseInt(req.params.date.substring(6, 8));
+  var m = moment(req.params.date, 'YYYYMMDD');
 
+  var year = parseInt(req.params.date.substring(0, 4));
+  var month = parseInt(req.params.date.substring(4, 6));
+  var day = parseInt(req.params.date.substring(6, 8));
+
+  if (m.isValid()) {
     db.getLatestMailByDate(req.user, year, month, day, function(err, result) {
       if (result.length > 0) {
         res.redirect('/' + req.params.date + '/' + result);
       } else {
-        res.render('index', { nomail: true, date: moment(req.params.date, "YYYYMMDD") });
+        res.render('index', { nomail: true, date: moment(req.params.date, "YYYYMMDD"), user: req.user });
       }
     });
-
-  });
+  } else {
+    res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+  }
+});
 
 app.get('/:date/:sid', function(req, res) {
 
-    db.getMailBySID(req.params.sid, function(err, result) {
-      res.render('index', {
-        result: result,
-        date: result.time,
-        user: req.user
-      });
-    });
+  var m = moment(req.params.date, 'YYYYMMDD');
 
-  });
+  var year = parseInt(req.params.date.substring(0, 4));
+  var month = parseInt(req.params.date.substring(4, 6));
+  var day = parseInt(req.params.date.substring(6, 8));
+
+  if (m.isValid()) {
+    db.getMailBySID(req.params.sid, year, month, day, function(err, result) {
+      if (result) {
+        res.render('index', {
+          result: result,
+          date: result.time,
+          user: req.user
+        });
+      } else {
+        res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+      }
+    });
+  } else {
+    res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+  }
+});
 
 app.get('/session/:sid/:lim', function(req, res) {
 
-    var s_sid = req.params.sid;
-    var n_lim = parseInt(req.params.lim);
-    var n_lim_next = n_lim * 10;
+  var s_sid = req.params.sid;
+  var n_lim = parseInt(req.params.lim);
+  var n_lim_next = n_lim * 10;
 
-    db.getSessionMails(s_sid, n_lim, function(err, result) {
+  db.getSessionMails(s_sid, n_lim, function(err, result) {
+    if (result) {
       res.render('session', {
         result: result,
         sid: s_sid,
         aft_lim: n_lim_next,
         user: req.user
       });
-    });
-
+    } else {
+      res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+    }
   });
+
+});
 
 app.get('/detail/:qid/:addr', function(req, res) {
 
-    var s_uid = req.params.qid + '/' + req.params.addr;
+  var s_uid = req.params.qid + '/' + req.params.addr;
 
-    db.getMailDetail(s_uid, function(err, result) {
+  db.getMailDetail(s_uid, function(err, result) {
+    if (result) {
       res.render('log', {
         result: result,
         user: req.user
       });
-    });
-
+    } else {
+      res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+    }
   });
+
+});
+
+app.use(function (req, res, next) {
+  res.status(404);
+
+  // respond with html page
+  if (req.accepts('html')) {
+    res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+    return;
+  }
+
+  // respond with json
+  if (req.accepts('json')) {
+    res.send({ error: 'Not found' });
+    return;
+  }
+
+  // default to plain-text. send()
+  res.type('txt').send('Not found');
+});
+
+/// error handlers
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+  app.use(function (err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', { message: err.message, error: err, title: 'Fatal Error', user: req.user });
+  });
+}
+
+// production error handler
+// no stacktraces leaked to user
+app.use(function (err, req, res, next) {
+  res.status(err.status || 500);
+  res.render('error', { message: err.message, error: {}, title: 'Page Error', user: req.user });
+});
 
 app.use(pmx.expressErrorHandler());

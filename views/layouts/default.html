@@ -41,6 +41,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker.css" rel="stylesheet">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.js"></script>
+    <script src="//cdn.ckeditor.com/4.5.3/standard-all/ckeditor.js"></script>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -58,6 +59,19 @@
       .mail-bounced {
         color: #d44a45;
       }
+      .datepicker.dropdown-menu table  {
+        background-color: #303030;
+        color: #fff;
+        border-bottom-color: #303030;
+      }
+      .navbar-center
+      {
+        position: absolute;
+        width: 100%;
+        left: 0;
+        text-align: center;
+        margin: auto;
+      }
     </style>
   </head>
   <body>
@@ -67,49 +81,137 @@
 
     <div class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
-      <a class="navbar-brand" href="/"><b>RELYMAIL</b></a>
+      <a class="navbar-brand" href="/"><b>RELYMAIL</b> by SIO</a>
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        {{#if user}}
+        <div class="navbar-brand navbar-center">{{user.email}}</div>
         <ul class="nav navbar-nav navbar-left">
           <li><a href="#" id="dp3" data-date="{{prettifyDate date}}"><i class="fa fa-calendar fa-lg"></i><b>    {{prettifyDate date}}</b> <span class="caret"></span></a></li>
           {{#if result}}
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-clock-o fa-lg"></i><b>   {{prettifyTime result.time}}</b> <span class="caret"></span></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-clock-o fa-lg"></i><b>   {{prettifyTime result.time}}</b> {{trimNavSubject result.subject}} <span class="caret"></span></a>
             <ul class="dropdown-menu" role="menu">
-              <li><a href="#">Action</a></li>
-              <li><a href="#">Another action</a></li>
-              <li><a href="#">Something else here</a></li>
-              <li class="divider"></li>
-              <li><a href="#">Separated link</a></li>
-              <li class="divider"></li>
-              <li><a href="#">One more separated link</a></li>
+              {{#result.daymail}}
+              <li><a href="{{sid}}"><b>{{prettifyTime time}}</b> {{subject}}</a></li>
+              {{/result.daymail}}
             </ul>
           </li>
           {{/if}}
         </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#mailModal" data-toggle="modal"><i class="fa fa-pencil-square-o fa-lg"></i> <b>NEW MAIL</b></a></li>
+          <li><a href="#listModal" data-toggle="modal"><i class="fa fa-list fa-lg"></i> <b>LISTS</b></a></li>
+          <li><a class="navLink droplets" href="/logout"><i class="fa fa-sign-out fa-lg"></i> <b>SIGN OUT</b></a></li>
+        </ul>
+        {{/if}}
       </div>
-      {{#user}}
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-        </div>
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      </div>
 
+        {{#user-old}}
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav navbar-right">
             <li><a href="/new"><i class="fa fa-envelope-o"></i>    New</a></li>
             <li><a href="/"><i class="fa fa-paper-plane"></i>    Statistics</a></li>
             <li><a href="/list"><i class="fa fa-bars"></i>    Lists</a></li>
+            <li><a href="#myModal" data-toggle="modal"><i class="fa fa-pencil-square-o fa-lg"></i> <b>NEW MAIL</b></a></li>
             <li><a class="navLink droplets" href="/logout"><i class="fa fa-sign-out"></i>    Logout</a></li>
           </ul>
         </div>
-      {{/user}}
+      {{/user-old}}
+      </div>
+    </div>
+    {{{ body }}}
+
+    <div class="modal fade" id="mailModal">
+      <div class="modal-dialog modal-lg">
+        <form action="#" method="POST">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+              <h3 class="modal-title">Create New Mail</h3>
+            </div>
+            <div class="modal-header">
+              <h5 class="modal-title"><b>From: </b>{{user.email}}</h5>
+              <br>
+              <h5 class="modal-title"><b>To:  &nbsp;</b>
+                {{#user.list}}
+                <input type="checkbox" class="rcptList" value="{{id}}" count-data="{{count}}">&nbsp;{{name}}&nbsp;({{count}})&nbsp;&nbsp;&nbsp;
+                <!--<input type="text" name="members-{{id}}" style="display: none;">{{members}}-->
+                {{else}}
+                <div class="label label-danger">Please create a new list from the list menu</div>
+                {{/user.list}}
+              </h5>
+            </div>
+            <div class="modal-body">
+              <input type="text" class="form-control" id="inputSubject" name="inputSubject" placeholder="Enter Your Mail Subject Here...">
+              <br>
+              <textarea name="mailBody"></textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary mailsender">Send</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
 
-    {{{ body }}}
+    <div class="modal fade" id="listModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 class="modal-title">Mailing Lists</h3>
+          </div>
+          <form action="#" method="POST">
+            <div class="modal-body">
+              <h4 class="modal-title"><b>Create New List</b></h4>
+              <br>
+              <input type="text" class="form-control" id="inputListName" name="inputListName" placeholder="Enter A Name For Your List Here...">
+              <br>
+              <textarea class="form-control" rows="4" id="textAreaList" name="textAreaList"  placeholder="Copy & Paste Your List Of Mails Here...*"></textarea>
+              <h6><b>* (valid seperators: comma[,] colon[:] semicolon[;] vertical-bar[|] space[ ] enter[CR])</b></h6>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary list-add">Save</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </form>
+          <hr>
+          <div class="modal-header">
+            <h4 class="modal-title"><b>My Lists</b></h4>
+          </div>
+          <form action="#" method="POST">
+            <div class="modal-body">
+              <h5>
+                {{#user.list}}
+                <input type="checkbox" class="delList" value="{{id}}"><b> {{name}} </b>
+                <!--<h6>
+                  <a href="#" id="{{id}}-show-list" class="label label-info">show</a>
+                  <a href="#" id="{{id}}-del-list" class="label label-danger">delete</a>
+                </h6>-->
+                <!--
+                <h5>
+                  <div style="display: none;">{{members}}</div>
+                </h5>
+                -->
+                {{/user.list}}
+              </h5>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary list-del">Delete Selected</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
     <script>
 
@@ -139,6 +241,201 @@
 
           window.location = '/' + yea + mo + day;
         });
+      });
+
+      CKEDITOR.replace( 'mailBody' , {
+        skin: 'office2013,/ext/ck/skin/office2013/',
+        language: 'en'
+      });
+
+      // process mailsender form
+      $('.mailsender').click(function(event) {
+
+        event.preventDefault();
+
+        var checkedAtLeastOne = false;
+        var subjectIsEmpty = false;
+        var mailCount = 0;
+
+        $('input[type="checkbox"].rcptList').each(function() {
+          if ($(this).is(":checked")) {
+            checkedAtLeastOne = true;
+            mailCount = mailCount + parseInt($(this).attr('count-data'));
+          }
+        });
+
+        if ( $('input[name="inputSubject"]').val().length === 0 ) {
+          subjectIsEmpty = true;
+        }
+
+        if (checkedAtLeastOne && !subjectIsEmpty) {
+
+          var lists = $('input[type="checkbox"].rcptList:checked').map(function() {
+            return $(this).val();
+          }).toArray();
+
+          var data = CKEDITOR.instances.mailBody.document.getBody().getHtml();
+            // get the form data
+            // there are many ways to get this data using jQuery (you can use the class or id also)
+            var formData = {
+                'subject'           : $('input[name=inputSubject]').val(),
+                'body'              : data,
+                'recipients'        : lists
+            };
+
+            var confirmation = confirm(mailCount + ' recipients are selected in total.\nAre you sure to send the mails?');
+
+            if (confirmation == true) {
+              // process the form
+              $.ajax({
+                  type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+                  url         : '/mailsender', // the url where we want to POST
+                  data        : formData, // our data object
+                  dataType    : 'json', // what type of data do we expect back from the server
+                  encode      : true
+              })
+              // using the done promise callback
+              .done(function(data) {
+
+                  // log data to the console so we can see
+                  //console.log(data);
+                  // here we will handle errors and validation messages
+              });
+
+              window.location.href = "/";
+
+            }
+
+        } else {
+          alert('Please select at least one recipient list and fill in the subject field!');
+        }
+
+      });
+
+      // process list-add form
+      $('.list-add').click(function(event) {
+
+        event.preventDefault();
+
+        var listNameIsEmpty = false;
+        var listAreaIsEmpty = false;
+
+        if ( $('input[name="inputListName"]').val().length === 0 ) {
+          listNameIsEmpty = true;
+        }
+
+        if ( $('textarea[name="textAreaList"]').val().length === 0 ) {
+          listAreaIsEmpty = true;
+        }
+
+        if (!listNameIsEmpty && !listAreaIsEmpty) {
+
+          var rawlist = $('textarea[name="textAreaList"]').val();
+          rawlist = rawlist.replace(/\s+/g, ',');
+          rawlist = rawlist.replace(/;+/g, ',');
+          rawlist = rawlist.replace(/:+/g, ',');
+          rawlist = rawlist.replace(/\|+/g, ',');
+          rawlist = rawlist.replace(/,+/g, ',');
+
+          var list = [];
+          list = rawlist.split(",");
+
+          function IsEmail(email) {
+            var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+            return regex.test(email);
+          }
+
+          var emailarray = [];
+
+          $.each(list, function(idx, obj) {
+            if ( IsEmail(obj) ) {
+              emailarray.push(obj);
+            }
+          })
+
+          // get the form data
+          // there are many ways to get this data using jQuery (you can use the class or id also)
+          var formData = {
+              'listname'          : $('input[name="inputListName"]').val(),
+              'listdata'          : emailarray,
+              'listcount'         : emailarray.length
+          };
+
+          // process the form
+          $.ajax({
+              type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+              url         : '/savelist', // the url where we want to POST
+              data        : formData, // our data object
+              dataType    : 'json', // what type of data do we expect back from the server
+              encode      : true
+          })
+          // using the done promise callback
+          .done(function(data) {
+
+              // log data to the console so we can see
+              //console.log(data);
+              // here we will handle errors and validation messages
+          });
+
+          window.location.href = "/";
+
+        } else {
+          alert('Please fill in the all fields!');
+        }
+      });
+
+      // process list-del form
+      $('.list-del').click(function(event) {
+
+        event.preventDefault();
+
+        var checkedAtLeastOne = false;
+
+        $('input[type="checkbox"].delList').each(function() {
+          if ($(this).is(":checked")) {
+            checkedAtLeastOne = true;
+          }
+        });
+
+        if (checkedAtLeastOne) {
+
+          var listdels = $('input[type="checkbox"].delList:checked').map(function() {
+            return $(this).val();
+          }).toArray();
+
+          // get the form data
+          // there are many ways to get this data using jQuery (you can use the class or id also)
+          var formData = {
+              'listdelete'        : listdels
+          };
+
+          // process the form
+          $.ajax({
+              type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+              url         : '/deletelist', // the url where we want to POST
+              data        : formData, // our data object
+              dataType    : 'json', // what type of data do we expect back from the server
+              encode      : true
+          })
+          // using the done promise callback
+          .done(function(data) {
+
+              // log data to the console so we can see
+              //console.log(data);
+              // here we will handle errors and validation messages
+          });
+
+          window.location.href = "/";
+
+        } else {
+          alert('No list selected!');
+        }
+      });
+
+      this.$('.navbar-brand').css('cursor', 'pointer');
+
+      $('.navbar-brand').click(function() {
+        window.location.href = "/";
       });
 
     </script>

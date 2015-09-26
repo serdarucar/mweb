@@ -42,7 +42,7 @@
               </div>
               <div class="col-lg-4 mail-deferred">
                 <h1 id="{{result.sid}}:deferred" align="center">{{result.deferred}}</h1>
-                <h6 align="center"><b>TRYING</b></h6>
+                <h6 align="center"><b>RETRY</b></h6>
               </div>
               <div class="col-lg-4 mail-bounced">
                 <h1 id="{{result.sid}}:bounced" align="center">{{result.bounced}}</h1>
@@ -56,7 +56,7 @@
               <div id="{{result.sid}}:bprog" class="progress-bar progress-bar-danger bounce-mail-prog-bar" style="width: 0%"></div>
             </div>
           </div>
-          <div id="mailButton" class="btn btn-default btn-block" onclick="toggleMailBody()"><b>SHOW MAIL</b></div>
+          <div id="mailButton" class="btn btn-default btn-block" onclick="toggleMailBody()"><b>SHOW MAIL CONTENT</b></div>
         </div>
       </div>
       <div id="mail-content" class="well" style="display: none;">
@@ -134,11 +134,11 @@
 
     if (displaySetting == 'block') {
       myMail.style.display = 'none';
-      mailButton.innerHTML = '<b>SHOW MAIL</b>';
+      mailButton.innerHTML = '<b>SHOW MAIL CONTENT</b>';
     }
     else {
       myMail.style.display = 'block';
-      mailButton.innerHTML = '<b>HIDE MAIL</b>';
+      mailButton.innerHTML = '<b>HIDE MAIL CONTENT</b>';
     }
   }
 
