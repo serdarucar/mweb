@@ -21,6 +21,7 @@ var express = require('express'),
   math = require('mathjs'),
   moment = require('moment'),
   shortid = require('shortid'),
+  request = require('request-json'),
   pmx = require('pmx');
 
 // `ExpressHandlebars` instance creation.
@@ -29,6 +30,9 @@ var hbs = exphbs.create({
   helpers: helpers,
   extname: '.html'
 });
+
+// request-json client creation
+var client = request.createClient('http://mapp1:11111/');
 
 // view engine setup
 app.engine('html', hbs.engine);
@@ -67,7 +71,27 @@ app.get('/', function(req, res) {
 });
 
 app.post('/mailsender', function(req, res) {
-  console.log(req.body);
+
+  var prebody = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'></head><body>";
+  var postbody = "</body></html>";
+  var body = prebody + req.body.body + postbody;
+
+  db.getMailArrFromListIDs(req.user.id, req.body.recipients, function(err, result) {
+
+    var maildata = {
+      fromaddr: req.user.email,
+      list: req.body.listnames,
+      toaddr: result,
+      mailsubject: req.body.subject,
+      mailbody: body
+    };
+
+    //client.post('rmail', maildata, function(err, res, body) {
+    //  return console.log(res.statusCode);
+    //});
+
+  });
+
 });
 
 app.post('/savelist', function(req, res) {
@@ -88,6 +112,7 @@ app.post('/deletelist', function(req, res) {
   req.body.listdelete.forEach(function(listid) {
     db.deleteMailList(req.user.id, listid);
   });
+
 });
 
 app.get('/:date', function(req, res) {

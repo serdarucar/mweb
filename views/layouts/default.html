@@ -142,7 +142,7 @@
               <br>
               <h5 class="modal-title"><b>To:  &nbsp;</b>
                 {{#user.list}}
-                <input type="checkbox" class="rcptList" value="{{id}}" count-data="{{count}}">&nbsp;{{name}}&nbsp;({{count}})&nbsp;&nbsp;&nbsp;
+                <input type="checkbox" class="rcptList" value="{{id}}" list-data="{{name}}" count-data="{{count}}">&nbsp;{{name}}&nbsp;({{count}})&nbsp;&nbsp;&nbsp;
                 <!--<input type="text" name="members-{{id}}" style="display: none;">{{members}}-->
                 {{else}}
                 <div class="label label-danger">Please create a new list from the list menu</div>
@@ -274,13 +274,18 @@
             return $(this).val();
           }).toArray();
 
+          var lists2 = $('input[type="checkbox"].rcptList:checked').map(function() {
+            return $(this).attr('list-data');
+          }).toArray();
+
           var data = CKEDITOR.instances.mailBody.document.getBody().getHtml();
             // get the form data
             // there are many ways to get this data using jQuery (you can use the class or id also)
             var formData = {
                 'subject'           : $('input[name=inputSubject]').val(),
                 'body'              : data,
-                'recipients'        : lists
+                'recipients'        : lists,
+                'listnames'         : lists2
             };
 
             var confirmation = confirm(mailCount + ' recipients are selected in total.\nAre you sure to send the mails?');
