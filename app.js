@@ -32,7 +32,7 @@ var hbs = exphbs.create({
 });
 
 // request-json client creation
-var client = request.createClient('http://mapp1:11111/');
+var client = request.createClient('http://localhost:11111/');
 
 // view engine setup
 app.engine('html', hbs.engine);
@@ -86,9 +86,9 @@ app.post('/mailsender', function(req, res) {
       mailbody: body
     };
 
-    //client.post('rmail', maildata, function(err, res, body) {
-    //  return console.log(res.statusCode);
-    //});
+    client.post('rmail', maildata, function(err, res, body) {
+      return console.log(res.statusCode);
+    });
 
   });
 
