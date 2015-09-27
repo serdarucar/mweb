@@ -20,6 +20,7 @@ var express = require('express'),
   session = require('express-session'),
   math = require('mathjs'),
   moment = require('moment'),
+  shortid = require('shortid'),
   pmx = require('pmx');
 
 // `ExpressHandlebars` instance creation.
@@ -70,11 +71,23 @@ app.post('/mailsender', function(req, res) {
 });
 
 app.post('/savelist', function(req, res) {
-  console.log(req.body);
+
+  var newlist = {
+    id: shortid.generate(),
+    name: req.body.listname,
+    members: req.body.listdata,
+    count: req.body.listcount
+  }
+
+  db.saveMailList(req.user.id, newlist);
+
 });
 
 app.post('/deletelist', function(req, res) {
-  console.log(req.body);
+
+  req.body.listdelete.forEach(function(listid) {
+    db.deleteMailList(req.user.id, listid);
+  });
 });
 
 app.get('/:date', function(req, res) {
