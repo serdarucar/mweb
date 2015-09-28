@@ -101,6 +101,7 @@ passport.use(new local(
     });
   }
 ));
+
 passport.serializeUser(function(user, done) {
   console.log("[DEBUG][passport][serializeUser] %s", user.username);
   done(null, user.id);
@@ -119,24 +120,30 @@ passport.deserializeUser(function (id, done) {
 app.get('/', function(req, res) {
   if (typeof req.user !== 'undefined') {
     // User is logged in.
-    res.redirect('/' + req.user.username);
+    var today = moment().format('YYYYMMDD');
+    res.redirect('/' + today);
   }
   else {
     req.user = false;
+    res.redirect('/login');
   }
   //var message = req.flash('error');
   //if (message.length < 1) {
   //  message = false;
   //}
-  var today = moment().format('YYYYMMDD');
-  res.redirect('/' + today);
 });
 
 // process the login form
 app.post('/login',
-  passport.authenticate('local', { failureRedirect: '/', failureFlash: true }),
+  passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }),
   function(req, res) {
-    res.redirect('/' + req.user.username);
+    res.redirect('/');
+  }
+);
+
+app.get('/login',
+  function(req, res) {
+    res.render('login');
   }
 );
 
