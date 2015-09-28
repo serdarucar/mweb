@@ -10,6 +10,7 @@ var express = require('express'),
   app = express(),
   io = require('socket.io').listen(app.listen(process.env.PORT || 8888)),
   db = require('./lib/db'),
+  db2 = require('./lib/db2'),
   exphbs = require('express-handlebars'),
   helpers = require('./lib/helpers'),
   debug = require('debug')('smw.tashimasu.info'),
@@ -146,6 +147,65 @@ app.get('/login',
     res.render('login');
   }
 );
+
+app.get('/admin', function (req, res) {
+  //var message = req.flash('error');
+var message = 0;
+  if (message.length < 1) {
+    message = false;
+  }
+debugger;
+  res.render('admin', { message: message });
+  //console.log("[DEBUG][/settings][getUserSettings] %j", req.user);
+});
+
+	// process the signup form
+	app.post('/admin', function(req, res){
+	  if (typeof req.user.admin !== 'undefined') {
+debugger;
+	    res.redirect('/');
+	  }
+	  if (!validateEmail(req.param('email'))) {
+	    // Probably not a good email address.
+	    //req.flash('error', 'Not a valid email address!')
+	    res.redirect('/');
+	    return;
+	  }
+	  if (req.param('password') !== req.param('password2')) {
+	    // 2 different passwords!
+	    //req.flash('error', 'Passwords does not match!')
+	    res.redirect('/');
+	    return;
+	  }
+
+var user = {
+        email: req.param('email'),
+        password: bcrypt.hashSync(req.param('password'), 8)
+	};
+
+	db2.saveUser(user, function(err, saved) {
+        console.log("[DEBUG][/signup][saveUser] %s", saved);
+        if(err) {
+          //req.flash('error', 'There was an error creating the account. Please try again later');
+debugger;
+          res.redirect('/');
+          return;
+        }
+        if(saved) {
+          console.log("[DEBUG][/signup][saveUser] User Registered");
+debugger;
+          passport.authenticate('local')(req, res, function () {
+            res.redirect('/');
+          })
+        }
+        else {
+          //req.flash('error', 'The account wasn\'t created');
+debugger;
+          res.redirect('/');
+          console.log("[DEBUG][/signup][saveUser] Unknown problem on creating account");
+        }
+      });
+	});
 
 app.post('/mailsender', function(req, res) {
 
