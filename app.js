@@ -18,6 +18,7 @@ var express = require('express'),
   bodyParser = require('body-parser'),
   methodOverride = require('method-override'),
   session = require('express-session'),
+  passport = require('passport'),
   math = require('mathjs'),
   moment = require('moment'),
   shortid = require('shortid'),
@@ -49,6 +50,11 @@ app.use(methodOverride());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// passport initialization
+app.use(session({ secret: 'janalicibaqishlary', resave: true, saveUninitialized: true })); // session secret
+app.use(passport.initialize());
+app.use(passport.session()); // make login sessions persistent
+
 // SOCKET.IO EMITTERS
 db.mailStatChanges(function(err, cursor) {
   cursor.each(function(err, data) {
@@ -64,11 +70,73 @@ app.use(function(req, res, next) {
   });
 });
 
+// PASSPORT INTEGRATION START
+// 
+//
+
+passport.use(new local(
+  function(username, password, done) {
+    // asynchronous verification, for effect...
+    process.nextTick(function () {
+
+      // Find the user by username.  If there is no user with the given
+      // username, or the password is not correct, set the user to `false` to
+      // indicate failure and set a flash message.  Otherwise, return the
+      // authenticated `user`.
+      var validateUser = function (err, user) {
+        if (err) { return done(err); }
+        if (!user) { return done(null, false, {message: 'Unknown user: ' + username})}
+
+        if (bcrypt.compareSync(password, user.password)) {
+          return done(null, user);
+        }
+        else {
+          return done(null, false, {message: 'Invalid username or password'});
+        }
+      };
+
+      db.findUserByName(username, validateUser);
+    });
+  }
+));
+passport.serializeUser(function(user, done) {
+  console.log("[DEBUG][passport][serializeUser] %s", user.username);
+  done(null, user.id);
+});
+
+passport.deserializeUser(function (id, done) {
+  console.log("[DEBUG][passport][deserializeUser] %j", id);
+  db.findUserById(id, done);
+});
+
+// 
+// 
+// PASSPORT INTEGRATION END
+
 // EXPRESS ROUTES
 app.get('/', function(req, res) {
+  if (typeof req.user !== 'undefined') {
+    // User is logged in.
+    res.redirect('/' + req.user.username);
+  }
+  else {
+    req.user = false;
+  }
+  //var message = req.flash('error');
+  //if (message.length < 1) {
+  //  message = false;
+  //}
   var today = moment().format('YYYYMMDD');
   res.redirect('/' + today);
 });
+
+// process the login form
+app.post('/login',
+  passport.authenticate('local', { failureRedirect: '/', failureFlash: true }),
+  function(req, res) {
+    res.redirect('/' + req.user.username);
+  }
+);
 
 app.post('/mailsender', function(req, res) {
 
@@ -234,5 +302,16 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error', { message: err.message, error: {}, title: 'Page Error', user: req.user });
 });
+
+function ensureAuthenticated(req, res, next) {
+  //return next();
+  if (req.isAuthenticated()) { return next(); }
+  res.redirect('/')
+}
+
+function validateEmail(email) {
+  var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(email);
+}
 
 app.use(pmx.expressErrorHandler());
