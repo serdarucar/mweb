@@ -77,7 +77,7 @@ app.use(function(req, res, next) {
 //
 
 passport.use(new local(
-  function(username, password, done) {
+  function(email, password, done) {
     // asynchronous verification, for effect...
     process.nextTick(function () {
 
@@ -87,17 +87,17 @@ passport.use(new local(
       // authenticated `user`.
       var validateUser = function (err, user) {
         if (err) { return done(err); }
-        if (!user) { return done(null, false, {message: 'Unknown user: ' + username})}
+        if (!user) { return done(null, false, {message: 'Unknown email: ' + email})}
 
         if (bcrypt.compareSync(password, user.password)) {
           return done(null, user);
         }
         else {
-          return done(null, false, {message: 'Invalid username or password'});
+          return done(null, false, {message: 'Invalid email or password'});
         }
       };
 
-      db.findUserByName(username, validateUser);
+      db.findUserByEmail(email, validateUser);
     });
   }
 ));
