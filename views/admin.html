@@ -1,16 +1,14 @@
 <br>
 <br>
 <br>
-            <!-- show any messages that come back with authentication -->
-            <!-- @todo: Message placement -->
-            {{# message }}
-            <li class="alert-link alert-danger">{{ message }}</li>
-            {{/ message }}
-          <form action="/admin" method="post" class="navbar-form navbar-right">
-            <div class="form-group">
-              <input type="text" class="form-control" name="email" placeholder="E-mail">
-              <input type="password" class="form-control" name="password" placeholder="Password">
-              <input type="password" class="form-control" name="password2" placeholder="Password2">
-            </div>
-            <button type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-log-in"></span></button>
-          </form>
+<form action="/admin" method="post" class="navbar-form navbar-left">
+  <div class="form-group">
+    <input type="text" class="form-control" name="email" placeholder="E-mail"><br><br>
+    <input type="password" class="form-control" name="password" placeholder="Password"><br><br>
+    <input type="password" class="form-control" name="password2" placeholder="Re-Password">
+  </div><br><br>
+  <button type="submit" class="btn btn-primary btn">Save User</button>
+  {{#if message}}
+  <br><br><div class="alert-link alert-danger">{{ message }}</div>
+  {{/if}}
+</form>
