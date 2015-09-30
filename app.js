@@ -97,12 +97,11 @@ passport.use(new local(
       var validateUser = function (err, user) {
         if (err) { return done(err); }
         if (!user) { return done(null, false, {message: 'Unknown user: ' + username})}
-
         if (bcrypt.compareSync(password, user.password)) {
           return done(null, user);
         }
         else {
-          return done(null, false, {message: 'Invalid username or password'});
+          return done(null, false, {message: 'Invalid password'});
         }
       };
 
@@ -165,11 +164,13 @@ app.post('/admin', function(req, res){
     // Probably not a good email address.
     req.flash('error', 'Not a valid email address!');
     res.redirect('/admin');
+    return;
   }
   if (req.body.password !== req.body.password2) {
     // 2 different passwords!
     req.flash('error', 'Passwords does not match!');
     res.redirect('/admin');
+    return;
   }
 
   var user = {
