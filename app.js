@@ -19,9 +19,9 @@ var express = require('express'),
   methodOverride = require('method-override'),
   session = require('express-session'),
   passport = require('passport'),
-  flash = require('connect-flash'),
-  bcrypt = require('bcrypt-nodejs'),
   local = require('passport-local').Strategy,
+  flash = require('connect-flash'),
+  bcrypt = require('bcryptjs'),
   math = require('mathjs'),
   moment = require('moment'),
   shortid = require('shortid'),
@@ -67,50 +67,56 @@ db.mailStatChanges(function(err, cursor) {
 });
 
 // MIDDLEWARE (get user)
+/*
 app.use(function(req, res, next) {
   db.getUser('b95eeb70-4768-4720-8b41-af15ea6ed0c3', function(err, user) {
     req.user = user;
     next();
   });
 });
+*/
+
+/*
+app.use(function(req, res, next) {
+  if (typeof req.user !== 'undefined') {
+    next();
+  } else {
+    res.render('landing');
+  }
+});
+*/
 
 // PASSPORT INTEGRATION START
 //
 //
 
 passport.use(new local(
-  function(email, password, done) {
+  function(username, password, done) {
     // asynchronous verification, for effect...
     process.nextTick(function () {
-
-      // Find the user by username.  If there is no user with the given
-      // username, or the password is not correct, set the user to `false` to
-      // indicate failure and set a flash message.  Otherwise, return the
-      // authenticated `user`.
       var validateUser = function (err, user) {
         if (err) { return done(err); }
-        if (!user) { return done(null, false, {message: 'Unknown email: ' + email})}
+        if (!user) { return done(null, false, {message: 'Unknown user: ' + username})}
 
         if (bcrypt.compareSync(password, user.password)) {
           return done(null, user);
         }
         else {
-          return done(null, false, {message: 'Invalid email or password'});
+          return done(null, false, {message: 'Invalid username or password'});
         }
       };
 
-      db.findUserByEmail(email, validateUser);
+      db.findUserByEmail(username, validateUser);
     });
   }
 ));
 
 passport.serializeUser(function(user, done) {
-  console.log("[DEBUG][passport][serializeUser] %s", user.username);
+  console.log("[DEBUG][passport][serializeUser] %j", user.id);
   done(null, user.id);
 });
 
 passport.deserializeUser(function (id, done) {
-  console.log("[DEBUG][passport][deserializeUser] %j", id);
   db.findUserById(id, done);
 });
 
@@ -126,86 +132,67 @@ app.get('/', function(req, res) {
     res.redirect('/' + today);
   }
   else {
-    req.user = false;
-    res.redirect('/login');
+    var message = req.flash('error');
+    if (message.length < 1) {
+      message = false;
+    }
+    res.render('landing', { message: message, user: req.user });
   }
-  //var message = req.flash('error');
-  //if (message.length < 1) {
-  //  message = false;
-  //}
 });
 
 // process the login form
-app.post('/login',
-  passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }),
-  function(req, res) {
-    res.redirect('/');
-  }
-);
+app.post('/', passport.authenticate('local', { successRedirect: '/', failureRedirect: '/', failureFlash: true }));
 
-app.get('/login',
-  function(req, res) {
-    res.render('login');
-  }
-);
+app.get('/logout', function(req, res) { req.logout(); res.redirect('/'); });
 
 app.get('/admin', function (req, res) {
-  var message = req.flash('error');
-  if (message.length < 1) {
-    message = false;
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
+  } else if (req.user.admin !== true) {
+    res.render('404', { url: req.url });
+  } else {
+    var message = req.flash('error');
+    if (message.length < 1) {
+      message = false;
+    }
+  res.render('admin', { message: message, user: req.user });
   }
-  res.render('admin', { message: message });
 });
 
 // process the signup form
 app.post('/admin', function(req, res){
-  if (req.user.admin !== true) {
-    console.log('NO ADMIN');
-    res.redirect('/');
-  }
-  if (!validateEmail(req.param('email'))) {
+  if (!validateEmail(req.body.email)) {
     // Probably not a good email address.
-    req.flash('error', 'Not a valid email address!')
-    console.log('EMAIL NO GOOD');
+    req.flash('error', 'Not a valid email address!');
     res.redirect('/admin');
-    return;
   }
-  if (req.param('password') !== req.param('password2')) {
+  if (req.body.password !== req.body.password2) {
     // 2 different passwords!
-    req.flash('error', 'Passwords does not match!')
-    console.log('PASS NO MATCH');
+    req.flash('error', 'Passwords does not match!');
     res.redirect('/admin');
-    return;
   }
 
   var user = {
-    email: req.param('email'),
-    password: bcrypt.hashSync(req.param('password'))
+    email: req.body.email,
+    password: bcrypt.hashSync(req.body.password, 8)
   };
 
 	db.saveUser(user, function(err, saved) {
-    //console.log("[DEBUG][/signup][saveUser] %s", saved);
+    console.log("[DEBUG][/signup][saveUser] %s", saved);
     if(err) {
-      console.log('ERROR');
+      console.log(err);
       req.flash('error', 'There was an error creating the account. Please try again later');
-      res.redirect('/');
-	    return;
+      res.redirect('/admin');
     }
     if(saved) {
-      console.log('SAVED');
-      req.flash('info', 'Account Created.')
-      res.redirect('/admin');
+      req.flash('info', 'Account Created.');
       console.log("[DEBUG][/signup][saveUser] User Registered");
-      //passport.authenticate('local')(req, res, function () {
-        //res.redirect('/');
-      //})
+      res.redirect('/admin');
     }
     else {
       req.flash('error', 'The account wasn\'t created');
-      console.log('PROBLEM');
-      res.redirect('/admin');
-	    return;
       console.log("[DEBUG][/signup][saveUser] Unknown problem on creating account");
+      res.redirect('/admin');
     }
   });
 });
@@ -255,7 +242,7 @@ app.post('/deletelist', function(req, res) {
 
 });
 
-app.get('/:date', function(req, res) {
+app.get('/:date', ensureAuthenticated, function(req, res) { //@todo: not logged in user is looping here on a date
 
   var m = moment(req.params.date, 'YYYYMMDD');
 
@@ -264,7 +251,7 @@ app.get('/:date', function(req, res) {
   var day = parseInt(req.params.date.substring(6, 8));
 
   if (m.isValid()) {
-    db.getLatestMailByDate(req.user, year, month, day, function(err, result) {
+    db.getLatestMailByDate(req.user.id, year, month, day, function(err, result) {
       if (result.length > 0) {
         res.redirect('/' + req.params.date + '/' + result);
       } else {
@@ -285,7 +272,7 @@ app.get('/:date/:sid', function(req, res) {
   var day = parseInt(req.params.date.substring(6, 8));
 
   if (m.isValid()) {
-    db.getMailBySID(req.params.sid, year, month, day, function(err, result) {
+    db.getMailBySID(req.params.sid, req.user.id, year, month, day, function(err, result) { // @todo: full path url working externally, put user control here
       if (result) {
         res.render('index', {
           result: result,
@@ -378,7 +365,6 @@ app.use(function (err, req, res, next) {
 function ensureAuthenticated(req, res, next) {
   //return next();
   if (req.isAuthenticated()) { return next(); }
-  res.redirect('/')
 }
 
 function validateEmail(email) {

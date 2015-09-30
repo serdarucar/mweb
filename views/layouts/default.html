@@ -72,6 +72,15 @@
         text-align: center;
         margin: auto;
       }
+      .alert-center
+      {
+        position: absolute;
+        width: 100%;
+        left: 0;
+        text-align: center;
+        margin: auto;
+        margin-top: 46px;
+      }
     </style>
   </head>
   <body>
@@ -99,10 +108,24 @@
           {{/if}}
         </ul>
         <ul class="nav navbar-nav navbar-right">
+          {{# if user.admin}}
+          <li><a href="/admin"><i class="fa fa-cogs fa-lg"></i> <b>ADMIN</b></a></li>
+          {{/if}}
           <li><a href="#mailModal" data-toggle="modal"><i class="fa fa-pencil-square-o fa-lg"></i> <b>NEW MAIL</b></a></li>
           <li><a href="#listModal" data-toggle="modal"><i class="fa fa-list fa-lg"></i> <b>LISTS</b></a></li>
           <li><a class="navLink droplets" href="/logout"><i class="fa fa-sign-out fa-lg"></i> <b>SIGN OUT</b></a></li>
         </ul>
+        {{else}}
+        {{#if message}}
+        <div class="alert-center alert-link alert-danger">{{message}}</div>
+        {{/if}}
+        <form action="/" method="POST" class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" name="username" placeholder="E-mail">
+            <input type="password" class="form-control" name="password" placeholder="Password">
+          </div>
+          <button type="submit" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-log-in"></span></button>
+        </form>
         {{/if}}
       </div>
       <div class="navbar-header">

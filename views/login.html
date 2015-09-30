@@ -3,10 +3,10 @@
 <br>
             <!-- show any messages that come back with authentication -->
             <!-- @todo: Message placement -->
+          <form action="/login" method="post" class="navbar-form navbar-right">
             {{# message }}
             <li class="alert-link alert-danger">{{ message }}</li>
             {{/ message }}
-          <form action="/login" method="post" class="navbar-form navbar-right">
             <div class="form-group">
               <input type="text" class="form-control" name="email" placeholder="E-mail">
               <input type="password" class="form-control" name="password" placeholder="Password">
