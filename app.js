@@ -208,6 +208,7 @@ app.post('/mailsender', function(req, res) {
 
     var maildata = {
       fromaddr: req.user.email,
+      owner: req.user.id,
       list: req.body.listnames,
       toaddr: result,
       mailsubject: req.body.subject,
