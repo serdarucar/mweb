@@ -28,7 +28,7 @@
           </div>
           <div id="mail-detail" style="display: none;">
             <h6 align="center"><b>Sender:</b> {{result.sender}}</h6>
-            <h6 align="center"><b>Recipents:</b> List1, List2, List6</h6>
+            <h6 align="center"><b>Recipents:</b> {{#each result.rcpt}}{{this}}, {{/each}}</h6>
             <h6 align="center"><b>Date/Time:</b> {{prettifyDate result.time}} {{prettifyTime result.time}}</h6>
             <h6 align="center"><b>Processed:</b> <span id="{{result.sid}}:process">{{result.process}}</span></h6>
             <h6 align="center"><b>Total:</b> {{result.count}}</h6>
