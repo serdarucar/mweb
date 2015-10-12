@@ -50,7 +50,7 @@
               </div>
             </div>
             <br>
-              <div class="progress progress-striped active mail-prog-bar">
+              <div class="progress mail-prog-bar">
               <div id="{{result.sid}}:sprog" class="progress-bar progress-bar-success sent-mail-prog-bar" style="width: 0%"></div>
               <div id="{{result.sid}}:dprog" class="progress-bar progress-bar-warning defer-mail-prog-bar" style="width: 0%"></div>
               <div id="{{result.sid}}:bprog" class="progress-bar progress-bar-danger bounce-mail-prog-bar" style="width: 0%"></div>
@@ -89,8 +89,8 @@
       procPer = procPer - 1;
     }
 
-    if (procPer == 100)
-      $('.mail-prog-bar').toggleClass('active progress-striped');
+    //if (procPer == 100)
+    //  $('.mail-prog-bar').toggleClass('active progress-striped');
 
     document.getElementById(ssid + ':sprog').style.width = sentPer + '%';
     document.getElementById(ssid + ':dprog').style.width = deferPer + '%';
