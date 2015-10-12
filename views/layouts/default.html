@@ -152,7 +152,7 @@
     </div>
     {{{ body }}}
 
-    <div class="modal fade" id="mailModal">
+    <div class="modal" id="mailModal">
       <div class="modal-dialog modal-lg">
         <form action="#" method="POST">
           <div class="modal-content">
@@ -168,7 +168,7 @@
                 <input type="checkbox" class="rcptList" value="{{id}}" list-data="{{name}}" count-data="{{count}}">&nbsp;{{name}}&nbsp;({{count}})&nbsp;&nbsp;&nbsp;
                 <!--<input type="text" name="members-{{id}}" style="display: none;">{{members}}-->
                 {{else}}
-                <div class="label label-danger">Please create a new list from the list menu</div>
+                <a href="#listModal" data-toggle="modal"><div class="label label-warning">Create A List</div></a>
                 {{/user.list}}
               </h5>
             </div>
@@ -186,7 +186,7 @@
       </div>
     </div>
 
-    <div class="modal fade" id="listModal">
+    <div class="modal" id="listModal">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -215,16 +215,28 @@
             <div class="modal-body">
               <h5>
                 {{#user.list}}
-                <input type="checkbox" class="delList" value="{{id}}" name-data="{{name}}"><b> {{name}} </b>
+                <input type="checkbox" class="delList" value="{{id}}" name-data="{{name}}"><b> {{name}} </b>({{count}}) <!--<a href="#" id="listMembers" onclick="toggleListMembers()">show</a>-->
                 <!--<h6>
                   <a href="#" id="{{id}}-show-list" class="label label-info">show</a>
                   <a href="#" id="{{id}}-del-list" class="label label-danger">delete</a>
                 </h6>-->
                 <!--
+
+                <div id="mail-content" class="well" style="display: none;">
+                  {{{result.mbody}}}
+                </div>
                 <h5>
-                  <div style="display: none;">{{members}}</div>
+                  <div id="list-members" class="well" style="display: none;"></div>
                 </h5>
                 -->
+                <div id="list-members">
+                  <h6>
+                    {{#each members}}
+                      {{this}},
+                    {{/each}}
+                  </h6>
+                </div>
+                <hr>
                 {{/user.list}}
               </h5>
             </div>
@@ -341,7 +353,7 @@
                   // here we will handle errors and validation messages
               });
 
-              window.location.href = "/";
+              window.location.reload();// = "/";
 
             }
 
@@ -374,6 +386,8 @@
           rawlist = rawlist.replace(/;+/g, ',');
           rawlist = rawlist.replace(/:+/g, ',');
           rawlist = rawlist.replace(/\|+/g, ',');
+          rawlist = rawlist.replace(/\>+/g, ',');
+          rawlist = rawlist.replace(/\<+/g, ',');
           rawlist = rawlist.replace(/,+/g, ',');
 
           var list = [];
@@ -503,6 +517,21 @@
       $('.navbar-brand').click(function() {
         window.location.href = "/";
       });
+
+      function toggleListMembers() {
+        var myDetail = document.getElementById('list-members');
+        var displaySetting = myDetail.style.display;
+        var detailLink = document.getElementById('listMembers');
+
+        if (displaySetting == 'block') {
+          myDetail.style.display = 'none';
+          detailLink.innerHTML = 'show';
+        }
+        else {
+          myDetail.style.display = 'block';
+          detailLink.innerHTML = 'hide';
+        }
+      }
 
     </script>
   </body>
