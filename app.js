@@ -236,6 +236,20 @@ app.post('/savelist', function(req, res) {
 
 });
 
+app.post('/updatelist', function(req, res) {
+
+  var updlist = {
+    id: shortid.generate(),
+    name: req.body.listname,
+    members: req.body.listdata,
+    count: req.body.listcount
+  }
+
+  db.saveMailList(req.user.id, updlist);
+  db.deleteMailList(req.user.id, req.body.listdelid);
+
+});
+
 app.post('/deletelist', function(req, res) {
 
   req.body.listdelete.forEach(function(listid) {
