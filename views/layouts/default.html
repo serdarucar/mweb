@@ -108,6 +108,7 @@
           {{/if}}
         </ul>
         <ul class="nav navbar-nav navbar-right">
+          <li><a href="/"><i class="fa fa-home fa-lg"></i> <b>HOME</b></a></li>
           {{# if user.admin}}
           <li><a href="/admin"><i class="fa fa-cogs fa-lg"></i> <b>ADMIN</b></a></li>
           {{/if}}
@@ -353,7 +354,7 @@
                   // here we will handle errors and validation messages
               });
 
-              window.location.href = "/";
+              window.location = "/";
 
             }
 
@@ -443,7 +444,7 @@
                   // here we will handle errors and validation messages
               });
 
-              window.location.href = "/";
+              window.location = "/";
 
             } else {
               alert('There is already a list named ' + listname + '!\nPlease choose another name');
@@ -503,7 +504,7 @@
                 // here we will handle errors and validation messages
             });
 
-            window.location.href = "/";
+            window.location = "/";
 
           }
 
