@@ -196,7 +196,17 @@
           </div>
           <form action="#" method="POST">
             <div class="modal-body">
-              <h4 class="modal-title"><b>Create New List</b></h4>
+              {{#user.list}}
+              <select class="form-control select-drp" id="select">
+                <option>New..</option>
+                <option>{{name}}</option>
+              </select>
+              {{/user.list}}
+              <br>
+              <select multiple="" class="form-control">
+                <option class="select-chg"></option>
+              </select>
+              <!--<h4 class="modal-title"><b>Create New List</b></h4>-->
               <br>
               <input type="text" class="form-control" id="inputListName" name="inputListName" placeholder="Enter A Name For Your List Here...">
               <br>
@@ -533,6 +543,16 @@
           detailLink.innerHTML = 'hide';
         }
       }
+
+      $( ".select-drp" )
+        .change(function () {
+          var str = "";
+          $( ".select-drp option:selected" ).each(function() {
+            str += $( this ).text() + " ";
+          });
+          $( ".select-chg" ).text( str );
+        })
+        .change();
 
     </script>
   </body>
