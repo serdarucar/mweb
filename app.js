@@ -18,8 +18,14 @@ var express = require('express'),
   bodyParser = require('body-parser'),
   methodOverride = require('method-override'),
   session = require('express-session'),
+  passport = require('passport'),
+  local = require('passport-local').Strategy,
+  flash = require('connect-flash'),
+  bcrypt = require('bcryptjs'),
   math = require('mathjs'),
   moment = require('moment'),
+  shortid = require('shortid'),
+  request = require('request-json'),
   pmx = require('pmx');
 
 // `ExpressHandlebars` instance creation.
@@ -28,6 +34,9 @@ var hbs = exphbs.create({
   helpers: helpers,
   extname: '.html'
 });
+
+// request-json client creation
+var client = request.createClient('http://localhost:11111/');
 
 // view engine setup
 app.engine('html', hbs.engine);
@@ -44,6 +53,12 @@ app.use(methodOverride());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// passport initialization
+app.use(session({ secret: 'janalicibaqishlary', resave: true, saveUninitialized: true })); // session secret
+app.use(passport.initialize());
+app.use(passport.session()); // make login sessions persistent
+app.use(flash()); // connect-flash messages
+
 // SOCKET.IO EMITTERS
 db.mailStatChanges(function(err, cursor) {
   cursor.each(function(err, data) {
@@ -52,32 +67,198 @@ db.mailStatChanges(function(err, cursor) {
 });
 
 // MIDDLEWARE (get user)
+/*
 app.use(function(req, res, next) {
   db.getUser('b95eeb70-4768-4720-8b41-af15ea6ed0c3', function(err, user) {
     req.user = user;
     next();
   });
 });
+*/
+
+/*
+app.use(function(req, res, next) {
+  if (typeof req.user !== 'undefined') {
+    next();
+  } else {
+    res.render('landing');
+  }
+});
+*/
+
+// PASSPORT INTEGRATION START
+//
+//
+
+passport.use(new local(
+  function(username, password, done) {
+    // asynchronous verification, for effect...
+    process.nextTick(function () {
+      var validateUser = function (err, user) {
+        if (err) { return done(err); }
+        if (!user) { return done(null, false, {message: 'Unknown user: ' + username})}
+        if (bcrypt.compareSync(password, user.password)) {
+          return done(null, user);
+        }
+        else {
+          return done(null, false, {message: 'Invalid password'});
+        }
+      };
+
+      db.findUserByEmail(username, validateUser);
+    });
+  }
+));
+
+passport.serializeUser(function(user, done) {
+  console.log("[DEBUG][passport][serializeUser] %j", user.id);
+  done(null, user.id);
+});
+
+passport.deserializeUser(function (id, done) {
+  db.findUserById(id, done);
+});
+
+//
+//
+// PASSPORT INTEGRATION END
 
 // EXPRESS ROUTES
 app.get('/', function(req, res) {
-  var today = moment().format('YYYYMMDD');
-  res.redirect('/' + today);
+  if (typeof req.user !== 'undefined') {
+    // User is logged in.
+    var today = moment().format('YYYYMMDD');
+    res.redirect('/' + today);
+  }
+  else {
+    var message = req.flash('error');
+    if (message.length < 1) {
+      message = false;
+    }
+    res.render('landing', { message: message, user: req.user });
+  }
+});
+
+// process the login form
+app.post('/', passport.authenticate('local', { successRedirect: '/', failureRedirect: '/', failureFlash: true }));
+
+app.get('/logout', function(req, res) { req.logout(); res.redirect('/'); });
+
+app.get('/admin', function (req, res) {
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
+  } else if (req.user.admin !== true) {
+    res.render('404', { url: req.url });
+  } else {
+    var message = req.flash('error');
+    if (message.length < 1) {
+      message = false;
+    }
+  res.render('admin', { message: message, user: req.user });
+  }
+});
+
+// process the signup form
+app.post('/admin', function(req, res){
+  if (!validateEmail(req.body.email)) {
+    // Probably not a good email address.
+    req.flash('error', 'Not a valid email address!');
+    res.redirect('/admin');
+    return;
+  }
+  if (req.body.password !== req.body.password2) {
+    // 2 different passwords!
+    req.flash('error', 'Passwords does not match!');
+    res.redirect('/admin');
+    return;
+  }
+
+  var user = {
+    email: req.body.email,
+    password: bcrypt.hashSync(req.body.password, 8)
+  };
+
+	db.saveUser(user, function(err, saved) {
+    console.log("[DEBUG][/signup][saveUser] %s", saved);
+    if(err) {
+      console.log(err);
+      req.flash('error', 'There was an error creating the account. Please try again later');
+      res.redirect('/admin');
+    }
+    if(saved) {
+      req.flash('info', 'Account Created.');
+      console.log("[DEBUG][/signup][saveUser] User Registered");
+      res.redirect('/admin');
+    }
+    else {
+      req.flash('error', 'The account wasn\'t created');
+      console.log("[DEBUG][/signup][saveUser] Unknown problem on creating account");
+      res.redirect('/admin');
+    }
+  });
 });
 
 app.post('/mailsender', function(req, res) {
-  console.log(req.body);
+
+  var prebody = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'></head><body>";
+  var postbody = "</body></html>";
+  var body = prebody + req.body.body + postbody;
+
+  db.getMailArrFromListIDs(req.user.id, req.body.recipients, function(err, result) {
+
+    var maildata = {
+      fromaddr: req.user.email,
+      owner: req.user.id,
+      list: req.body.listnames,
+      toaddr: result,
+      mailsubject: req.body.subject,
+      mailbody: body
+    };
+
+    client.post('rmail', maildata, function(err, res, body) {
+      return console.log(res.statusCode);
+    });
+
+  });
+
 });
 
 app.post('/savelist', function(req, res) {
-  console.log(req.body);
+
+  var newlist = {
+    id: shortid.generate(),
+    name: req.body.listname,
+    members: req.body.listdata,
+    count: req.body.listcount
+  }
+
+  db.saveMailList(req.user.id, newlist);
+
+});
+
+app.post('/updatelist', function(req, res) {
+
+  var updlist = {
+    id: shortid.generate(),
+    name: req.body.listname,
+    members: req.body.listdata,
+    count: req.body.listcount
+  }
+
+  db.saveMailList(req.user.id, updlist);
+  db.deleteMailList(req.user.id, req.body.listdelid);
+
 });
 
 app.post('/deletelist', function(req, res) {
-  console.log(req.body);
+
+  req.body.listdelete.forEach(function(listid) {
+    db.deleteMailList(req.user.id, listid);
+  });
+
 });
 
-app.get('/:date', function(req, res) {
+app.get('/:date', ensureAuthenticated, function(req, res) { //@todo: not logged in user is looping here on a date
 
   var m = moment(req.params.date, 'YYYYMMDD');
 
@@ -86,7 +267,7 @@ app.get('/:date', function(req, res) {
   var day = parseInt(req.params.date.substring(6, 8));
 
   if (m.isValid()) {
-    db.getLatestMailByDate(req.user, year, month, day, function(err, result) {
+    db.getLatestMailByDate(req.user.id, year, month, day, function(err, result) {
       if (result.length > 0) {
         res.redirect('/' + req.params.date + '/' + result);
       } else {
@@ -107,7 +288,7 @@ app.get('/:date/:sid', function(req, res) {
   var day = parseInt(req.params.date.substring(6, 8));
 
   if (m.isValid()) {
-    db.getMailBySID(req.params.sid, year, month, day, function(err, result) {
+    db.getMailBySID(req.params.sid, req.user.id, year, month, day, function(err, result) { // @todo: full path url working externally, put user control here
       if (result) {
         res.render('index', {
           result: result,
@@ -196,5 +377,15 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error', { message: err.message, error: {}, title: 'Page Error', user: req.user });
 });
+
+function ensureAuthenticated(req, res, next) {
+  //return next();
+  if (req.isAuthenticated()) { return next(); }
+}
+
+function validateEmail(email) {
+  var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(email);
+}
 
 app.use(pmx.expressErrorHandler());

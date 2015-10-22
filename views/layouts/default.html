@@ -41,7 +41,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker.css" rel="stylesheet">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.js"></script>
-    <script src="//cdn.ckeditor.com/4.5.3/standard-all/ckeditor.js"></script>
+    <script src="//cdn.ckeditor.com/4.5.3/full-all/ckeditor.js"></script>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -72,6 +72,15 @@
         text-align: center;
         margin: auto;
       }
+      .alert-center
+      {
+        position: absolute;
+        width: 100%;
+        left: 0;
+        text-align: center;
+        margin: auto;
+        margin-top: 46px;
+      }
     </style>
   </head>
   <body>
@@ -81,7 +90,7 @@
 
     <div class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
-      <a class="navbar-brand" href="/"><b>RELYMAIL</b> by SIO</a>
+      <a class="navbar-brand" href="/"><b>MAILER</b> by SIO</a>
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         {{#if user}}
         <div class="navbar-brand navbar-center">{{user.email}}</div>
@@ -99,10 +108,24 @@
           {{/if}}
         </ul>
         <ul class="nav navbar-nav navbar-right">
+          {{# if user.admin}}
+          <li><a href="/admin"><i class="fa fa-cogs fa-lg"></i> <b>ADMIN</b></a></li>
+          {{/if}}
           <li><a href="#mailModal" data-toggle="modal"><i class="fa fa-pencil-square-o fa-lg"></i> <b>NEW MAIL</b></a></li>
           <li><a href="#listModal" data-toggle="modal"><i class="fa fa-list fa-lg"></i> <b>LISTS</b></a></li>
           <li><a class="navLink droplets" href="/logout"><i class="fa fa-sign-out fa-lg"></i> <b>SIGN OUT</b></a></li>
         </ul>
+        {{else}}
+        {{#if message}}
+        <div class="alert-center alert-link alert-danger">{{message}}</div>
+        {{/if}}
+        <form action="/" method="POST" class="navbar-form navbar-right">
+          <div class="form-group">
+            <input type="text" class="form-control" name="username" placeholder="E-mail">
+            <input type="password" class="form-control" name="password" placeholder="Password">
+          </div>
+          <button type="submit" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-log-in"></span></button>
+        </form>
         {{/if}}
       </div>
       <div class="navbar-header">
@@ -129,7 +152,7 @@
     </div>
     {{{ body }}}
 
-    <div class="modal fade" id="mailModal">
+    <div class="modal" id="mailModal">
       <div class="modal-dialog modal-lg">
         <form action="#" method="POST">
           <div class="modal-content">
@@ -142,10 +165,10 @@
               <br>
               <h5 class="modal-title"><b>To:  &nbsp;</b>
                 {{#user.list}}
-                <input type="checkbox" class="rcptList" value="{{id}}" count-data="{{count}}">&nbsp;{{name}}&nbsp;({{count}})&nbsp;&nbsp;&nbsp;
+                <input type="checkbox" class="rcptList" value="{{id}}" list-data="{{name}}" count-data="{{count}}">&nbsp;{{name}}&nbsp;({{count}})&nbsp;&nbsp;&nbsp;
                 <!--<input type="text" name="members-{{id}}" style="display: none;">{{members}}-->
                 {{else}}
-                <div class="label label-danger">Please create a new list from the list menu</div>
+                <a href="#listModal" data-toggle="modal"><div class="label label-warning">Create A List</div></a>
                 {{/user.list}}
               </h5>
             </div>
@@ -163,7 +186,7 @@
       </div>
     </div>
 
-    <div class="modal fade" id="listModal">
+    <div class="modal" id="listModal">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -192,16 +215,28 @@
             <div class="modal-body">
               <h5>
                 {{#user.list}}
-                <input type="checkbox" class="delList" value="{{id}}"><b> {{name}} </b>
+                <input type="checkbox" class="delList" value="{{id}}" name-data="{{name}}"><b> {{name}} </b>({{count}}) <!--<a href="#" id="listMembers" onclick="toggleListMembers()">show</a>-->
                 <!--<h6>
                   <a href="#" id="{{id}}-show-list" class="label label-info">show</a>
                   <a href="#" id="{{id}}-del-list" class="label label-danger">delete</a>
                 </h6>-->
                 <!--
+
+                <div id="mail-content" class="well" style="display: none;">
+                  {{{result.mbody}}}
+                </div>
                 <h5>
-                  <div style="display: none;">{{members}}</div>
+                  <div id="list-members" class="well" style="display: none;"></div>
                 </h5>
                 -->
+                <div id="list-members">
+                  <h6>
+                    {{#each members}}
+                      {{this}},
+                    {{/each}}
+                  </h6>
+                </div>
+                <hr>
                 {{/user.list}}
               </h5>
             </div>
@@ -214,6 +249,17 @@
     </div>
 
     <script>
+
+      $.fn.modal.Constructor.prototype.enforceFocus = function() {
+        modal_this = this
+        $(document).on('focusin.modal', function (e) {
+          if (modal_this.$element[0] !== e.target && !modal_this.$element.has(e.target).length
+          && !$(e.target.parentNode).hasClass('cke_dialog_ui_input_select')
+          && !$(e.target.parentNode).hasClass('cke_dialog_ui_input_text')) {
+            modal_this.$element.focus()
+          }
+        })
+      };
 
       $(document).ready(function() {
         $('#dp3').datepicker({
@@ -274,13 +320,18 @@
             return $(this).val();
           }).toArray();
 
+          var lists2 = $('input[type="checkbox"].rcptList:checked').map(function() {
+            return $(this).attr('list-data');
+          }).toArray();
+
           var data = CKEDITOR.instances.mailBody.document.getBody().getHtml();
             // get the form data
             // there are many ways to get this data using jQuery (you can use the class or id also)
             var formData = {
                 'subject'           : $('input[name=inputSubject]').val(),
                 'body'              : data,
-                'recipients'        : lists
+                'recipients'        : lists,
+                'listnames'         : lists2
             };
 
             var confirmation = confirm(mailCount + ' recipients are selected in total.\nAre you sure to send the mails?');
@@ -335,6 +386,8 @@
           rawlist = rawlist.replace(/;+/g, ',');
           rawlist = rawlist.replace(/:+/g, ',');
           rawlist = rawlist.replace(/\|+/g, ',');
+          rawlist = rawlist.replace(/\>+/g, ',');
+          rawlist = rawlist.replace(/\<+/g, ',');
           rawlist = rawlist.replace(/,+/g, ',');
 
           var list = [];
@@ -351,33 +404,54 @@
             if ( IsEmail(obj) ) {
               emailarray.push(obj);
             }
-          })
-
-          // get the form data
-          // there are many ways to get this data using jQuery (you can use the class or id also)
-          var formData = {
-              'listname'          : $('input[name="inputListName"]').val(),
-              'listdata'          : emailarray,
-              'listcount'         : emailarray.length
-          };
-
-          // process the form
-          $.ajax({
-              type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
-              url         : '/savelist', // the url where we want to POST
-              data        : formData, // our data object
-              dataType    : 'json', // what type of data do we expect back from the server
-              encode      : true
-          })
-          // using the done promise callback
-          .done(function(data) {
-
-              // log data to the console so we can see
-              //console.log(data);
-              // here we will handle errors and validation messages
           });
 
-          window.location.href = "/";
+          var listname = $.trim($('input[name="inputListName"]').val());
+          var listNameIsDuplicate = false;
+
+          $('input[type="checkbox"].delList').each(function() {
+            if ($(this).attr('name-data').toLowerCase() === listname.toLowerCase()) {
+              listNameIsDuplicate = true;
+            }
+          });
+
+          if (emailarray.length > 0) {
+
+            if (!listNameIsDuplicate) {
+
+              // get the form data
+              // there are many ways to get this data using jQuery (you can use the class or id also)
+              var formData = {
+                  'listname'          : listname,
+                  'listdata'          : emailarray,
+                  'listcount'         : emailarray.length
+              };
+
+              // process the form
+              $.ajax({
+                  type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+                  url         : '/savelist', // the url where we want to POST
+                  data        : formData, // our data object
+                  dataType    : 'json', // what type of data do we expect back from the server
+                  encode      : true
+              })
+              // using the done promise callback
+              .done(function(data) {
+
+                  // log data to the console so we can see
+                  //console.log(data);
+                  // here we will handle errors and validation messages
+              });
+
+              window.location.href = "/";
+
+            } else {
+              alert('There is already a list named ' + listname + '!\nPlease choose another name');
+            }
+
+          } else {
+            alert('There are no valid mails on the list you provided.\nList can not be saved.');
+          }
 
         } else {
           alert('Please fill in the all fields!');
@@ -409,23 +483,29 @@
               'listdelete'        : listdels
           };
 
-          // process the form
-          $.ajax({
-              type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
-              url         : '/deletelist', // the url where we want to POST
-              data        : formData, // our data object
-              dataType    : 'json', // what type of data do we expect back from the server
-              encode      : true
-          })
-          // using the done promise callback
-          .done(function(data) {
+          var confirmation = confirm('Are you sure to delete selected list(s)?');
 
-              // log data to the console so we can see
-              //console.log(data);
-              // here we will handle errors and validation messages
-          });
+          if (confirmation == true) {
 
-          window.location.href = "/";
+            // process the form
+            $.ajax({
+                type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+                url         : '/deletelist', // the url where we want to POST
+                data        : formData, // our data object
+                dataType    : 'json', // what type of data do we expect back from the server
+                encode      : true
+            })
+            // using the done promise callback
+            .done(function(data) {
+
+                // log data to the console so we can see
+                //console.log(data);
+                // here we will handle errors and validation messages
+            });
+
+            window.location.href = "/";
+
+          }
 
         } else {
           alert('No list selected!');
@@ -437,6 +517,21 @@
       $('.navbar-brand').click(function() {
         window.location.href = "/";
       });
+
+      function toggleListMembers() {
+        var myDetail = document.getElementById('list-members');
+        var displaySetting = myDetail.style.display;
+        var detailLink = document.getElementById('listMembers');
+
+        if (displaySetting == 'block') {
+          myDetail.style.display = 'none';
+          detailLink.innerHTML = 'show';
+        }
+        else {
+          myDetail.style.display = 'block';
+          detailLink.innerHTML = 'hide';
+        }
+      }
 
     </script>
   </body>

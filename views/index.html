@@ -16,26 +16,27 @@
       <div id="0:bprog" style="display: none; width: 0%"></div>
       {{else}}
       <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 align="center">MAIL PROGRESS</h2>
-        </div>
+        <!--<div class="panel-heading">-->
+          <!--<h2 align="center">MAIL PROGRESS</h2>-->
+        <!--</div>-->
         <div class="panel-body">
-          <div class="row">
-            <h5 align="center">
-              <i class="fa fa-envelope-o"></i>   <b>SUBJECT: {{result.subject}}</b>
-              (<a id="mailDetails" class="btn-link mail-detail-btn" onclick="toggleMailDetails()">More details</a>)
+          <div class="well">
+            <h5 align="left">
+              <b>Subject: </b><i>{{result.subject}}</i><br>
+            </h5>
+            <h5 align="left">
+              <b>Sender / Recipient Lists:</b> {{result.sender}} / {{#each result.rcpt}}{{this}}, {{/each}}<br>
+            </h5>
+            <h5 align="left">
+              <b>Date/Time:</b> {{prettifyDate result.time}} / {{prettifyTime result.time}}<br>
+            </h5>
+            <h5 align="left">
+              <b>Processed / Total:</b> <span id="{{result.sid}}:process">{{result.process}}</span> / {{result.count}}<br>
+              <!--(<a id="mailDetails" class="btn-link mail-detail-btn" onclick="toggleMailDetails()">More details</a>)-->
             </h5>
           </div>
-          <div id="mail-detail" style="display: none;">
-            <h6 align="center"><b>Sender:</b> {{result.sender}}</h6>
-            <h6 align="center"><b>Recipents:</b> List1, List2, List6</h6>
-            <h6 align="center"><b>Date/Time:</b> {{prettifyDate result.time}} {{prettifyTime result.time}}</h6>
-            <h6 align="center"><b>Processed:</b> <span id="{{result.sid}}:process">{{result.process}}</span></h6>
-            <h6 align="center"><b>Total:</b> {{result.count}}</h6>
-          </div>
-          <br>
           <div class="jumbotron">
-            <div class="row" onclick="location='/session/{{result.sid}}/10'">
+            <div class="row"><!-- onclick="location='/session/{{result.sid}}/10'">-->
               <div class="col-lg-4 mail-sent">
                 <h1 id="{{result.sid}}:sent" align="center">{{result.sent}}</h1>
                 <h6 align="center"><b>SENT</b></h6>
@@ -50,16 +51,17 @@
               </div>
             </div>
             <br>
-              <div class="progress progress-striped active mail-prog-bar">
+              <div class="progress mail-prog-bar">
               <div id="{{result.sid}}:sprog" class="progress-bar progress-bar-success sent-mail-prog-bar" style="width: 0%"></div>
               <div id="{{result.sid}}:dprog" class="progress-bar progress-bar-warning defer-mail-prog-bar" style="width: 0%"></div>
               <div id="{{result.sid}}:bprog" class="progress-bar progress-bar-danger bounce-mail-prog-bar" style="width: 0%"></div>
             </div>
           </div>
-          <div id="mailButton" class="btn btn-default btn-block" onclick="toggleMailBody()"><b>SHOW MAIL CONTENT</b></div>
+          <!--<div id="mailButton" class="btn btn-default btn-block" onclick="toggleMailBody()"><b>SHOW MAIL CONTENT</b></div>-->
         </div>
       </div>
-      <div id="mail-content" class="well" style="display: none;">
+      <h4><b>MAIL BODY:</b></h4>
+      <div id="mail-content" class="well" style="display: block;">
         {{{result.mbody}}}
       </div>
       <div id="session-id" style="display: none;">{{result.sid}}</div>
@@ -89,8 +91,8 @@
       procPer = procPer - 1;
     }
 
-    if (procPer == 100)
-      $('.mail-prog-bar').toggleClass('active progress-striped');
+    //if (procPer == 100)
+    //  $('.mail-prog-bar').toggleClass('active progress-striped');
 
     document.getElementById(ssid + ':sprog').style.width = sentPer + '%';
     document.getElementById(ssid + ':dprog').style.width = deferPer + '%';
