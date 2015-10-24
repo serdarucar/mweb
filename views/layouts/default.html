@@ -81,6 +81,12 @@
         margin: auto;
         margin-top: 46px;
       }
+      @media (min-width: 768px) {
+        .modal-xl {
+          width: 90%;
+          max-width:1200px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -188,37 +194,83 @@
     </div>
 
     <div class="modal" id="listModal">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             <h3 class="modal-title">Mailing Lists</h3>
           </div>
           <form action="#" method="POST">
-            <div class="modal-body">
-              {{#user.list}}
-              <select class="form-control select-drp" id="select">
+              <div>
+              <div class="col-md-4">
+                <h5><b>NEW MAILS</b></h5>
+                <textarea class="form-control" rows="24" id="textAreaList" name="textAreaList"  placeholder="Copy & Paste Your Mails Here..."></textarea>
+                <br>
+                <button type="button" class="btn btn-success btn-xs list-crea">CREATE</button>
+                <!-- <br>
+                <input class="form-control" id="newlist" type="text" value="Enter Name For A New List..."> -->
+              </div>
+              <div class="col-md-4">
+                <h5><b>LIST NAME</b></h5>
+                <div id="list" class="list">
+                  <select multiple="" class="form-control" size="24">
+                    {{#user.list}}
+                    <option class="list-sel" idxVal="{{@index}}">{{name}}</option>
+                    {{/user.list}}
+                  </select>
+                </div>
+                <br>
+                <button type="button" class="btn btn-danger btn-xs list-dell">DELETE</button>
+              </div>
+              <div class="col-md-4">
+                <h5><b>LIST MEMBERS</b></h5>
+                <div id="listinc-default" class="list-include" style="display: block;">
+                  <select multiple="" class="form-control" size="24">
+                  </select>
+                </div>
+                {{#user.list}}
+                <div id="listinc-{{@index}}" class="list-include" style="display: none;">
+                  <select multiple="" class="form-control">
+                    {{#each members}}
+                    <option class="select-chg">{{this}}</option>
+                    {{/each}}
+                  </select>
+                </div>
+                {{/user.list}}
+                <br>
+                <button type="button" class="btn btn-danger btn-xs list-delm">REMOVE</button>
+              </div>
+              <!-- <h6><b>* (valid seperators: comma[,] colon[:] semicolon[;] vertical-bar[|] space[ ] enter[CR])</b></h6> -->
+              <!-- <div class="col-md-10">
+              </div>
+              <div class="col-md-2">
+                <div class="btn-group">
+                  <button id="list-picker-btn" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    New... <span class="caret"></span>
+                  </button>
+                  <ul id="list-picker" class="dropdown-menu">
+                    <li><a id="listsel-new" href="#">New... </a></li>
+                    {{#user.list}}
+                    <li><a id="list-select" href="#" idxVal="{{@index}}">{{name}}</a></li>
+                    {{/user.list}}
+                  </ul>
+                </div>
+              </div> -->
+              <!-- <select class="form-control select-drp" id="select">
                 <option>New..</option>
-                <option>{{name}}</option>
-              </select>
-              {{/user.list}}
-              <br>
-              <select multiple="" class="form-control">
-                <option class="select-chg"></option>
-              </select>
+                {{#user.list}}
+                <option id="listopt-{{@index}}">{{name}}</option>
+                {{/user.list}}
+              </select> -->
               <!--<h4 class="modal-title"><b>Create New List</b></h4>-->
-              <br>
-              <input type="text" class="form-control" id="inputListName" name="inputListName" placeholder="Enter A Name For Your List Here...">
-              <br>
-              <textarea class="form-control" rows="4" id="textAreaList" name="textAreaList"  placeholder="Copy & Paste Your List Of Mails Here...*"></textarea>
-              <h6><b>* (valid seperators: comma[,] colon[:] semicolon[;] vertical-bar[|] space[ ] enter[CR])</b></h6>
+              <!-- <input type="text" class="form-control" id="inputListName" name="inputListName" placeholder="Enter A Name For Your List Here..."> -->
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-primary list-add">Save</button>
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <!-- <button type="button" class="btn btn-primary list-add">Save</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> -->
             </div>
           </form>
-          <hr>
+          <!-- <hr>
           <div class="modal-header">
             <h4 class="modal-title"><b>My Lists</b></h4>
           </div>
@@ -226,7 +278,7 @@
             <div class="modal-body">
               <h5>
                 {{#user.list}}
-                <input type="checkbox" class="delList" value="{{id}}" name-data="{{name}}"><b> {{name}} </b>({{count}}) <!--<a href="#" id="listMembers" onclick="toggleListMembers()">show</a>-->
+                <input type="checkbox" class="delList" value="{{id}}" name-data="{{name}}"><b> {{name}} </b>({{count}}) --> <!--<a href="#" id="listMembers" onclick="toggleListMembers()">show</a>-->
                 <!--<h6>
                   <a href="#" id="{{id}}-show-list" class="label label-info">show</a>
                   <a href="#" id="{{id}}-del-list" class="label label-danger">delete</a>
@@ -239,7 +291,6 @@
                 <h5>
                   <div id="list-members" class="well" style="display: none;"></div>
                 </h5>
-                -->
                 <div id="list-members">
                   <h6>
                     {{#each members}}
@@ -254,7 +305,7 @@
             <div class="modal-footer">
               <button type="button" class="btn btn-primary list-del">Delete Selected</button>
             </div>
-          </form>
+          </form> -->
         </div>
       </div>
     </div>
@@ -544,15 +595,30 @@
         }
       }
 
-      $( ".select-drp" )
-        .change(function () {
-          var str = "";
-          $( ".select-drp option:selected" ).each(function() {
-            str += $( this ).text() + " ";
-          });
-          $( ".select-chg" ).text( str );
-        })
-        .change();
+      this.$('#list-picker li a').on('click', function(e){
+        var btnTxt = $('#list-picker-btn:first-child');
+        console.log(btnTxt);
+        $('#newlist').val($(this).text());
+        $('#newlist').attr('disabled','');
+        btnTxt.text($(this).text());
+        idx = $(this).attr('idxVal');
+        var incBlock = document.getElementById('listinc-' + idx);
+        //console.log($('#listinc-' + idx));
+        //$('.list-include').style.display = 'none';
+        $('.list-include').css('display', 'none');
+        incBlock.style.display = 'block';
+        e.preventDefault();
+      });
+
+      // $( ".select-drp" )
+      //   .change(function () {
+      //     var str = "";
+      //     $( ".select-drp option:selected" ).each(function() {
+      //       str += $( this ).text() + " ";
+      //     });
+      //     $( ".select-chg" ).text( str );
+      //   })
+      //   .change();
 
     </script>
   </body>
