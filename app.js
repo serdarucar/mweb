@@ -258,6 +258,12 @@ app.post('/deletelist', function(req, res) {
 
 });
 
+app.post('/deletelast', function(req, res) {
+
+    db.deleteMailList(req.user.id, req.body.listdelid);
+
+});
+
 app.get('/:date', ensureAuthenticated, function(req, res) { //@todo: not logged in user is looping here on a date
 
   var m = moment(req.params.date, 'YYYYMMDD');

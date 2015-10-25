@@ -203,24 +203,24 @@
           <form action="#" method="POST">
               <div>
               <div class="col-md-4">
-                <h5><b>NEW MAILS</b></h5>
+                <h5><b>CREATE NEW LIST</b></h5>
                 <textarea class="form-control" rows="24" id="textAreaList" name="textAreaList"  placeholder="Copy & Paste Your Mails Here..."></textarea>
                 <br>
-                <button type="button" class="btn btn-success btn-xs list-crea">CREATE</button>
+                <button type="button" class="btn btn-success btn-xs btn-list-crea">CREATE</button>
                 <!-- <br>
                 <input class="form-control" id="newlist" type="text" value="Enter Name For A New List..."> -->
               </div>
               <div class="col-md-4">
-                <h5><b>LIST NAME</b></h5>
+                <h5><b>YOUR LISTS</b></h5>
                 <div id="list" class="list">
-                  <select multiple="" class="form-control" size="24">
+                  <select multiple="" class="form-control" id="my-list" size="24">
                     {{#user.list}}
-                    <option class="list-sel" idxVal="{{@index}}">{{name}}</option>
+                    <option class="list-del" idxVal="{{@index}}" name-data="{{name}}" idVal="{{id}}">{{name}}</option>
                     {{/user.list}}
                   </select>
                 </div>
                 <br>
-                <button type="button" class="btn btn-danger btn-xs list-dell">DELETE</button>
+                <button type="button" class="btn btn-danger btn-xs btn-list-del">DELETE</button>
               </div>
               <div class="col-md-4">
                 <h5><b>LIST MEMBERS</b></h5>
@@ -230,7 +230,7 @@
                 </div>
                 {{#user.list}}
                 <div id="listinc-{{@index}}" class="list-include" style="display: none;">
-                  <select multiple="" class="form-control">
+                  <select multiple="" class="form-control" id="list-members-{{@index}}" size="24">
                     {{#each members}}
                     <option class="select-chg">{{this}}</option>
                     {{/each}}
@@ -238,7 +238,7 @@
                 </div>
                 {{/user.list}}
                 <br>
-                <button type="button" class="btn btn-danger btn-xs list-delm">REMOVE</button>
+                <button type="button" class="btn btn-danger btn-xs btn-members-rm">REMOVE</button>
               </div>
               <!-- <h6><b>* (valid seperators: comma[,] colon[:] semicolon[;] vertical-bar[|] space[ ] enter[CR])</b></h6> -->
               <!-- <div class="col-md-10">
@@ -351,6 +351,13 @@
         });
       });
 
+      // $('#dp3').on('click', function(e) {
+      //   e.preventDefault();
+      //   if ($(this).datepicker('widget').is(':visible')) {
+      //     console.log('XXX');
+      //   }
+      // });
+
       CKEDITOR.replace( 'mailBody' , {
         skin: 'office2013,/ext/ck/skin/office2013/',
         language: 'en'
@@ -363,12 +370,12 @@
 
         var checkedAtLeastOne = false;
         var subjectIsEmpty = false;
-        var mailCount = 0;
+        // var mailCount = 0;
 
         $('input[type="checkbox"].rcptList').each(function() {
           if ($(this).is(":checked")) {
             checkedAtLeastOne = true;
-            mailCount = mailCount + parseInt($(this).attr('count-data'));
+            // mailCount = mailCount + parseInt($(this).attr('count-data'));
           }
         });
 
@@ -396,7 +403,9 @@
                 'listnames'         : lists2
             };
 
-            var confirmation = confirm(mailCount + ' recipients are selected in total.\nAre you sure to send the mails?');
+            // var confirmation = confirm(mailCount + ' recipients are selected in total.\nAre you sure to send the mails?');
+
+            var confirmation = confirm('Are you sure to send the mails?');
 
             if (confirmation == true) {
               // process the form
@@ -426,14 +435,16 @@
       });
 
       // process list-add form
-      $('.list-add').click(function(event) {
+      $('.btn-list-crea').click(function(event) {
 
         event.preventDefault();
 
         var listNameIsEmpty = false;
         var listAreaIsEmpty = false;
 
-        if ( $('input[name="inputListName"]').val().length === 0 ) {
+        var listNameTxt = prompt("Please Enter List Name:", "My-List-0");
+
+        if ( listNameTxt.length === 0 ) {
           listNameIsEmpty = true;
         }
 
@@ -468,10 +479,10 @@
             }
           });
 
-          var listname = $.trim($('input[name="inputListName"]').val());
+          var listname = $.trim(listNameTxt);
           var listNameIsDuplicate = false;
 
-          $('input[type="checkbox"].delList').each(function() {
+          $('#my-list option').each(function() {
             if ($(this).attr('name-data').toLowerCase() === listname.toLowerCase()) {
               listNameIsDuplicate = true;
             }
@@ -508,7 +519,7 @@
               window.location = "/";
 
             } else {
-              alert('There is already a list named ' + listname + '!\nPlease choose another name');
+              alert('There is already a list named ' + listname.toLowerCase() + '!\nPlease choose another name');
             }
 
           } else {
@@ -521,22 +532,22 @@
       });
 
       // process list-del form
-      $('.list-del').click(function(event) {
+      $('.btn-list-del').click(function(event) {
 
         event.preventDefault();
 
         var checkedAtLeastOne = false;
 
-        $('input[type="checkbox"].delList').each(function() {
-          if ($(this).is(":checked")) {
+        $('#my-list option').each(function() {
+          if ($(this).is(":selected")) {
             checkedAtLeastOne = true;
           }
         });
 
         if (checkedAtLeastOne) {
 
-          var listdels = $('input[type="checkbox"].delList:checked').map(function() {
-            return $(this).val();
+          var listdels = $('#my-list option:selected').map(function() {
+            return $(this).attr('idVal');
           }).toArray();
 
           // get the form data
@@ -574,6 +585,118 @@
         }
       });
 
+      // process members-remove form
+      $('.btn-members-rm').click(function(event) {
+
+        event.preventDefault();
+
+        var checkedListCount = 0;
+        var checkedListId = false;
+        var checkedListName = false;
+
+        $('#my-list option').each(function() {
+          if ($(this).is(":selected")) {
+            checkedListCount++;
+            checkedListId = $(this).attr('idVal');
+            checkedListName = $(this).attr('name-data');
+            checkedListIdx = $(this).attr('idxVal');
+          }
+        });
+
+        var checkedAtLeastOne = false;
+
+        $('#list-members-' + checkedListIdx + ' option:selected').each(function() {
+          if ($(this).is(":selected")) {
+            checkedAtLeastOne = true;
+          }
+        });
+
+        if (checkedAtLeastOne && checkedListCount === 1) {
+
+          var memberdels = $('#list-members-' + checkedListIdx + ' option:selected').map(function() {
+            return $(this).text();
+          }).toArray();
+
+          var memberall = $('#list-members-' + checkedListIdx + ' option').map(function() {
+            return $(this).text();
+          }).toArray();
+
+          var newlist = $(memberall).not(memberdels).get();
+
+          if (newlist.length === 0) {
+
+            // get the form data
+            // there are many ways to get this data using jQuery (you can use the class or id also)
+            var formData = {
+                'listdelid'        : checkedListId
+            };
+
+            var confirmation = confirm('Are you sure to delete last member(s)?\n(note that the list will be deleted too.)');
+
+            if (confirmation == true) {
+
+              // process the form
+              $.ajax({
+                  type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+                  url         : '/deletelast', // the url where we want to POST
+                  data        : formData, // our data object
+                  dataType    : 'json', // what type of data do we expect back from the server
+                  encode      : true
+              })
+              // using the done promise callback
+              .done(function(data) {
+
+                  // log data to the console so we can see
+                  //console.log(data);
+                  // here we will handle errors and validation messages
+              });
+
+              window.location = "/";
+
+            }
+
+          } else {
+
+            // get the form data
+            // there are many ways to get this data using jQuery (you can use the class or id also)
+            var formData = {
+                'listname'        : checkedListName,
+                'listdata'        : newlist,
+                'listcount'       : newlist.length,
+                'listdelid'       : checkedListId
+            };
+
+            var confirmation = confirm('Are you sure to delete selected member(s)?');
+
+            if (confirmation == true) {
+
+              // process the form
+              $.ajax({
+                  type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+                  url         : '/updatelist', // the url where we want to POST
+                  data        : formData, // our data object
+                  dataType    : 'json', // what type of data do we expect back from the server
+                  encode      : true
+              })
+              // using the done promise callback
+              .done(function(data) {
+
+                  // log data to the console so we can see
+                  //console.log(data);
+                  // here we will handle errors and validation messages
+              });
+
+              window.location = "/";
+
+            }
+
+          }
+
+        } else {
+          alert('Please select only one list.');
+        }
+      });
+
       this.$('.navbar-brand').css('cursor', 'pointer');
 
       $('.navbar-brand').click(function() {
@@ -595,12 +718,7 @@
         }
       }
 
-      this.$('#list-picker li a').on('click', function(e){
-        var btnTxt = $('#list-picker-btn:first-child');
-        console.log(btnTxt);
-        $('#newlist').val($(this).text());
-        $('#newlist').attr('disabled','');
-        btnTxt.text($(this).text());
+      this.$('#list select option').on('click', function(e){
         idx = $(this).attr('idxVal');
         var incBlock = document.getElementById('listinc-' + idx);
         //console.log($('#listinc-' + idx));
