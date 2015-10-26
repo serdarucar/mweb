@@ -198,6 +198,14 @@ app.post('/admin', function(req, res){
   });
 });
 
+app.get('/new', function (req, res) {
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
+  } else {
+    res.render('new', { user: req.user });
+  }
+});
+
 app.post('/mailsender', function(req, res) {
 
   var prebody = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'></head><body>";
