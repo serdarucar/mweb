@@ -223,6 +223,10 @@ app.post('/mailsender', function(req, res) {
 
 });
 
+app.get('/list', function (req, res) {
+  res.render('list', { user: req.user });
+});
+
 app.post('/savelist', function(req, res) {
 
   var newlist = {
