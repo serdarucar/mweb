@@ -272,89 +272,95 @@ app.post('/deletelast', function(req, res) {
 
 });
 
-app.get('/:date', ensureAuthenticated, function(req, res) { //@todo: not logged in user is looping here on a date
-
-  var m = moment(req.params.date, 'YYYYMMDD');
-
-  var year = parseInt(req.params.date.substring(0, 4));
-  var month = parseInt(req.params.date.substring(4, 6));
-  var day = parseInt(req.params.date.substring(6, 8));
-
-  if (m.isValid()) {
-    db.getLatestMailByDate(req.user.id, year, month, day, function(err, result) {
-      if (result.length > 0) {
-        res.redirect('/' + req.params.date + '/' + result);
-      } else {
-        res.render('index', { nomail: true, date: moment(req.params.date, "YYYYMMDD"), user: req.user });
-      }
-    });
+app.get('/:date', function(req, res) { //@todo: not logged in user is looping here on a date (not anymore with user control; ensureAuthenticated caused this. investigate.)
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
   } else {
-    res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+    var m = moment(req.params.date, 'YYYYMMDD');
+
+    var year = parseInt(req.params.date.substring(0, 4));
+    var month = parseInt(req.params.date.substring(4, 6));
+    var day = parseInt(req.params.date.substring(6, 8));
+
+    if (m.isValid()) {
+      db.getLatestMailByDate(req.user.id, year, month, day, function(err, result) {
+        if (result.length > 0) {
+          res.redirect('/' + req.params.date + '/' + result);
+        } else {
+          res.render('index', { nomail: true, date: moment(req.params.date, "YYYYMMDD"), user: req.user });
+        }
+      });
+    } else {
+      res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+    }
   }
 });
 
 app.get('/:date/:sid', function(req, res) {
-
-  var m = moment(req.params.date, 'YYYYMMDD');
-
-  var year = parseInt(req.params.date.substring(0, 4));
-  var month = parseInt(req.params.date.substring(4, 6));
-  var day = parseInt(req.params.date.substring(6, 8));
-
-  if (m.isValid()) {
-    db.getMailBySID(req.params.sid, req.user.id, year, month, day, function(err, result) { // @todo: full path url working externally, put user control here
-      if (result) {
-        res.render('index', {
-          result: result,
-          date: result.time,
-          user: req.user
-        });
-      } else {
-        res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
-      }
-    });
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
   } else {
-    res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+    var m = moment(req.params.date, 'YYYYMMDD');
+
+    var year = parseInt(req.params.date.substring(0, 4));
+    var month = parseInt(req.params.date.substring(4, 6));
+    var day = parseInt(req.params.date.substring(6, 8));
+
+    if (m.isValid()) {
+      db.getMailBySID(req.params.sid, req.user.id, year, month, day, function(err, result) { // @todo: full path url working externally, put user control here
+        if (result) {
+          res.render('index', {
+            result: result,
+            date: result.time,
+            user: req.user
+          });
+        } else {
+          res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+        }
+      });
+    } else {
+      res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+    }
   }
 });
 
-app.get('/session/:sid/:lim', function(req, res) {
-
-  var s_sid = req.params.sid;
-  var n_lim = parseInt(req.params.lim);
-  var n_lim_next = n_lim * 10;
-
-  db.getSessionMails(s_sid, n_lim, function(err, result) {
-    if (result) {
-      res.render('session', {
-        result: result,
-        sid: s_sid,
-        aft_lim: n_lim_next,
-        user: req.user
-      });
-    } else {
-      res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
-    }
-  });
-
-});
-
-app.get('/detail/:qid/:addr', function(req, res) {
-
-  var s_uid = req.params.qid + '/' + req.params.addr;
-
-  db.getMailDetail(s_uid, function(err, result) {
-    if (result) {
-      res.render('log', {
-        result: result,
-        user: req.user
-      });
-    } else {
-      res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
-    }
-  });
-
-});
+// app.get('/session/:sid/:lim', function(req, res) {
+//
+//   var s_sid = req.params.sid;
+//   var n_lim = parseInt(req.params.lim);
+//   var n_lim_next = n_lim * 10;
+//
+//   db.getSessionMails(s_sid, n_lim, function(err, result) {
+//     if (result) {
+//       res.render('session', {
+//         result: result,
+//         sid: s_sid,
+//         aft_lim: n_lim_next,
+//         user: req.user
+//       });
+//     } else {
+//       res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+//     }
+//   });
+//
+// });
+//
+// app.get('/detail/:qid/:addr', function(req, res) {
+//
+//   var s_uid = req.params.qid + '/' + req.params.addr;
+//
+//   db.getMailDetail(s_uid, function(err, result) {
+//     if (result) {
+//       res.render('log', {
+//         result: result,
+//         user: req.user
+//       });
+//     } else {
+//       res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+//     }
+//   });
+//
+// });
 
 app.use(function (req, res, next) {
   res.status(404);
