@@ -82,7 +82,7 @@ $('.btn-list-crea').click(function(event) {
             // here we will handle errors and validation messages
         });
 
-        window.location.reload(true);
+        window.setTimeout('location.reload(true)', 100);
 
       } else {
         alert('There is already a list named ' + listname.toLowerCase() + '!\nPlease choose another name');
@@ -142,7 +142,7 @@ $('.btn-list-del').click(function(event) {
           // here we will handle errors and validation messages
       });
 
-      window.location.reload(true);
+      window.setTimeout('location.reload(true)', 100);
 
     }
 
@@ -241,7 +241,7 @@ $('.btn-members-add').click(function(event) {
             // here we will handle errors and validation messages
         });
 
-        window.location.reload(true);
+        window.setTimeout('location.reload(true)', 100);
 
       } else {
         alert('Please enter mail addresses in the form.');
@@ -320,7 +320,7 @@ $('.btn-members-rm').click(function(event) {
             // here we will handle errors and validation messages
         });
 
-        window.location.reload(true);
+        window.setTimeout('location.reload(true)', 100);
 
       }
 
@@ -355,7 +355,7 @@ $('.btn-members-rm').click(function(event) {
             // here we will handle errors and validation messages
         });
 
-        window.location.reload(true);
+        window.setTimeout('location.reload(true)', 100);
 
       }
 
