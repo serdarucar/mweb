@@ -1,13 +1,63 @@
 <div class="container">
-<div class="row">
-<div class="col-lg-12">
-<div class="page-header">
-  <h1 id="navbar"><br>Mailing Lists</h1>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="page-header">
+        <h3 id="navbar"><br>Mailing Lists</h3>
+      </div>
+      <form action="#" method="POST">
+        <div>
+          <div class="col-md-12">
+            <h5><b>MAIL ADDRESS INPUT</b></h5>
+            <textarea class="form-control" rows="5" id="textAreaList" name="textAreaList"  placeholder="Copy & Paste Your Mails Here..."></textarea>
+            <br>
+            <!-- <br>
+            <input class="form-control" id="newlist" type="text" value="Enter Name For A New List..."> -->
+          </div>
+          <div class="col-md-6">
+            <button type="button" class="btn btn-primary btn-xs btn-block btn-members-add">ADD MAIL(S) TO SELECTED LIST</button>
+          </div>
+          <div class="col-md-6">
+            <button type="button" class="btn btn-success btn-xs btn-block btn-list-crea">CREATE NEW MAIL LIST</button>
+          </div>
+          <div class="col-md-6">
+            <br><br>
+            <h5><b>YOUR LISTS</b></h5>
+            <div id="list" class="list">
+              <select multiple="" class="form-control" id="my-list" size="7">
+                {{#user.list}}
+                <option class="list-del" idxVal="{{@index}}" name-data="{{name}}" idVal="{{id}}">{{name}}</option>
+                {{/user.list}}
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <br><br>
+            <h5><b>LIST MEMBERS</b></h5>
+            <div id="listinc-default" class="list-include" style="display: block;">
+              <select multiple="" class="form-control" size="7">
+              </select>
+            </div>
+            {{#user.list}}
+            <div id="listinc-{{@index}}" class="list-include" style="display: none;">
+              <select multiple="" class="form-control" id="list-members-{{@index}}" size="7">
+                {{#each members}}
+                <option class="select-chg">{{this}}</option>
+                {{/each}}
+              </select>
+            </div>
+            {{/user.list}}
+          </div>
+          <div class="col-md-6">
+            <br>
+            <button type="button" class="btn btn-danger btn-xs btn-block btn-list-del">DELETE SELECTED LIST(S)</button>
+          </div>
+          <div class="col-md-6">
+            <br>
+            <button type="button" class="btn btn-danger btn-xs btn-block btn-members-rm">REMOVE MAIL(S) FROM LIST</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
-
-<div id='main'>
-</div>
-{{list}}
-</div>
-</div>
-</div>
+<script type="text/javascript" src="/js/list.js"></script>
