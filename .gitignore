@@ -1,12 +1,6 @@
-bck/
-data/bounces.sqlite3
-pull.sh
-starter.sh
 npm-debug.log
-newrelic.js
-newrelic_agent.log
 node_modules/
-.foreverignore
+
 ### SublimeText ###
 # workspace files are user-specific
 *.sublime-workspace

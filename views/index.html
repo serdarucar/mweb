@@ -35,27 +35,38 @@
               <!--(<a id="mailDetails" class="btn-link mail-detail-btn" onclick="toggleMailDetails()">More details</a>)-->
             </h5>
           </div>
-          <div class="jumbotron">
-            <div class="row"><!-- onclick="location='/session/{{result.sid}}/10'">-->
-              <div class="col-lg-4 mail-sent">
-                <h1 id="{{result.sid}}:sent" align="center">{{result.sent}}</h1>
-                <h6 align="center"><b>SENT</b></h6>
+          <div class="ui three statistics">
+            <div class="green huge statistic">
+              <div id="{{result.sid}}:sent" class="value mail-sent">
+                {{result.sent}}
               </div>
-              <div class="col-lg-4 mail-deferred">
-                <h1 id="{{result.sid}}:deferred" align="center">{{result.deferred}}</h1>
-                <h6 align="center"><b>RETRY</b></h6>
-              </div>
-              <div class="col-lg-4 mail-bounced">
-                <h1 id="{{result.sid}}:bounced" align="center">{{result.bounced}}</h1>
-                <h6 align="center"><b>UNSENT</b></h6>
+              <div class="label">
+                SENT
               </div>
             </div>
-            <br>
-              <div class="progress mail-prog-bar">
-              <div id="{{result.sid}}:sprog" class="progress-bar progress-bar-success sent-mail-prog-bar" style="width: 0%"></div>
-              <div id="{{result.sid}}:dprog" class="progress-bar progress-bar-warning defer-mail-prog-bar" style="width: 0%"></div>
-              <div id="{{result.sid}}:bprog" class="progress-bar progress-bar-danger bounce-mail-prog-bar" style="width: 0%"></div>
+            <div class="yellow huge statistic">
+              <div id="{{result.sid}}:deferred" class="value mail-deferred">
+                {{result.deferred}}
+              </div>
+              <div class="label">
+                RETRY
+              </div>
             </div>
+            <div class="red huge statistic">
+              <div id="{{result.sid}}:bounced" class="value mail-bounced">
+                {{result.bounced}}
+              </div>
+              <div class="label">
+                UNSENT
+              </div>
+            </div>
+          </div>
+          <br>
+          </div>
+          <div class="progress mail-prog-bar">
+            <div id="{{result.sid}}:sprog" class="progress-bar progress-bar-success sent-mail-prog-bar" style="width: 0%"></div>
+            <div id="{{result.sid}}:dprog" class="progress-bar progress-bar-warning defer-mail-prog-bar" style="width: 0%"></div>
+            <div id="{{result.sid}}:bprog" class="progress-bar progress-bar-danger bounce-mail-prog-bar" style="width: 0%"></div>
           </div>
           <!--<div id="mailButton" class="btn btn-default btn-block" onclick="toggleMailBody()"><b>SHOW MAIL CONTENT</b></div>-->
         </div>
