@@ -7,14 +7,14 @@
       <form action="#" method="POST">
         <div >
           <h5>From: <b>{{user.email}}<b></h5>
-          <h5>To:  &nbsp;<b>
+          <h5>To:  &nbsp;
             {{#user.list}}
-            <input type="checkbox" class="rcptList" value="{{id}}" list-data="{{name}}" count-data="{{count}}">&nbsp;{{name}}&nbsp;({{count}})&nbsp;&nbsp;&nbsp;
-            <!--<input type="text" name="members-{{id}}" style="display: none;">{{members}}-->
+            <b><input type="checkbox" class="rcptList" value="{{id}}" list-data="{{name}}" count-data="{{count}}">&nbsp;{{name}}&nbsp;({{count}})&nbsp;&nbsp;&nbsp;</b>
             {{else}}
             <a href="/list">Create A List</a>
-            {{/user.list}}</b>
+            {{/user.list}}
           </h5>
+          <!-- <h6><a href="/list">Manage Lists</a></h6> -->
         </div>
         <div>
           <br>
@@ -30,4 +30,4 @@
     </div>
   </div>
 </div>
-<script src="/js/new.js"></script>
+<script type="text/javascript" src="/js/new.js"></script>

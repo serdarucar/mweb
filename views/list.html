@@ -8,7 +8,7 @@
         <div>
           <div class="col-md-12">
             <h5><b>MAIL ADDRESS INPUT</b></h5>
-            <textarea class="form-control" rows="6" id="textAreaList" name="textAreaList"  placeholder="Copy & Paste Your Mails Here..."></textarea>
+            <textarea class="form-control" rows="5" id="textAreaList" name="textAreaList"  placeholder="Copy & Paste Your Mails Here..."></textarea>
             <br>
             <!-- <br>
             <input class="form-control" id="newlist" type="text" value="Enter Name For A New List..."> -->
@@ -23,7 +23,7 @@
             <br><br>
             <h5><b>YOUR LISTS</b></h5>
             <div id="list" class="list">
-              <select multiple="" class="form-control" id="my-list" size="10">
+              <select multiple="" class="form-control" id="my-list" size="7">
                 {{#user.list}}
                 <option class="list-del" idxVal="{{@index}}" name-data="{{name}}" idVal="{{id}}">{{name}}</option>
                 {{/user.list}}
@@ -34,12 +34,12 @@
             <br><br>
             <h5><b>LIST MEMBERS</b></h5>
             <div id="listinc-default" class="list-include" style="display: block;">
-              <select multiple="" class="form-control" size="10">
+              <select multiple="" class="form-control" size="7">
               </select>
             </div>
             {{#user.list}}
             <div id="listinc-{{@index}}" class="list-include" style="display: none;">
-              <select multiple="" class="form-control" id="list-members-{{@index}}" size="10">
+              <select multiple="" class="form-control" id="list-members-{{@index}}" size="7">
                 {{#each members}}
                 <option class="select-chg">{{this}}</option>
                 {{/each}}
@@ -60,4 +60,4 @@
     </div>
   </div>
 </div>
-<script src="/js/list.js"></script>
+<script type="text/javascript" src="/js/list.js"></script>
