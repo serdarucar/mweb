@@ -224,7 +224,11 @@ app.post('/mailsender', function(req, res) {
 });
 
 app.get('/list', function (req, res) {
-  res.render('list', { user: req.user });
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
+  } else {
+    res.render('list', { user: req.user });
+  }
 });
 
 app.post('/savelist', function(req, res) {
