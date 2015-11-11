@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html lang="en" data-framework="angularjs">
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
@@ -28,6 +29,7 @@
     <!-- Socket.IO related scripts -->
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"></script>
     <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>-->
 
     <!--<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
@@ -36,11 +38,12 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
   -->
-  
+
     <link href="/ext/semantic/ui/dist/semantic.min.css" rel="stylesheet" type="text/css">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.4/yeti/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="bower_components/todomvc-common/base.css"> -->
     <script src="/ext/semantic/ui/dist/semantic.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.js"></script>
@@ -85,8 +88,10 @@
         margin-top: 46px;
       }
     </style>
+		<style>[ng-cloak] { display: none; }</style>
   </head>
   <body>
+
     <!--[if lt IE 7]>
       <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
     <![endif]-->
@@ -113,6 +118,7 @@
         <ul class="nav navbar-nav navbar-right">
           {{# if user.admin}}
           <li><a href="/admin"><i class="fa fa-cogs fa-lg"></i> <b>ADMIN</b></a></li>
+          <li><a href="/lists"><i class="fa fa-cogs fa-lg"></i> <b>ng-lists</b></a></li>
           {{/if}}
           <li><a href="/"><i class="fa fa-home fa-lg"></i> <b>HOME</b></a></li>
           <li><a href="/new"><i class="fa fa-pencil-square-o fa-lg"></i> <b>NEW MAIL</b></a></li>

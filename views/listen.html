@@ -1,0 +1,39 @@
+<div ng-app="listApp">
+  <ng-view />
+
+  <br><br><br><br>
+    <div ng-controller="listCtrl" class="ui container">
+      <div class="col-lg-12">
+        <div class="col-lg-4 ui segment">
+          <div class="ui large selection list">
+            <div class="item" ng-repeat="list in lists">
+              <div class="right floated content">
+                <div class="ui button">X</div>
+              </div>
+              <div class="content">
+                {[{list.name}]}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-8 ui segment">
+          <div class="ui selection list">
+            <div class="item" ng-repeat="list in lists">
+              <div class="right floated content">
+                <div class="ui button">X</div>
+              </div>
+              <div class="content">
+                {[{list.name}]}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <br><br><br><br>
+  {{user.id}}
+</div>
+
+<script type="text/javascript" src="/js/app.js"></script>
+<script type="text/javascript" src="/js/controllers/listCtrl.js"></script>
+<script type="text/javascript" src="/js/services/listStorage.js"></script>

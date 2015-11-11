@@ -9,6 +9,8 @@ require('pmx').init({
 var express = require('express'),
   app = express(),
   io = require('socket.io').listen(app.listen(process.env.PORT || 8888)),
+  r = require('rethinkdb'),
+  async = require('async'),
   db = require('./lib/db'),
   exphbs = require('express-handlebars'),
   helpers = require('./lib/helpers'),
@@ -27,6 +29,8 @@ var express = require('express'),
   shortid = require('shortid'),
   request = require('request-json'),
   pmx = require('pmx');
+
+var config = require(__dirname + '/config.js');
 
 // `ExpressHandlebars` instance creation.
 var hbs = exphbs.create({
@@ -231,6 +235,14 @@ app.post('/mailsender', function(req, res) {
 
 });
 
+app.get('/lists', function (req, res) {
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
+  } else {
+    res.render('listen', { user: req.user });
+  }
+});
+
 app.get('/list', function (req, res) {
   if (typeof req.user === 'undefined') {
     res.render('404', { url: req.url });
@@ -330,6 +342,155 @@ app.get('/:date/:sid', function(req, res) {
       res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
     }
   }
+});
+
+//The REST routes for "list".
+app.route('/api/rest/list')
+  .get(allListItems)
+  .post(createListItem);
+
+app.route('/api/rest/list/:id')
+  .get(getListItem)
+  .put(updateListItem)
+  .delete(deleteListItem);
+
+//If we reach this middleware the route could not be handled and must be unknown.
+app.use(handle404);
+
+//Generic error handling middleware.
+app.use(handleError);
+
+
+/*
+ * Retrieve all list items.
+ */
+function allListItems(req, res, next) {
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
+  } else {
+    r.table('list').orderBy({index: 'createdAt'}).filter({'user': req.user.id}).run(req.app._rdbConn, function(err, cursor) {
+      if(err) {
+        return next(err);
+      }
+
+      //Retrieve all the lists in an array.
+      cursor.toArray(function(err, result) {
+        if(err) {
+          return next(err);
+        }
+
+        res.json(result);
+      });
+    });
+  }
+}
+
+/*
+ * Delete a list item.
+ */
+function deleteListItem(req, res, next) {
+  var listItemID = req.params.id;
+
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
+  } else {
+    r.table('list').get(listItemID).update({active: false}).run(req.app._rdbConn, function(err, result) {
+      if(err) {
+        return next(err);
+      }
+
+      res.json({success: true});
+    });
+  }
+}
+
+/*
+ * Insert a new todo item.
+ */
+function createListItem(req, res, next) {
+  var listItem = req.body;
+  listItem.createdAt = r.now();
+
+  console.dir(listItem);
+
+  r.table('list').insert(listItem, {returnChanges: true}).run(req.app._rdbConn, function(err, result) {
+    if(err) {
+      return next(err);
+    }
+
+    res.json(result.changes[0].new_val);
+  });
+}
+
+/*
+ * Get a specific todo item.
+ */
+function getListItem(req, res, next) {
+  var listItemID = req.params.id;
+
+  r.table('list').get(listItemID).run(req.app._rdbConn, function(err, result) {
+    if(err) {
+      return next(err);
+    }
+
+    res.json(result);
+  });
+}
+
+/*
+ * Update a todo item.
+ */
+function updateListItem(req, res, next) {
+  var listItem = req.body;
+  var listItemID = req.params.id;
+
+  r.table('list').get(listItemID).update(listItem, {returnChanges: true}).run(req.app._rdbConn, function(err, result) {
+    if(err) {
+      return next(err);
+    }
+
+    res.json(result.changes[0].new_val);
+  });
+}
+
+/*
+ * Page-not-found middleware.
+ */
+function handle404(req, res, next) {
+  res.status(404).end('not found');
+}
+
+/*
+ * Generic error handling middleware.
+ * Send back a 500 page and log the error to the console.
+ */
+function handleError(err, req, res, next) {
+  console.error(err.stack);
+  res.status(500).json({err: err.message});
+}
+
+/*
+ * Store the db connection and start listening on a port.
+ */
+function startDB(connection) {
+  app._rdbConn = connection;
+}
+
+/*
+ * Connect to rethinkdb, create the needed tables/indexes and then start express.
+ * Create tables/indexes then start express
+ */
+async.waterfall([
+  function connect(callback) {
+    r.connect(config.rethinkdb, callback);
+  }], function(err, connection) {
+  if(err) {
+    console.error(err);
+    process.exit(1);
+    return;
+  }
+
+  startDB(connection);
 });
 
 // app.get('/session/:sid/:lim', function(req, res) {
