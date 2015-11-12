@@ -2,17 +2,34 @@
   <ng-view />
 
 
-<br><br><br><br>
 <div class="container">
   <div class="row">
+    <div class="page-header">
+      <h3 id="navbar"><br>Manage Mailing Lists</h3>
+    </div>
+    <div class="ui two column grid">
+      <div class="col-lg-6 ui left aligned column header">
+        <br>
+        <a href="/list2"><b>CREATE A NEW LIST</b></a>
+      </div>
+        <div class="col-lg-6 ui right aligned column">
+          <div class="ui big fluid icon input">
+            <input type="text" placeholder="Add mail to selected list...">
+            <i class="large green add circle link icon"></i>
+            <br>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
     <div ng-controller="listCtrl" class="ui container">
       <div class="col-lg-12 ui segment">
         <div class="col-lg-6">
-          <div class="ui left aligned big header">&nbsp;&nbsp;MY LISTS</div>
-          <div class="ui big celled selection list">
+          <div class="ui left aligned huge header">{[{listName}]}</div>
+          <div class="ui big padded celled selection list">
             <div class="item" ng-repeat="list in lists" ng-click="switchListMembers($index, list.id, list.name)">
               <div class="right floated content">
-                <button class="ui inverted tiny circular red button" ng-click="removeList(list, $index)">X</button>
+                <i class="large remove circle red link icon" ng-click="removeList(list, $index)"></i>
               </div>
               <div class="content">
                 {[{list.name}]}
@@ -21,11 +38,11 @@
           </div>
         </div>
         <div class="col-lg-6">
-          <div class="ui right aligned big header">{[{listName}]}</div>
+          <div class="ui right aligned huge header">{[{listCount}]}&nbsp;mail(s)</div>
           <div class="ui big celled list">
             <div class="item" ng-repeat="member in listMembers">
               <div class="right floated content">
-                <div class="ui inverted tiny circular red button" ng-click="removeMember(member, $index, member.listid)">X</div>
+                <i class="large remove circle red link icon" ng-click="removeMember(member, $index, member.listid)"></i>
               </div>
               <div class="content">
                 {[{member.email}]}

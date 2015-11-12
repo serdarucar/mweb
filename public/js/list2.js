@@ -9,6 +9,7 @@ $('.btn-list-crea').click(function(event) {
   var listAreaIsEmpty = false;
 
   //var listNameTxt = prompt("Please Enter List Name:", "My-List-0");
+  var listNameTxt = $('input[name="newlist"]').val();
 
   if ( listNameTxt.length === 0 ) {
     listNameIsEmpty = true;
@@ -82,7 +83,8 @@ $('.btn-list-crea').click(function(event) {
             // here we will handle errors and validation messages
         });
 
-        window.setTimeout('location.reload(true)', 100);
+        // window.setTimeout('location.reload(true)', 100);
+        window.location = '/lists';
 
       } else {
         alert('There is already a list named ' + listname.toLowerCase() + '!\nPlease choose another name');

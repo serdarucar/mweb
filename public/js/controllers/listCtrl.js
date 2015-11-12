@@ -10,6 +10,7 @@ listApp.controller('listCtrl', function listCtrl($scope, listStorage) {
 
   $scope.lists = [];
   $scope.listMembers = [];
+  $scope.listCount = 0;
   // $scope.members = [];
 
   listStorage.get().success(function(lists) {
@@ -26,12 +27,16 @@ listApp.controller('listCtrl', function listCtrl($scope, listStorage) {
       $scope.listMembers.push({email: members[i], listid: listid});
     }
     $scope.listName = listname;
+    $scope.listCount = $scope.listMembers.length;
   };
 
+// @todo: sending index from template removes erroneous when it's ordered on the client side. maybe indexOf should be used.
   $scope.removeList = function (list, idx) {
     listStorage.delete(list.id).success(function() {
       $scope.lists.splice(idx, 1);
       $scope.listMembers = [];
+      $scope.listName = null;
+      $scope.listCount = 0;
     }).error(function() {
       alert('Failed to delete this LIST');
     });

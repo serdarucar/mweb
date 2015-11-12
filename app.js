@@ -206,7 +206,9 @@ app.get('/new', function (req, res) {
   if (typeof req.user === 'undefined') {
     res.render('404', { url: req.url });
   } else {
-    res.render('new', { user: req.user });
+    db.getUsersActiveLists(req.user.id, function (err, result) {
+      res.render('new', { lists: result, user: req.user });
+    })
   }
 });
 
