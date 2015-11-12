@@ -98,18 +98,18 @@
 
     <div class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
-      <a class="navbar-brand" href="/"><b>MAILER</b> by SIO</a>
+      <!-- <a class="navbar-brand" href="/"><b>MAILER</b> by SIO</a> -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         {{#if user}}
-        <div class="navbar-brand navbar-center">{{user.email}}</div>
+        <!-- <div class="navbar-brand navbar-center">{{user.email}}</div> -->
         <ul class="nav navbar-nav navbar-left">
-          <li><a href="#" id="dp3" data-date="{{prettifyDate date}}"><i class="fa fa-calendar fa-lg"></i><b>    {{prettifyDate date}}</b> <span class="caret"></span></a></li>
+          <!-- <li><a href="#" id="dp3" data-date="{{prettifyDate date}}"><i class="fa fa-calendar fa-lg"></i><b>    {{prettifyDate date}}</b> <span class="caret"></span></a></li> -->
           {{#if result}}
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-clock-o fa-lg"></i><b>   {{prettifyTime result.time}}</b> {{trimNavSubject result.subject}} <span class="caret"></span></a>
+            <!-- <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-clock-o fa-lg"></i><b>   {{prettifyTime result.time}}</b> {{trimNavSubject result.subject}} <span class="caret"></span></a> -->
             <ul class="dropdown-menu" role="menu">
               {{#result.daymail}}
-              <li><a href="{{sid}}"><b>{{prettifyTime time}}</b> {{subject}}</a></li>
+              <!-- <li><a href="{{sid}}"><b>{{prettifyTime time}}</b> {{subject}}</a></li> -->
               {{/result.daymail}}
             </ul>
           </li>
@@ -117,12 +117,13 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
           {{# if user.admin}}
-          <li><a href="/admin"><i class="fa fa-cogs fa-lg"></i> <b>ADMIN</b></a></li>
+          <!-- <li><a href="/admin"><i class="fa fa-cogs fa-lg"></i> <b>ADMIN</b></a></li> -->
           <li><a href="/lists"><i class="fa fa-cogs fa-lg"></i> <b>ng-lists</b></a></li>
+          <li><a href="/list2"><i class="fa fa-cogs fa-lg"></i> <b>ng-list2</b></a></li>
           {{/if}}
-          <li><a href="/"><i class="fa fa-home fa-lg"></i> <b>HOME</b></a></li>
+          <!-- <li><a href="/"><i class="fa fa-home fa-lg"></i> <b>HOME</b></a></li>
           <li><a href="/new"><i class="fa fa-pencil-square-o fa-lg"></i> <b>NEW MAIL</b></a></li>
-          <li><a href="/list"><i class="fa fa-list fa-lg"></i> <b>LISTS</b></a></li>
+          <li><a href="/list"><i class="fa fa-list fa-lg"></i> <b>LISTS</b></a></li> -->
           <li><a href="/logout"><i class="fa fa-sign-out fa-lg"></i> <b>SIGN OUT</b></a></li>
         </ul>
         {{else}}

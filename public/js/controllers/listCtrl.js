@@ -7,7 +7,9 @@
  * - exposes the model to the template and provides event handlers
  */
 listApp.controller('listCtrl', function listCtrl($scope, listStorage) {
+
   $scope.lists = [];
+  $scope.listMembers = [];
   // $scope.members = [];
 
   listStorage.get().success(function(lists) {
@@ -17,11 +19,30 @@ listApp.controller('listCtrl', function listCtrl($scope, listStorage) {
     alert('Failed to load LISTs');
   });
 
-  $scope.removeList = function (list) {
+  $scope.switchListMembers = function (idx, listid, listname) {
+    $scope.listMembers = [];
+    var members = $scope.lists[idx].members;
+    for (var i = 0; i < members.length; i++) {
+      $scope.listMembers.push({email: members[i], listid: listid});
+    }
+    $scope.listName = listname;
+  };
+
+  $scope.removeList = function (list, idx) {
     listStorage.delete(list.id).success(function() {
-      $scope.lists.splice($scope.lists.indexOf(list), 1);
+      $scope.lists.splice(idx, 1);
+      $scope.listMembers = [];
     }).error(function() {
       alert('Failed to delete this LIST');
     });
   };
+
+  $scope.removeMember = function (member, idx, listid) {
+    // listStorage.update(selectedListId, member, 'delete').success(function() {
+    //   $scope.listMembers.splice(idx, 1);
+    // }).error(function() {
+    //   alert('Failed to delete this MEMBER');
+    // });
+  };
+
 });

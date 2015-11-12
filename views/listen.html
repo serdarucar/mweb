@@ -1,14 +1,18 @@
 <div ng-app="listApp">
   <ng-view />
 
-  <br><br><br><br>
+
+<br><br><br><br>
+<div class="container">
+  <div class="row">
     <div ng-controller="listCtrl" class="ui container">
-      <div class="col-lg-12">
-        <div class="col-lg-4 ui segment">
-          <div class="ui large selection list">
-            <div class="item" ng-repeat="list in lists">
+      <div class="col-lg-12 ui segment">
+        <div class="col-lg-6">
+          <div class="ui left aligned big header">&nbsp;&nbsp;MY LISTS</div>
+          <div class="ui big celled selection list">
+            <div class="item" ng-repeat="list in lists" ng-click="switchListMembers($index, list.id, list.name)">
               <div class="right floated content">
-                <div class="ui button">X</div>
+                <button class="ui inverted tiny circular red button" ng-click="removeList(list, $index)">X</button>
               </div>
               <div class="content">
                 {[{list.name}]}
@@ -16,22 +20,23 @@
             </div>
           </div>
         </div>
-        <div class="col-lg-8 ui segment">
-          <div class="ui selection list">
-            <div class="item" ng-repeat="list in lists">
+        <div class="col-lg-6">
+          <div class="ui right aligned big header">{[{listName}]}</div>
+          <div class="ui big celled list">
+            <div class="item" ng-repeat="member in listMembers">
               <div class="right floated content">
-                <div class="ui button">X</div>
+                <div class="ui inverted tiny circular red button" ng-click="removeMember(member, $index, member.listid)">X</div>
               </div>
               <div class="content">
-                {[{list.name}]}
+                {[{member.email}]}
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  <br><br><br><br>
-  {{user.id}}
+</div>
+</div>
 </div>
 
 <script type="text/javascript" src="/js/app.js"></script>

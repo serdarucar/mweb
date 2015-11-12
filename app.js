@@ -251,6 +251,14 @@ app.get('/list', function (req, res) {
   }
 });
 
+app.get('/list2', function (req, res) {
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
+  } else {
+    res.render('list2', { user: req.user });
+  }
+});
+
 app.post('/savelist', function(req, res) {
 
   var newlist = {
@@ -261,6 +269,18 @@ app.post('/savelist', function(req, res) {
   }
 
   db.saveMailList(req.user.id, newlist);
+
+});
+
+app.post('/savelist2', function(req, res) {
+
+  var newlist = {
+    name: req.body.listname,
+    members: req.body.listdata,
+    count: req.body.listcount
+  }
+
+  db.saveMailList2(req.user.id, newlist);
 
 });
 
@@ -368,7 +388,7 @@ function allListItems(req, res, next) {
   if (typeof req.user === 'undefined') {
     res.render('404', { url: req.url });
   } else {
-    r.table('list').orderBy({index: 'createdAt'}).filter({'user': req.user.id}).run(req.app._rdbConn, function(err, cursor) {
+    r.table('list').orderBy({index: 'createdAt'}).filter({user: req.user.id, active: true}).run(req.app._rdbConn, function(err, cursor) {
       if(err) {
         return next(err);
       }
