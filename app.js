@@ -460,13 +460,16 @@ function getListItem(req, res, next) {
 }
 
 /*
- * Update a todo item.
+ * Update a list member.
  */
 function updateListItem(req, res, next) {
-  var listItem = req.body;
+  var listMembers = req.body;
   var listItemID = req.params.id;
 
-  r.table('list').get(listItemID).update(listItem, {returnChanges: true}).run(req.app._rdbConn, function(err, result) {
+  r.db('mailsender').table('list').get(listItemID)
+    .update(function () {
+      return { members: listMembers }
+    }, {returnChanges: true}).run(req.app._rdbConn, function(err, result) {
     if(err) {
       return next(err);
     }

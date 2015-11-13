@@ -87,15 +87,15 @@ $('.btn-list-crea').click(function(event) {
         window.location = '/lists';
 
       } else {
-        alert('There is already a list named ' + listname.toLowerCase() + '!\nPlease choose another name');
+        //alert('There is already a list named ' + listname.toLowerCase() + '!\nPlease choose another name');
       }
 
     } else {
-      alert('There are no valid mails on the list you provided.\nList can not be saved.');
+      //alert('There are no valid mails on the list you provided.\nList can not be saved.');
     }
 
   } else {
-    alert('Please enter mail addresses in the form.');
+    //alert('Please enter mail addresses in the form.');
   }
 });
 

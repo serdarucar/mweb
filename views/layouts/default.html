@@ -98,67 +98,53 @@
 
     <div class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
-      <!-- <a class="navbar-brand" href="/"><b>MAILER</b> by SIO</a> -->
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        {{#if user}}
-        <!-- <div class="navbar-brand navbar-center">{{user.email}}</div> -->
-        <ul class="nav navbar-nav navbar-left">
-          <!-- <li><a href="#" id="dp3" data-date="{{prettifyDate date}}"><i class="fa fa-calendar fa-lg"></i><b>    {{prettifyDate date}}</b> <span class="caret"></span></a></li> -->
-          {{#if result}}
-          <li class="dropdown">
-            <!-- <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-clock-o fa-lg"></i><b>   {{prettifyTime result.time}}</b> {{trimNavSubject result.subject}} <span class="caret"></span></a> -->
-            <ul class="dropdown-menu" role="menu">
-              {{#result.daymail}}
-              <!-- <li><a href="{{sid}}"><b>{{prettifyTime time}}</b> {{subject}}</a></li> -->
-              {{/result.daymail}}
-            </ul>
-          </li>
-          {{/if}}
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-          {{# if user.admin}}
-          <!-- <li><a href="/admin"><i class="fa fa-cogs fa-lg"></i> <b>ADMIN</b></a></li> -->
-          <li><a href="/lists"><i class="fa fa-cogs fa-lg"></i> <b>ng-lists</b></a></li>
-          <li><a href="/list2"><i class="fa fa-cogs fa-lg"></i> <b>ng-list2</b></a></li>
-          {{/if}}
-          <!-- <li><a href="/"><i class="fa fa-home fa-lg"></i> <b>HOME</b></a></li>
-          <li><a href="/new"><i class="fa fa-pencil-square-o fa-lg"></i> <b>NEW MAIL</b></a></li>
-          <li><a href="/list"><i class="fa fa-list fa-lg"></i> <b>LISTS</b></a></li> -->
-          <li><a href="/logout"><i class="fa fa-sign-out fa-lg"></i> <b>SIGN OUT</b></a></li>
-        </ul>
-        {{else}}
-        {{#if message}}
-        <div class="alert-center alert-link alert-danger">{{message}}</div>
-        {{/if}}
-        <form action="/" method="POST" class="navbar-form navbar-right">
-          <div class="form-group">
-            <input type="text" class="form-control" name="username" placeholder="E-mail">
-            <input type="password" class="form-control" name="password" placeholder="Password">
-          </div>
-          <button type="submit" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-log-in"></span></button>
-        </form>
-        {{/if}}
-      </div>
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-      </div>
-
-        {{#user-old}}
+        <a class="navbar-brand" href="/"><b>MAILER</b> by SIO</a>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="/new"><i class="fa fa-envelope-o"></i>    New</a></li>
-            <li><a href="/"><i class="fa fa-paper-plane"></i>    Statistics</a></li>
-            <li><a href="/list"><i class="fa fa-bars"></i>    Lists</a></li>
-            <li><a href="#myModal" data-toggle="modal"><i class="fa fa-pencil-square-o fa-lg"></i> <b>NEW MAIL</b></a></li>
-            <li><a class="navLink droplets" href="/logout"><i class="fa fa-sign-out"></i>    Logout</a></li>
+          {{#if user}}
+          <div class="navbar-brand navbar-center">{{user.email}}</div>
+          <ul class="nav navbar-nav navbar-left">
+            <li><a href="#" id="dp3" data-date="{{prettifyDate date}}"><i class="fa fa-calendar fa-lg"></i><b>    {{prettifyDate date}}</b> <span class="caret"></span></a></li>
+            {{#if result}}
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-clock-o fa-lg"></i><b>   {{prettifyTime result.time}}</b> {{trimNavSubject result.subject}} <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                {{#result.daymail}}
+                <li><a href="{{sid}}"><b>{{prettifyTime time}}</b> {{subject}}</a></li>
+                {{/result.daymail}}
+              </ul>
+            </li>
+            {{/if}}
           </ul>
+          <ul class="nav navbar-nav navbar-right">
+            {{# if user.admin}}
+            <li><a href="/admin"><i class="fa fa-cogs fa-lg"></i> <b>ADMIN</b></a></li>
+            {{/if}}
+            <li><a href="/"><i class="fa fa-home fa-lg"></i> <b>HOME</b></a></li>
+            <li><a href="/new"><i class="fa fa-pencil-square-o fa-lg"></i> <b>NEW MAIL</b></a></li>
+            <li><a href="/lists"><i class="fa fa-list-ul fa-lg"></i> <b>LISTS</b></a></li>
+            <li><a href="/logout"><i class="fa fa-sign-out fa-lg"></i> <b>SIGN OUT</b></a></li>
+          </ul>
+          {{else}}
+          {{#if message}}
+          <div class="alert-center alert-link alert-danger">{{message}}</div>
+          {{/if}}
+          <form action="/" method="POST" class="navbar-form navbar-right">
+            <div class="form-group">
+              <input type="text" class="form-control" name="username" placeholder="E-mail">
+              <input type="password" class="form-control" name="password" placeholder="Password">
+            </div>
+            <button type="submit" class="btn btn-info btn-sm"><span class="glyphicon glyphicon-log-in"></span></button>
+          </form>
+          {{/if}}
         </div>
-      {{/user-old}}
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
       </div>
     </div>
     {{{ body }}}
