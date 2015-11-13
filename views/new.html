@@ -5,26 +5,28 @@
         <h3 id="navbar"><br>Send New Mail</h3>
       </div>
       <form action="#" method="POST">
-        <div >
+        <div>
           <h5>From: <b>{{user.email}}<b></h5>
           <h5>To:  &nbsp;
-            {{#user.list}}
-            <b><input type="checkbox" class="rcptList" value="{{id}}" list-data="{{name}}" count-data="{{count}}">&nbsp;{{name}}&nbsp;({{count}})&nbsp;&nbsp;&nbsp;</b>
+            {{#lists}}
+            <b><input type="checkbox" class="rcptList" value="{{id}}" list-data="{{name}}" count-data="{{count}}">&nbsp;{{name}}&nbsp;</b>({{count}})<b>&nbsp;&nbsp;&nbsp;</b>
             {{else}}
             <a href="/list">Create A List</a>
-            {{/user.list}}
+            {{/lists}}
           </h5>
           <!-- <h6><a href="/list">Manage Lists</a></h6> -->
         </div>
+        <hr>
         <div>
+          <h5><b>ENTER MAIL SUBJECT:</b></h5>
+          <input type="text" class="form-control" id="inputSubject" name="inputSubject">
           <br>
-          <input type="text" class="form-control" id="inputSubject" name="inputSubject" placeholder="Enter Your Mail Subject Here...">
-          <br>
+          <h5><b>ENTER MAIL BODY:</b></h5>
           <textarea name="mailBody"></textarea>
         </div>
         <div>
           <br>
-          <button type="button" class="btn btn-success btn-block btn-mailsender">SEND YOUR MAIL</button>
+          <button type="button" class="btn btn-success btn-block btn-mailsender">SEND MAIL</button>
         </div>
       </form>
     </div>
