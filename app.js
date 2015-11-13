@@ -218,7 +218,7 @@ app.post('/mailsender', function(req, res) {
   var postbody = "</body></html>";
   var body = prebody + req.body.body + postbody;
 
-  db.getMailArrFromListIDs(req.user.id, req.body.recipients, function(err, result) {
+  db.getMailArraysFromListIDs(req.body.recipients, function(err, result) {
 
     var maildata = {
       fromaddr: req.user.email,
