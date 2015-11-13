@@ -1,6 +1,6 @@
 module.exports = {
   rethinkdb: {
-    host: 'localhost',
+    host: 'mdbs1-priv',
     port: 28015,
     authKey: '',
     db: 'mailsender'
