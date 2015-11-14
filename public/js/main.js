@@ -79,10 +79,15 @@ var listApp = angular.module('listApp', [])
     var listArray = $rootScope.listArray;
 
     listArray.splice(listArray.indexOf(mail), 1);
+    var garbage = {
+      list: listId,
+      member: mail
+    };
 
     listStorage.update(listId, listArray).success(function() {
       $scope.listMembers.slice($scope.listMembers.indexOf(mail), 1);
       $scope.listCount = $scope.listMembers.length;
+      listStorage.recycle(garbage);
     }).error(function() {
       alert('Failed to remove this MEMBER');
     });
@@ -122,6 +127,10 @@ var listApp = angular.module('listApp', [])
     delete: function(id) {
       var url = '/api/rest/list/' + id;
       return $http.delete(url);
+    },
+    recycle: function (garbage) {
+      var url = '/api/rest/trash/';
+      return $http.put(url, garbage);
     }
   };
 

@@ -376,6 +376,9 @@ app.route('/api/rest/list/:id')
   .put(updateListItem)
   .delete(deleteListItem);
 
+app.route('/api/rest/trash')
+  .put(recycleListMember);
+
 //If we reach this middleware the route could not be handled and must be unknown.
 app.use(handle404);
 
@@ -387,6 +390,7 @@ app.use(handleError);
  * Retrieve all list items.
  */
 function allListItems(req, res, next) {
+
   if (typeof req.user === 'undefined') {
     res.render('404', { url: req.url });
   } else {
@@ -445,18 +449,22 @@ function createListItem(req, res, next) {
 }
 
 /*
- * Get a specific todo item.
+ * Get a specific list item.
  */
 function getListItem(req, res, next) {
   var listItemID = req.params.id;
 
-  r.table('list').get(listItemID).run(req.app._rdbConn, function(err, result) {
-    if(err) {
-      return next(err);
-    }
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
+  } else {
+    r.table('list').get(listItemID).run(req.app._rdbConn, function(err, result) {
+      if(err) {
+        return next(err);
+      }
 
-    res.json(result);
-  });
+      res.json(result);
+    });
+  }
 }
 
 /*
@@ -466,16 +474,38 @@ function updateListItem(req, res, next) {
   var listMembers = req.body;
   var listItemID = req.params.id;
 
-  r.db('mailsender').table('list').get(listItemID)
-    .update(function () {
-      return { members: listMembers }
-    }, {returnChanges: true}).run(req.app._rdbConn, function(err, result) {
-    if(err) {
-      return next(err);
-    }
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
+  } else {
+    r.db('mailsender').table('list').get(listItemID)
+      .update(function () {
+        return { members: listMembers }
+      }, {returnChanges: true}).run(req.app._rdbConn, function(err, result) {
+      if(err) {
+        return next(err);
+      }
 
-    res.json(result.changes[0].new_val);
-  });
+      res.json(result.changes[0].new_val);
+    });
+  }
+}
+
+/*
+ * Thrash a list item.
+ */
+function recycleListMember(req, res, next) {
+
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
+  } else {
+    r.table('trash').insert(req.body).run(req.app._rdbConn, function(err, result) {
+      if(err) {
+        return next(err);
+      }
+
+      res.json({success: true});
+    });
+  }
 }
 
 /*
