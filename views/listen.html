@@ -2,65 +2,79 @@
   <ng-view />
 
 
-<div class="container">
-  <div class="row">
-    <div class="page-header">
-      <h3 id="navbar"><br>Manage Lists</h3>
-    </div>
-  </div>
+<div class="ui container">
+  <br>
+  <br>
+  <br>
+  <br>
   <div id="listBox" ng-controller="listCtrl" class="ui container">
     <div class="ui two column grid">
-      <div class="col-lg-6 ui left aligned column">
-        <a class="ui massive button" href="/list2"><b>CREATE</b></a>
+      <div class="ui left aligned column">
+        <h2>LISTS</h2>
       </div>
-        <div class="col-lg-6 ui right aligned column">
-          <div class="ui right aligned icon input">
-              <input ng-model="listQuery" type="text" placeholder="SEARCH MAILS...">
-              <i class="search icon"></i>
-          </div>
+      <div class="ui right aligned column">
+        <div class="ui right aligned icon input">
+            <input ng-model="listQuery" type="text" placeholder="SEARCH MAILS...">
+            <i class="search icon"></i>
         </div>
       </div>
-      <br>
-      <div class="col-lg-12 ui attached segment">
-        <div class="col-lg-6">
-          <div class="ui left aligned huge header">{[{listName}]}</div>
-        </div>
-        <div class="col-lg-6">
-          <div class="ui fluid big icon input">
-              <input ng-model="mailAdd" ng-keyup="$event.keyCode == 13 && addMailToList(mailAdd)" type="text" placeholder="Add mail to list...">
-              <i class="large green add circle link icon" ng-click="addMailToList(mailAdd)"></i>
-            <br>
-          </div>
-        </div>
-        <br>
-        <br>
-        <hr>
-        <div class="col-lg-6">
-          <div class="ui big padded celled selection list">
-            <div class="item" ng-repeat="list in lists" ng-click="switchListMembers($index, list.id, list.name)">
-              <div class="right floated content">
-                <i class="large remove circle red link icon" ng-click="removeList(list)"></i>
+    </div>
+      <div class="ui top attached segment">
+        <div class="ui two column grid">
+          <div class="ui column">
+            <div class="ui two column grid">
+              <div class="ui column">
+                <div class="ui left aligned huge header">{[{listName}]}</div>
               </div>
-              <div class="content">
-                {[{list.name}]}
+              <div class="ui right aligned column">
+                <a class="ui massive button" href="/list2">CREATE</a>
               </div>
             </div>
           </div>
-        </div>
-        <div class="col-lg-6" style='overflow-y:auto; height:400px;'>
-          <div class="ui big celled list">
-            <div class="item" ng-repeat="member in listMembers | orderBy | filter: listQuery track by $index">
-              <div class="right floated content">
-                <i class="large remove circle red link icon" ng-click="removeMailFromList(member)"></i>
-              </div>
-              <div class="content">
-                {[{member}]}
-              </div>
+          <div class="ui column">
+            <div class="ui fluid large icon input">
+                <input ng-model="mailAdd" ng-keyup="$event.keyCode == 13 && addMailToList(mailAdd)" type="text" placeholder="Add mail to list...">
+                <i class="large green add circle link icon" ng-click="addMailToList(mailAdd)"></i>
             </div>
           </div>
         </div>
       </div>
-      <div class="ui right aligned bottom attached header">Mail Count:&nbsp;{[{listCount}]}</div>
+      <div class="ui attached segment">
+        <div class="ui two column grid">
+          <div class="ui column">
+            <div class="ui big divided selection list">
+              <div class="item" ng-repeat="list in lists" ng-click="switchListMembers($index, list.id, list.name)">
+                <div class="right floated content">
+                  <i class="large remove circle red link icon" ng-click="removeList(list)"></i>
+                </div>
+                <div class="content">
+                  {[{list.name}]}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="ui column" style='overflow-y:auto; height:400px;'>
+            <div class="ui big divided list">
+              <div class="item" ng-repeat="member in listMembers | orderBy | filter: listQuery track by $index">
+                <div class="right floated content">
+                  <i class="large remove circle red link icon" ng-click="removeMailFromList(member)"></i>
+                </div>
+                <div class="content">
+                  {[{member}]}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ui bottom attached header two column grid">
+        <div class="ui column">
+          List Count:
+        </div>
+        <div class="ui right aligned column">
+          Mail Count:&nbsp;{[{listCount}]}
+        </div>
+      </div>
     </div>
 </div>
 </div>
