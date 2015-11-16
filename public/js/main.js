@@ -16,23 +16,40 @@ var listApp = angular.module('listApp', [])
 })
 .run(function($rootScope) {
 
+  $rootScope.lists = [];
   $rootScope.listId = [];
+  $rootScope.listIdx = null;
   $rootScope.listArray = [];
+  $rootScope.listHeader = null;
+  $rootScope.newList = true;
+  $rootScope.oldList = false;
+  $rootScope.oldListObjects = true;
+  $rootScope.newListInputPh = 'NEW LIST';
+  $rootScope.newListInputBtnState = null;
 
 })
 .controller('listCtrl', function listCtrl($scope, listStorage, $rootScope) {
 
   $scope.lists = [];
   $scope.listMembers = [];
-  $scope.listCount = 0;
+  $scope.listMemberCount = 0;
   $scope.listid = [];
 
   listStorage.get().success(function(lists) {
     $scope.lists = lists;
-    //$scope.members = lists.members;
   }).error(function(error) {
     alert('Failed to load LISTs');
   });
+
+  $scope.crateNewFocus = function () {
+
+    $rootScope.newList = true;
+    $rootScope.oldList = false;
+    $rootScope.listHeader = 'NEW LIST';
+    $rootScope.newListInputPh = 'LIST NAME';
+    $rootScope.newListInputBtnState = null;
+    $rootScope.oldListObjects = false;
+  };
 
   $scope.switchListMembers = function (idx, listid, listname) {
     $scope.listMembers = [];
@@ -40,17 +57,87 @@ var listApp = angular.module('listApp', [])
     for (var i = 0; i < members.length; i++) {
       $scope.listMembers.push(members[i]);
     }
-    $scope.listName = listname;
     $scope.listId = listid;
-    $scope.listCount = $scope.listMembers.length;
+    $scope.listMemberCount = $scope.listMembers.length;
 
+    $rootScope.newList = false;
+    $rootScope.oldList = true;
+    $rootScope.oldListObjects = true;
     $rootScope.listId = listid;
+    $rootScope.listIdx = idx;
+    $rootScope.listHeader = listname;
+    $rootScope.newListInputPh = 'NEW LIST';
+    $rootScope.newListInputBtnState = 'disabled';
     $rootScope.listArray = $scope.listMembers;
+  };
+
+  $scope.createNewList = function (listname) {
+
+    if ( listname ) {
+
+      if ( $scope.multiMailAdd ) {
+        var rawlist = $scope.multiMailAdd;
+      } else {
+        var rawlist = '';
+      }
+
+      var name = $.trim(listname);
+
+      if ( name.length === 0 ) {
+        return;
+      }
+
+      rawlist = rawlist.replace(/\s+/g, ',');
+      rawlist = rawlist.replace(/;+/g, ',');
+      rawlist = rawlist.replace(/:+/g, ',');
+      rawlist = rawlist.replace(/\|+/g, ',');
+      rawlist = rawlist.replace(/\>+/g, ',');
+      rawlist = rawlist.replace(/\<+/g, ',');
+      rawlist = rawlist.replace(/,+/g, ',');
+
+      var list = [];
+      list = rawlist.split(",");
+
+      function IsEmail(email) {
+        var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        return regex.test(email);
+      }
+
+      var emailarray = [];
+
+      $.each(list, function(idx, obj) {
+        if ( IsEmail(obj) ) {
+          emailarray.push(obj);
+        }
+      });
+
+      var newlist = {
+        'listname'          : name,
+        'listdata'          : emailarray,
+        'listcount'         : emailarray.length
+      };
+
+      listStorage.create(newlist).success(function(savedList) {
+        $scope.lists.push(savedList);
+        $scope.multiMailAdd = null;
+        $scope.listAdd = null;
+
+        var switchListId = $scope.lists[0].id;
+        var switchListName = $scope.lists[0].name;
+
+        $scope.switchListMembers(0, switchListId, switchListName);
+      }).error(function() {
+        alert('Failed to add this LIST');
+      });
+    } else {
+      return;
+    }
   };
 
   $scope.addMailToList = function (mail) {
     $scope.mailAdd = null;
     var listId = $rootScope.listId;
+    var listIdx = $rootScope.listIdx;
     var listArray = $rootScope.listArray;
     var listBoxScope = angular.element($("#listBox")).scope();
 
@@ -68,7 +155,8 @@ var listApp = angular.module('listApp', [])
     listArray.push(mailChkd);
 
     listStorage.update(listId, listArray).success(function() {
-      listBoxScope.listCount = listBoxScope.listMembers.length;
+      listBoxScope.listMemberCount = listBoxScope.listMembers.length;
+      $scope.lists[listIdx].members.push(mail);
     }).error(function() {
       alert('Failed to add this MEMBER');
     });
@@ -76,6 +164,7 @@ var listApp = angular.module('listApp', [])
 
   $scope.removeMailFromList = function (mail) {
     var listId = $rootScope.listId;
+    var listIdx = $rootScope.listIdx;
     var listArray = $rootScope.listArray;
 
     listArray.splice(listArray.indexOf(mail), 1);
@@ -86,31 +175,34 @@ var listApp = angular.module('listApp', [])
 
     listStorage.update(listId, listArray).success(function() {
       $scope.listMembers.slice($scope.listMembers.indexOf(mail), 1);
-      $scope.listCount = $scope.listMembers.length;
-      listStorage.recycle(garbage);
+      $scope.lists[listIdx].members = listArray;
+      $scope.listMemberCount = $scope.listMembers.length;
+      listStorage.recycle(garbage); // @todo: success/error callback.
+
+      var switchListId = $scope.lists[listIdx].id;
+      var switchListName = $scope.lists[listIdx].name;
+
+      $scope.switchListMembers(listIdx, switchListId, switchListName);
     }).error(function() {
       alert('Failed to remove this MEMBER');
     });
   };
 
-// @todo: sending index from template removes erroneous when it's ordered on the client side. maybe indexOf should be used.
   $scope.removeList = function (list) {
+
     listStorage.delete(list.id).success(function() {
       $scope.lists.splice($scope.lists.indexOf(list), 1);
       $scope.listMembers = [];
       $scope.listName = null;
-      $scope.listCount = 0;
+      $scope.listMemberCount = 0;
+
+      var switchListId = $scope.lists[0].id;
+      var switchListName = $scope.lists[0].name;
+
+      $scope.switchListMembers(0, switchListId, switchListName);
     }).error(function() {
       alert('Failed to delete this LIST');
     });
-  };
-
-  $scope.removeMember = function (member, idx, listid) {
-    // listStorage.update(selectedListId, member, 'delete').success(function() {
-    //   $scope.listMembers.splice($scope.listMembers.indexOf(member), 1);
-    // }).error(function() {
-    //   alert('Failed to delete this MEMBER');
-    // });
   };
 })
 .factory('listStorage', function ($http) {
@@ -119,6 +211,10 @@ var listApp = angular.module('listApp', [])
     get: function () {
       var url = '/api/rest/list';
       return $http.get(url);
+    },
+    create: function (list) {
+      var url = '/api/rest/list';
+      return $http.post(url, list);
     },
     update: function (id, newlist) {
       var url = '/api/rest/list/' + id;
@@ -129,7 +225,7 @@ var listApp = angular.module('listApp', [])
       return $http.delete(url);
     },
     recycle: function (garbage) {
-      var url = '/api/rest/trash/';
+      var url = '/api/rest/trash';
       return $http.put(url, garbage);
     }
   };

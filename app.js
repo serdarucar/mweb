@@ -243,6 +243,7 @@ app.get('/lists', function (req, res) {
   } else {
     res.render('listen', { user: req.user });
   }
+    //  res.render('listen', { user: req.user });
 });
 
 app.get('/list', function (req, res) {
@@ -431,13 +432,18 @@ function deleteListItem(req, res, next) {
 }
 
 /*
- * Insert a new todo item.
+ * Insert a new list item.
  */
 function createListItem(req, res, next) {
-  var listItem = req.body;
-  listItem.createdAt = r.now();
 
-  console.dir(listItem);
+  var listItem = {
+    active: true,
+    user: req.user.id,
+    createdAt : r.now(),
+    name: req.body.listname,
+    members: req.body.listdata,
+    count: req.body.listcount
+  }
 
   r.table('list').insert(listItem, {returnChanges: true}).run(req.app._rdbConn, function(err, result) {
     if(err) {
@@ -491,14 +497,17 @@ function updateListItem(req, res, next) {
 }
 
 /*
- * Thrash a list item.
+ * Trash a list item.
  */
 function recycleListMember(req, res, next) {
+
+  var trash = req.body;
+  trash['timestamp'] = r.now();
 
   if (typeof req.user === 'undefined') {
     res.render('404', { url: req.url });
   } else {
-    r.table('trash').insert(req.body).run(req.app._rdbConn, function(err, result) {
+    r.table('trash').insert(trash).run(req.app._rdbConn, function(err, result) {
       if(err) {
         return next(err);
       }
