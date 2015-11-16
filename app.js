@@ -395,7 +395,7 @@ function allListItems(req, res, next) {
   if (typeof req.user === 'undefined') {
     res.render('404', { url: req.url });
   } else {
-    r.table('list').orderBy({index: 'createdAt'}).filter({user: req.user.id, active: true}).run(req.app._rdbConn, function(err, cursor) {
+    r.table('list').orderBy({index: r.desc('createdAt')}).filter({user: req.user.id, active: true}).run(req.app._rdbConn, function(err, cursor) {
       if(err) {
         return next(err);
       }

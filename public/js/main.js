@@ -118,7 +118,7 @@ var listApp = angular.module('listApp', [])
       };
 
       listStorage.create(newlist).success(function(savedList) {
-        $scope.lists.push(savedList);
+        $scope.lists.unshift(savedList);
         $scope.multiMailAdd = null;
         $scope.listAdd = null;
 
