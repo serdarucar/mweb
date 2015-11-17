@@ -41,6 +41,16 @@ var listApp = angular.module('listApp', [])
     alert('Failed to load LISTs');
   });
 
+  $scope.ListHoverIn = function () {
+    this.hoverDelete = true;
+    this.hoverCheck = true;
+  };
+
+  $scope.ListHoverOut = function () {
+      this.hoverDelete = false;
+      this.hoverCheck = false;
+  };
+
   $scope.crateNewFocus = function () {
 
     $rootScope.newList = true;

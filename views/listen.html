@@ -36,9 +36,10 @@
               <div class="massive ui button {[{newListInputBtnState}]}" ng-click="createNewList(listAdd)">CREATE</div>
             </div>
             <div class="ui big divided selection list" style="overflow-y:auto; height:296px;">
-              <div class="item" ng-repeat="list in lists track by $index" ng-click="switchListMembers($index, list.id, list.name)">
+              <div class="item" ng-repeat="list in lists track by $index" ng-mouseover="ListHoverIn()" ng-mouseleave="ListHoverOut()" ng-click="switchListMembers($index, list.id, list.name)">
                 <div class="right floated content">
-                  <i class="remove circle grey link icon" ng-click="removeList(list)"></i>
+                  <i class="square outline grey link icon" ng-show="hoverCheck" ng-click=""></i>
+                  <i class="remove circle grey link icon" ng-show="hoverDelete" ng-click="removeList(list)"></i>
                 </div>
                 <div class="content">
                   {[{list.name}]}
@@ -51,10 +52,11 @@
               <input ng-model="mailAdd" ng-keyup="$event.keyCode == 13 && addMailToList(mailAdd)" type="text" placeholder="ADD MAIL TO LIST">
               <button class="massive ui button" ng-click="addMailToList(mailAdd)">ADD</button>
             </div>
-            <div ng-show="oldList" class="ui big divided list" style="overflow-y:auto; height:296px;">
-              <div class="item" ng-repeat="member in listMembers | orderBy | filter: listQuery track by $index">
+            <div ng-show="oldList" class="ui big divided selection list" style="overflow-y:auto; height:296px;">
+              <div class="item" ng-repeat="member in listMembers | orderBy | filter: listQuery track by $index" ng-mouseover="ListHoverIn()" ng-mouseleave="ListHoverOut()">
                 <div class="right floated content">
-                  <i class="remove circle grey link icon" ng-click="removeMailFromList(member)"></i>
+                  <i class="square outline grey link icon" ng-show="hoverCheck" ng-click=""></i>
+                  <i class="remove circle grey link icon" ng-show="hoverDelete" ng-click="removeMailFromList(member)"></i>
                 </div>
                 <div class="content">
                   {[{member}]}

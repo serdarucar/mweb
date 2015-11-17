@@ -96,6 +96,76 @@
       <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
     <![endif]-->
 
+    <div class="ui basic segment">
+      <!-- <br><br><br> -->
+      <div class="ui one column grid">
+        <div class="ui center aligned column">
+        </div>
+      </div>
+      <div class="ui three column grid">
+        <div class="ui left aligned column">
+          {{#if user}}
+          <div class="ui left aligned header">
+            <div class="ui basic segment">
+              <div class="ui two column grid">
+                <div class="ui right aligned column">
+                  <i class="tasks icon"></i>
+                  <div class="content">
+                    Sessions
+                  </div>
+                </div>
+                <div class="ui left aligned column">
+                  <i class="users icon"></i>
+                  <div class="content">
+                    Lists
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {{/if}}
+        </div>
+        <div class="ui center aligned column">
+          <div class="ui huge header">
+            MAILSENDER
+            <div class="sub header">by steminorder.com</div>
+          </div>
+          {{#if user}}
+            <i class="mail outline icon"></i>
+            {{user.email}}
+          {{/if}}
+        </div>
+        <div class="ui right aligned column">
+          <div class="ui right aligned header">
+            <div class="ui basic segment">
+              <div class="ui two column grid">
+                <div class="ui right aligned column">
+                  {{#if user}}
+                  <i class="edit icon"></i>
+                  <div class="content">
+                    New Mail
+                  </div>
+                  {{/if}}
+                </div>
+                <div class="ui left aligned column">
+                  {{#if user}}
+                  <i class="sign out icon"></i>
+                  <div class="content">
+                    Logout
+                  </div>
+                  {{else}}
+                  <i class="sign in icon"></i>
+                  <div class="content">
+                    Login
+                  </div>
+                  {{/if}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
         <a class="navbar-brand" href="/"><b>MAILER</b> by SIO</a>
@@ -146,6 +216,20 @@
           </button>
         </div>
       </div>
+    </div>
+    <div class="ui left demo vertical inverted thin sidebar labeled icon menu">
+      <a class="item">
+        <i class="home icon"></i>
+        Home
+      </a>
+      <a class="item">
+        <i class="block layout icon"></i>
+        Topics
+      </a>
+      <a class="item">
+        <i class="smile icon"></i>
+        Friends
+      </a>
     </div>
     {{{ body }}}
   </body>
