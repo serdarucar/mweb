@@ -38,15 +38,11 @@ var mailApp = angular.module('mailApp', [])
   listStorage.get().success(function(lists) {
     $scope.lists = lists;
 
-    // if (lists === undefined) {
-    //   return;
-    // } else {
-    //   if (lists.length > 0) {
-    //     var switchListId = $scope.lists[0].id;
-    //     var switchListName = $scope.lists[0].name;
-    //     $scope.switchListMembers(0, switchListId, switchListName);
-    //   }
-    // }
+    if ($scope.lists.length > 0) {
+      var switchListId = $scope.lists[0].id;
+      var switchListName = $scope.lists[0].name;
+      $scope.switchListMembers(0, switchListId, switchListName);
+    }
   }).error(function(error) {
     alert('Failed to load LISTs');
   });
@@ -69,11 +65,15 @@ var mailApp = angular.module('mailApp', [])
     $rootScope.newListInputPh = 'LIST NAME';
     $rootScope.newListInputBtnState = null;
     $rootScope.oldListObjects = false;
+
+    var listCountScope = angular.element($("#listMemberCount")).scope();
+    listCountScope.listMemberCount = 0;
   };
 
   $scope.switchListMembers = function (idx, listid, listname) {
     $scope.listMembers = [];
-    var members = $scope.lists[idx].members;
+    var members = [];
+    members = $scope.lists[idx].members;
     for (var i = 0; i < members.length; i++) {
       $scope.listMembers.push(members[i]);
     }

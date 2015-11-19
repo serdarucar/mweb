@@ -140,7 +140,7 @@ app.get('/', function(req, res) {
     if (message.length < 1) {
       message = false;
     }
-    res.render('landing', { message: message, user: req.user });
+    res.redirect('/login.html');
   }
 });
 

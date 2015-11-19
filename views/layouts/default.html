@@ -177,7 +177,7 @@
       <div ng-controller="sessionCtrl" class="ui left vertical inverted menu sidebar">
         <div id="sessionBox" class="ui secondary vertical menu">
           <a ng-repeat="session in sessions track by $index" class="item" href="/{[{session.sid}]}">
-            <div class="ui small header">
+            <div class="ui inverted large header">
               {[{session.subject}]}
             </div>
           </a>
@@ -261,7 +261,7 @@
                 </div>
               </div>
             </div>
-            <div class="ui basic right aligned segment" ng-show="oldListObjects">
+            <div id="listMemberCount" class="ui basic right aligned segment">
               Mails on this List:&nbsp;{[{listMemberCount}]}
             </div>
           </div>
