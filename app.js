@@ -150,9 +150,9 @@ app.get('/logout', function(req, res) { req.logout(); res.redirect('/'); });
 
 app.get('/admin', function (req, res) {
   if (typeof req.user === 'undefined') {
-    res.render('404', { url: req.url });
+    res.render('/', { url: req.url });
   } else if (req.user.admin !== true) {
-    res.render('404', { url: req.url });
+    res.render('/', { url: req.url });
   } else {
     var message = req.flash('error');
     if (message.length < 1) {
@@ -204,7 +204,7 @@ app.post('/admin', function(req, res){
 
 app.get('/new', function (req, res) {
   if (typeof req.user === 'undefined') {
-    res.render('404', { url: req.url });
+    res.render('/', { url: req.url });
   } else {
     db.getUsersActiveLists(req.user.id, function (err, result) {
       res.render('new', { lists: result, user: req.user });
@@ -239,7 +239,7 @@ app.post('/mailsender', function(req, res) {
 
 app.get('/lists', function (req, res) {
   if (typeof req.user === 'undefined') {
-    res.render('404', { url: req.url });
+    res.render('/', { url: req.url });
   } else {
     res.render('listen', { user: req.user });
   }
@@ -248,7 +248,7 @@ app.get('/lists', function (req, res) {
 
 app.get('/list', function (req, res) {
   if (typeof req.user === 'undefined') {
-    res.render('404', { url: req.url });
+    res.render('/', { url: req.url });
   } else {
     res.render('list', { user: req.user });
   }
@@ -256,7 +256,7 @@ app.get('/list', function (req, res) {
 
 app.get('/list2', function (req, res) {
   if (typeof req.user === 'undefined') {
-    res.render('404', { url: req.url });
+    res.render('/', { url: req.url });
   } else {
     res.render('list2', { user: req.user });
   }
@@ -317,7 +317,7 @@ app.post('/deletelast', function(req, res) {
 
 app.get('/:date', function(req, res) { //@todo: not logged in user is looping here on a date (not anymore with user control; ensureAuthenticated caused this. investigate.)
   if (typeof req.user === 'undefined') {
-    res.render('404', { url: req.url });
+    res.render('/', { url: req.url });
   } else {
     var m = moment(req.params.date, 'YYYYMMDD');
 
@@ -334,14 +334,14 @@ app.get('/:date', function(req, res) { //@todo: not logged in user is looping he
         }
       });
     } else {
-      res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+      res.render('/', { url: req.url, title: 'Page Not Found', user: req.user });
     }
   }
 });
 
 app.get('/:date/:sid', function(req, res) {
   if (typeof req.user === 'undefined') {
-    res.render('404', { url: req.url });
+    res.render('/', { url: req.url });
   } else {
     var m = moment(req.params.date, 'YYYYMMDD');
 
@@ -358,16 +358,19 @@ app.get('/:date/:sid', function(req, res) {
             user: req.user
           });
         } else {
-          res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+          res.render('/', { url: req.url, title: 'Page Not Found', user: req.user });
         }
       });
     } else {
-      res.render('404', { url: req.url, title: 'Page Not Found', user: req.user });
+      res.render('/', { url: req.url, title: 'Page Not Found', user: req.user });
     }
   }
 });
 
 //The REST routes for "list".
+app.route('/api/rest/session/:id')
+.get(allUserSessions);
+
 app.route('/api/rest/list')
   .get(allListItems)
   .post(createListItem);
@@ -386,6 +389,24 @@ app.use(handle404);
 //Generic error handling middleware.
 app.use(handleError);
 
+/*
+ * Get a sessions of a user.
+ */
+function allUserSessions(req, res, next) {
+  var userID = req.params.id;
+
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
+  } else {
+    r.table('session').getAll(userID, {index: 'owner'}).orderBy(r.desc('time')).run(req.app._rdbConn, function(err, result) {
+      if(err) {
+        return next(err);
+      }
+
+      res.json(result);
+    });
+  }
+}
 
 /*
  * Retrieve all list items.

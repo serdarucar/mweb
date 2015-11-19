@@ -8,7 +8,7 @@
  * @type {angular.Module}
  */
 
-var listApp = angular.module('listApp', [])
+var mailApp = angular.module('mailApp', [])
 .config(function($interpolateProvider) {
 
   $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
@@ -38,10 +38,15 @@ var listApp = angular.module('listApp', [])
   listStorage.get().success(function(lists) {
     $scope.lists = lists;
 
-    var switchListId = $scope.lists[0].id;
-    var switchListName = $scope.lists[0].name;
-
-    $scope.switchListMembers(0, switchListId, switchListName);
+    // if (lists === undefined) {
+    //   return;
+    // } else {
+    //   if (lists.length > 0) {
+    //     var switchListId = $scope.lists[0].id;
+    //     var switchListName = $scope.lists[0].name;
+    //     $scope.switchListMembers(0, switchListId, switchListName);
+    //   }
+    // }
   }).error(function(error) {
     alert('Failed to load LISTs');
   });
@@ -242,6 +247,49 @@ var listApp = angular.module('listApp', [])
     recycle: function (garbage) {
       var url = '/api/rest/trash';
       return $http.put(url, garbage);
+    }
+  };
+
+})
+.controller('sessionCtrl', function sessionCtrl($scope, sessionStorage, $rootScope) {
+
+  $scope.lists = [];
+  $scope.listMembers = [];
+  $scope.listMemberCount = 0;
+  $scope.listid = [];
+
+  sessionStorage.get().success(function(sessions) {
+    $scope.sessions = sessions;
+  }).error(function(error) {
+    alert('Failed to load SESSIONs');
+  });
+
+  $scope.switchListMembers = function (idx, listid, listname) {
+    $scope.listMembers = [];
+    var members = $scope.lists[idx].members;
+    for (var i = 0; i < members.length; i++) {
+      $scope.listMembers.push(members[i]);
+    }
+    $scope.listId = listid;
+    $scope.listMemberCount = $scope.listMembers.length;
+
+    $rootScope.newList = false;
+    $rootScope.oldList = true;
+    $rootScope.oldListObjects = true;
+    $rootScope.listId = listid;
+    $rootScope.listIdx = idx;
+    $rootScope.listHeader = listname;
+    $rootScope.newListInputPh = 'NEW LIST';
+    $rootScope.newListInputBtnState = 'disabled';
+    $rootScope.listArray = $scope.listMembers;
+  };
+})
+.factory('sessionStorage', function ($http) {
+
+  return {
+    get: function (id) {
+      var url = '/api/rest/session/' + id;
+      return $http.get(url);
     }
   };
 
