@@ -109,15 +109,19 @@
             <div class="ui basic segment">
               <div class="ui two column grid">
                 <div class="ui right aligned column">
-                  <i class="tasks icon"></i>
-                  <div class="content">
-                    Sessions
+                  <div id="show-sessions" style="cursor: pointer;">
+                    <i class="tasks icon"></i>
+                    <div class="content">
+                      Sessions
+                    </div>
                   </div>
                 </div>
                 <div class="ui left aligned column">
-                  <i class="users icon"></i>
-                  <div class="content">
-                    Lists
+                    <div id="show-lists" style="cursor: pointer;">
+                    <i class="users icon"></i>
+                    <div class="content">
+                      Lists
+                    </div>
                   </div>
                 </div>
               </div>
@@ -141,23 +145,28 @@
               <div class="ui two column grid">
                 <div class="ui right aligned column">
                   {{#if user}}
-                  <i class="edit icon"></i>
-                  <div class="content">
-                    New Mail
+                  <div onclick="location.href='/new';" style="cursor: pointer;">
+                    <i class="edit icon"></i>
+                    <div class="content">
+                      New Mail
+                    </div>
                   </div>
                   {{/if}}
                 </div>
                 <div class="ui left aligned column">
                   {{#if user}}
-                  <i class="sign out icon"></i>
-                  <div class="content">
-                    Logout
+                  <div onclick="location.href='/logout';" style="cursor: pointer;">
+                    <i class="sign out icon"></i>
+                    <div class="content">
+                      Logout
+                    </div>
                   </div>
-                  {{else}}
-                  <i class="sign in icon"></i>
-                  <div class="content">
-                    Login
-                  </div>
+                  <!-- <div id="login-btn" style="cursor: pointer;">
+                    <i class="sign in icon"></i>
+                    <div class="content">
+                      Login
+                    </div>
+                  </div> -->
                   {{/if}}
                 </div>
               </div>
@@ -217,7 +226,7 @@
         </div>
       </div>
     </div>
-    <div class="ui left demo vertical inverted thin sidebar labeled icon menu">
+    <div class="ui left vertical inverted sidebar labeled menu">
       <a class="item">
         <i class="home icon"></i>
         Home
@@ -230,8 +239,113 @@
         <i class="smile icon"></i>
         Friends
       </a>
+      <li><a href="#" id="dp3" data-date="{{prettifyDate date}}"><i class="fa fa-calendar fa-lg"></i><b>    {{prettifyDate date}}</b> <span class="caret"></span></a></li>
+      {{#if result}}
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-clock-o fa-lg"></i><b>   {{prettifyTime result.time}}</b> {{trimNavSubject result.subject}} <span class="caret"></span></a>
+        <ul class="dropdown-menu" role="menu">
+          {{#result.daymail}}
+          <li><a href="{{sid}}"><b>{{prettifyTime time}}</b> {{subject}}</a></li>
+          {{/result.daymail}}
+        </ul>
+      </li>
+      {{/if}}
     </div>
+    <div class="ui bottom sidebar ui segment">
+      <div ng-app="listApp">
+        <ng-view />
+        <div class="ui container">
+          <div id="hide-lists" class="ui center aligned container" style="cursor: pointer;">
+            <i class="center aligned chevron down icon"></i>
+          </div>
+          <br>
+          <!-- <br>
+          <br>
+          <br>
+          <br> -->
+          <div id="listBox" ng-controller="listCtrl" class="ui container">
+            <div class="ui two column grid">
+              <div class="ui left aligned column">
+                <h2>MANAGE LISTS</h2>
+              </div>
+              <div class="ui right aligned column">
+                <div class="ui right aligned icon input">
+                    <input ng-model="listQuery" type="text" placeholder="SEARCH MAILS">
+                    <i class="search icon"></i>
+                </div>
+              </div>
+            </div>
+            <br>
+            <div class="ui top attached segment">
+              <div class="ui two column grid">
+                <div class="ui column">
+                  <div class="ui huge header">{[{listHeader}]}</div>
+                </div>
+                <div class="ui column">
+                  <p ng-hide="oldListObjects">&nbsp;</p>
+                </div>
+              </div>
+            </div>
+            <div class="ui attached segment">
+              <div class="ui two column grid">
+                <div class="ui column">
+                  <div class="ui fluid input">
+                    <input ng-model="listAdd" ng-focus="crateNewFocus()" ng-keyup="$event.keyCode == 13 && createNewList(listAdd)" type="text" autofocus="true" placeholder="{[{newListInputPh}]}">
+                    <div class="massive ui button {[{newListInputBtnState}]}" ng-click="createNewList(listAdd)">CREATE</div>
+                  </div>
+                  <div class="ui big divided selection list" style="overflow-y:auto; height:296px;">
+                    <div class="item" ng-repeat="list in lists track by $index" ng-mouseover="ListHoverIn()" ng-mouseleave="ListHoverOut()" ng-click="switchListMembers($index, list.id, list.name)">
+                      <div class="right floated content">
+                        <i class="square outline grey link icon" ng-show="hoverCheck" ng-click=""></i>
+                        <i class="remove circle grey link icon" ng-show="hoverDelete" ng-click="removeList(list)"></i>
+                      </div>
+                      <div class="content">
+                        {[{list.name}]}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="ui column">
+                  <div class="ui fluid input" ng-show="oldListObjects">
+                    <input ng-model="mailAdd" ng-keyup="$event.keyCode == 13 && addMailToList(mailAdd)" type="text" placeholder="ADD MAIL TO LIST">
+                    <button class="massive ui button" ng-click="addMailToList(mailAdd)">ADD</button>
+                  </div>
+                  <div ng-show="oldList" class="ui big divided selection list" style="overflow-y:auto; height:296px;">
+                    <div class="item" ng-repeat="member in listMembers | orderBy | filter: listQuery track by $index" ng-mouseover="ListHoverIn()" ng-mouseleave="ListHoverOut()">
+                      <div class="right floated content">
+                        <i class="square outline grey link icon" ng-show="hoverCheck" ng-click=""></i>
+                        <i class="remove circle grey link icon" ng-show="hoverDelete" ng-click="removeMailFromList(member)"></i>
+                      </div>
+                      <div class="content">
+                        {[{member}]}
+                      </div>
+                    </div>
+                  </div>
+                  <div ng-show="newList" class="ui form">
+                    <div class="field">
+                      <textarea ng-init="multiMailAdd = multiMailAdd = null ? [] : multiMailAdd" ng-model="multiMailAdd" rows=13 style="resize:none;font-size: 19px;" placeholder="Enter mail addresses..."></textarea>
+                    </div>
+                    <div class="ui small basic right floated icon buttons">
+                      <button class="ui disabled button"><i class="file icon"></i></button>
+                      <button class="ui disabled button"><i class="save icon"></i></button>
+                      <button class="ui disabled button"><i class="upload icon"></i></button>
+                      <button class="ui disabled button"><i class="download icon"></i></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="ui basic right aligned segment" ng-show="oldListObjects">
+              Mails on this List:&nbsp;{[{listMemberCount}]}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="pusher"> -->
     {{{ body }}}
+    <!-- </div> -->
   </body>
+  <script type="text/javascript" src="/js/main.js"></script>
   <script type="text/javascript" src="/js/default.js"></script>
 </html>

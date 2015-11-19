@@ -37,18 +37,23 @@ var listApp = angular.module('listApp', [])
 
   listStorage.get().success(function(lists) {
     $scope.lists = lists;
+
+    var switchListId = $scope.lists[0].id;
+    var switchListName = $scope.lists[0].name;
+
+    $scope.switchListMembers(0, switchListId, switchListName);
   }).error(function(error) {
     alert('Failed to load LISTs');
   });
 
   $scope.ListHoverIn = function () {
     this.hoverDelete = true;
-    this.hoverCheck = true;
+    //this.hoverCheck = true;
   };
 
   $scope.ListHoverOut = function () {
       this.hoverDelete = false;
-      this.hoverCheck = false;
+      //this.hoverCheck = false;
   };
 
   $scope.crateNewFocus = function () {

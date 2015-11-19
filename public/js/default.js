@@ -35,6 +35,38 @@ $(document).ready(function() {
   });
 });
 
+// semantic-ui login modal
+// $('#login-btn').click(function () {
+//   $('#login-modal').modal({
+//     inverted: false,
+//     blurring: true
+//   }).modal('show');
+// });
+
+// semantic-ui sidebars
+$('#show-lists').click(function () {
+  $('.bottom.sidebar')
+  .sidebar('setting', {
+      dimPage             : false,
+      transition          : 'overlay',
+      mobileTransition    : 'overlay'})
+  .sidebar('toggle');
+});
+
+$('#hide-lists').click(function () {
+  $('.bottom.sidebar')
+  .sidebar('toggle');
+})
+
+$('#show-sessions').click(function () {
+  $('.left.sidebar')
+  .sidebar('setting', {
+      dimPage             : false,
+      transition          : 'overlay',
+      mobileTransition    : 'overlay'})
+  .sidebar('toggle');
+});
+
 // $('#dp3').on('click', function(e) {
 //   e.preventDefault();
 //   if ($(this).datepicker('widget').is(':visible')) {
