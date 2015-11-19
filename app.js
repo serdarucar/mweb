@@ -131,8 +131,9 @@ passport.deserializeUser(function (id, done) {
 app.get('/', function(req, res) {
   if (typeof req.user !== 'undefined') {
     // User is logged in.
-    var today = moment().format('YYYYMMDD');
-    res.redirect('/' + today);
+    db.getLatestMail(req.user.id, function (err, result) {
+      res.redirect('/' + result);
+    });
   }
   else {
     var message = req.flash('error');
@@ -150,9 +151,9 @@ app.get('/logout', function(req, res) { req.logout(); res.redirect('/'); });
 
 app.get('/admin', function (req, res) {
   if (typeof req.user === 'undefined') {
-    res.render('/', { url: req.url });
+    res.redirect('/');
   } else if (req.user.admin !== true) {
-    res.render('/', { url: req.url });
+    res.redirect('/');
   } else {
     var message = req.flash('error');
     if (message.length < 1) {
@@ -204,7 +205,7 @@ app.post('/admin', function(req, res){
 
 app.get('/new', function (req, res) {
   if (typeof req.user === 'undefined') {
-    res.render('/', { url: req.url });
+    res.redirect('/');
   } else {
     db.getUsersActiveLists(req.user.id, function (err, result) {
       res.render('new', { lists: result, user: req.user });
@@ -239,7 +240,7 @@ app.post('/mailsender', function(req, res) {
 
 app.get('/lists', function (req, res) {
   if (typeof req.user === 'undefined') {
-    res.render('/', { url: req.url });
+    res.redirect('/');
   } else {
     res.render('listen', { user: req.user });
   }
@@ -248,7 +249,7 @@ app.get('/lists', function (req, res) {
 
 app.get('/list', function (req, res) {
   if (typeof req.user === 'undefined') {
-    res.render('/', { url: req.url });
+    res.redirect('/');
   } else {
     res.render('list', { user: req.user });
   }
@@ -256,7 +257,7 @@ app.get('/list', function (req, res) {
 
 app.get('/list2', function (req, res) {
   if (typeof req.user === 'undefined') {
-    res.render('/', { url: req.url });
+    res.redirect('/');
   } else {
     res.render('list2', { user: req.user });
   }
@@ -315,61 +316,51 @@ app.post('/deletelast', function(req, res) {
 
 });
 
-app.get('/:date', function(req, res) { //@todo: not logged in user is looping here on a date (not anymore with user control; ensureAuthenticated caused this. investigate.)
+// app.get('/:date', function(req, res) { //@todo: not logged in user is looping here on a date (not anymore with user control; ensureAuthenticated caused this. investigate.)
+//   if (typeof req.user === 'undefined') {
+//     res.redirect('/');
+//   } else {
+//     var m = moment(req.params.date, 'YYYYMMDD');
+//
+//     var year = parseInt(req.params.date.substring(0, 4));
+//     var month = parseInt(req.params.date.substring(4, 6));
+//     var day = parseInt(req.params.date.substring(6, 8));
+//
+//     if (m.isValid()) {
+//       db.getLatestMailByDate(req.user.id, year, month, day, function(err, result) {
+//         if (result.length > 0) {
+//           res.redirect('/' + req.params.date + '/' + result);
+//         } else {
+//           res.render('index', { nomail: true, date: moment(req.params.date, "YYYYMMDD"), user: req.user });
+//         }
+//       });
+//     } else {
+//       res.render('/', { url: req.url, title: 'Page Not Found', user: req.user });
+//     }
+//   }
+// });
+
+app.get('/:sid', function(req, res) {
   if (typeof req.user === 'undefined') {
-    res.render('/', { url: req.url });
+    res.redirect('/');
   } else {
-    var m = moment(req.params.date, 'YYYYMMDD');
-
-    var year = parseInt(req.params.date.substring(0, 4));
-    var month = parseInt(req.params.date.substring(4, 6));
-    var day = parseInt(req.params.date.substring(6, 8));
-
-    if (m.isValid()) {
-      db.getLatestMailByDate(req.user.id, year, month, day, function(err, result) {
-        if (result.length > 0) {
-          res.redirect('/' + req.params.date + '/' + result);
-        } else {
-          res.render('index', { nomail: true, date: moment(req.params.date, "YYYYMMDD"), user: req.user });
-        }
-      });
-    } else {
-      res.render('/', { url: req.url, title: 'Page Not Found', user: req.user });
-    }
-  }
-});
-
-app.get('/:date/:sid', function(req, res) {
-  if (typeof req.user === 'undefined') {
-    res.render('/', { url: req.url });
-  } else {
-    var m = moment(req.params.date, 'YYYYMMDD');
-
-    var year = parseInt(req.params.date.substring(0, 4));
-    var month = parseInt(req.params.date.substring(4, 6));
-    var day = parseInt(req.params.date.substring(6, 8));
-
-    if (m.isValid()) {
-      db.getMailBySID(req.params.sid, req.user.id, year, month, day, function(err, result) { // @todo: full path url working externally, put user control here
-        if (result) {
-          res.render('index', {
-            result: result,
-            date: result.time,
-            user: req.user
-          });
-        } else {
-          res.render('/', { url: req.url, title: 'Page Not Found', user: req.user });
-        }
-      });
-    } else {
-      res.render('/', { url: req.url, title: 'Page Not Found', user: req.user });
-    }
+    db.getMailBySID(req.params.sid, function(err, result) {
+      if (result) {
+        res.render('index', {
+          result: result,
+          date: result.time,
+          user: req.user
+        });
+      } else {
+        res.redirect('/');
+      }
+    });
   }
 });
 
 //The REST routes for "list".
-app.route('/api/rest/session/:id')
-.get(allUserSessions);
+app.route('/api/rest/session')
+  .get(allUserSessions);
 
 app.route('/api/rest/list')
   .get(allListItems)
@@ -393,12 +384,11 @@ app.use(handleError);
  * Get a sessions of a user.
  */
 function allUserSessions(req, res, next) {
-  var userID = req.params.id;
 
   if (typeof req.user === 'undefined') {
     res.render('404', { url: req.url });
   } else {
-    r.table('session').getAll(userID, {index: 'owner'}).orderBy(r.desc('time')).run(req.app._rdbConn, function(err, result) {
+    r.table('session').getAll(req.user.id, {index: 'owner'}).orderBy(r.desc('time')).run(req.app._rdbConn, function(err, result) {
       if(err) {
         return next(err);
       }

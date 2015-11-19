@@ -253,42 +253,19 @@ var mailApp = angular.module('mailApp', [])
 })
 .controller('sessionCtrl', function sessionCtrl($scope, sessionStorage, $rootScope) {
 
-  $scope.lists = [];
-  $scope.listMembers = [];
-  $scope.listMemberCount = 0;
-  $scope.listid = [];
+  $scope.sessions = [];
 
   sessionStorage.get().success(function(sessions) {
     $scope.sessions = sessions;
   }).error(function(error) {
     alert('Failed to load SESSIONs');
   });
-
-  $scope.switchListMembers = function (idx, listid, listname) {
-    $scope.listMembers = [];
-    var members = $scope.lists[idx].members;
-    for (var i = 0; i < members.length; i++) {
-      $scope.listMembers.push(members[i]);
-    }
-    $scope.listId = listid;
-    $scope.listMemberCount = $scope.listMembers.length;
-
-    $rootScope.newList = false;
-    $rootScope.oldList = true;
-    $rootScope.oldListObjects = true;
-    $rootScope.listId = listid;
-    $rootScope.listIdx = idx;
-    $rootScope.listHeader = listname;
-    $rootScope.newListInputPh = 'NEW LIST';
-    $rootScope.newListInputBtnState = 'disabled';
-    $rootScope.listArray = $scope.listMembers;
-  };
 })
 .factory('sessionStorage', function ($http) {
 
   return {
     get: function (id) {
-      var url = '/api/rest/session/' + id;
+      var url = '/api/rest/session';
       return $http.get(url);
     }
   };
