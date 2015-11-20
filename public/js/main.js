@@ -27,6 +27,8 @@ var mailApp = angular.module('mailApp', [])
   $rootScope.newListInputPh = 'NEW LIST';
   $rootScope.newListInputBtnState = null;
 
+  $rootScope.sessions = [];
+
 })
 .controller('listCtrl', function listCtrl($scope, listStorage, $rootScope) {
 
@@ -257,9 +259,11 @@ var mailApp = angular.module('mailApp', [])
 
   sessionStorage.get().success(function(sessions) {
     $scope.sessions = sessions;
+    $scope.sessions.date = $scope.sessions.date.replace(/,/,".");
   }).error(function(error) {
     alert('Failed to load SESSIONs');
   });
+
 })
 .factory('sessionStorage', function ($http) {
 

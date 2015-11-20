@@ -7,7 +7,15 @@
 //   window.location.href = "/";
 // });
 
-// $(document).ready(function() {
+$(document).ready(function() {
+
+  //semantic-ui accordion
+  $('.ui.accordion')
+    .accordion();
+
+  $('#session-subject')
+  .popup();
+
 //   $('#dp3').datepicker({
 //     autoclose: true,
 //     format: "dd.mm.yyyy",
@@ -33,7 +41,7 @@
 //
 //     window.location = '/' + yea + mo + day;
 //   });
-// });
+});
 
 // semantic-ui login modal
 // $('#login-btn').click(function () {
@@ -56,7 +64,7 @@ $('#show-lists').click(function () {
 $('#hide-lists').click(function () {
   $('.bottom.sidebar')
   .sidebar('toggle');
-})
+});
 
 $('#show-sessions').click(function () {
   $('.left.sidebar')
@@ -64,6 +72,11 @@ $('#show-sessions').click(function () {
       dimPage             : false,
       transition          : 'overlay',
       mobileTransition    : 'overlay'})
+  .sidebar('toggle');
+});
+
+$('#hide-sessions').click(function () {
+  $('.left.sidebar')
   .sidebar('toggle');
 });
 

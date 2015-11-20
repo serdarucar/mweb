@@ -388,7 +388,13 @@ function allUserSessions(req, res, next) {
   if (typeof req.user === 'undefined') {
     res.render('404', { url: req.url });
   } else {
-    r.table('session').getAll(req.user.id, {index: 'owner'}).orderBy(r.desc('time')).run(req.app._rdbConn, function(err, result) {
+    r.table('session').getAll(req.user.id, {index: 'owner'}).orderBy(r.desc('time')).pluck('time','sid','subject')
+    .group([r.row('time').day(), r.row('time').month(), r.row('time').year()]).ungroup().map(function(doc){
+      return {
+        date: doc('group'),
+        session: doc('reduction')
+      }
+    }).run(req.app._rdbConn, function(err, result) {
       if(err) {
         return next(err);
       }

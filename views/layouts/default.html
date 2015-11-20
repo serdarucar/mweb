@@ -175,12 +175,35 @@
         </div>
       </div>
       <div ng-controller="sessionCtrl" class="ui left vertical inverted menu sidebar">
-        <div id="sessionBox" class="ui secondary vertical menu">
-          <a ng-repeat="session in sessions track by $index" class="item" href="/{[{session.sid}]}">
-            <div class="ui inverted large header">
-              {[{session.subject}]}
+        <br>
+        <div id="hide-sessions" class="ui inverted left aligned huge header" style="cursor: pointer;">
+          <div class="content">
+            <div class="ui basic segment">
+              MAIL SESSIONS
             </div>
-          </a>
+          </div>
+        </div>
+        <hr>
+        <div class="ui inverted accordion">
+          <div class="ui basic segment">
+            <div ng-repeat="session in sessions track by $index" id="sessionBox">
+              <div class="ui inverted left aligned large header title">
+                &nbsp;
+                <i class="calendar icon"></i>
+                {[{session.date}]}
+              </div>
+              <div class="content">
+                <div ng-repeat="session in session.session track by $index" id="sessionBox">
+                  <a id="session-subject" class="item" href="/{[{session.sid}]}" data-content="{[{session.time}]}" data-position="right center">
+                    <div class="ui inverted large header">
+                      {[{session.subject}]}
+                    </div>
+                  </a>
+                </div>
+                <br>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="ui bottom sidebar ui segment">
