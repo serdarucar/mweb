@@ -51,20 +51,20 @@ $(document).ready(function() {
 //   }).modal('show');
 // });
 
-// semantic-ui sidebars
-$('#show-lists').click(function () {
-  $('.bottom.sidebar')
-  .sidebar('setting', {
-      dimPage             : false,
-      transition          : 'overlay',
-      mobileTransition    : 'overlay'})
-  .sidebar('toggle');
-});
-
-$('#hide-lists').click(function () {
-  $('.bottom.sidebar')
-  .sidebar('toggle');
-});
+// // semantic-ui sidebars
+// $('#show-lists').click(function () {
+//   $('.bottom.sidebar')
+//   .sidebar('setting', {
+//       dimPage             : false,
+//       transition          : 'overlay',
+//       mobileTransition    : 'overlay'})
+//   .sidebar('toggle');
+// });
+//
+// $('#hide-lists').click(function () {
+//   $('.bottom.sidebar')
+//   .sidebar('toggle');
+// });
 
 $('#show-sessions').click(function () {
   $('.left.sidebar')
