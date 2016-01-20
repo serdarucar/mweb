@@ -70,8 +70,8 @@ $('#show-sessions').click(function () {
   $('.left.sidebar')
   .sidebar('setting', {
       dimPage             : false,
-      transition          : 'overlay',
-      mobileTransition    : 'overlay'})
+      transition          : 'uncover',
+      mobileTransition    : 'uncover'})
   .sidebar('toggle');
 });
 

@@ -358,6 +358,16 @@ app.get('/:sid', function(req, res) {
   }
 });
 
+app.get('/admin/sessions', function (req, res) {
+  if (typeof req.user === 'undefined') {
+    res.redirect('/');
+  } else if (req.user.admin !== true) {
+    res.redirect('/');
+  } else {
+    res.render('sessions', { user: req.user });
+  }
+});
+
 //The REST routes for "list".
 app.route('/api/rest/session')
   .get(allUserSessions);
@@ -373,6 +383,9 @@ app.route('/api/rest/list/:id')
 
 app.route('/api/rest/trash')
   .put(recycleListMember);
+
+app.route('/api/rest/admin/activity')
+  .get(allActivity);
 
 //If we reach this middleware the route could not be handled and must be unknown.
 app.use(handle404);
@@ -400,6 +413,33 @@ function allUserSessions(req, res, next) {
       }
 
       res.json(result);
+    });
+  }
+}
+
+/*
+ * Get all session activity for admins.
+ */
+function allActivity(req, res, next) {
+
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
+  } else {
+    r.table('session')
+    .orderBy(r.desc('time'))
+    .run(req.app._rdbConn, function(err, cursor) {
+      if(err) {
+        return next(err);
+      }
+
+      //Retrieve all the lists in an array.
+      cursor.toArray(function(err, result) {
+        if(err) {
+          return next(err);
+        }
+
+        res.json(result);
+      });
     });
   }
 }
