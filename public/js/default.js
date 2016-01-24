@@ -69,7 +69,7 @@ $(document).ready(function() {
 $('#show-sessions').click(function () {
   $('.left.sidebar')
   .sidebar('setting', {
-      dimPage             : false,
+      dimPage             : true,
       transition          : 'uncover',
       mobileTransition    : 'uncover'})
   .sidebar('toggle');

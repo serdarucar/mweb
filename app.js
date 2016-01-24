@@ -24,6 +24,7 @@ var express = require('express'),
   local = require('passport-local').Strategy,
   flash = require('connect-flash'),
   bcrypt = require('bcryptjs'),
+  _ = require('underscore'),
   math = require('mathjs'),
   moment = require('moment'),
   shortid = require('shortid'),
@@ -534,7 +535,7 @@ function getListItem(req, res, next) {
  * Update a list member.
  */
 function updateListItem(req, res, next) {
-  var listMembers = req.body;
+  var listMembers = _.uniq(req.body);
   var listItemID = req.params.id;
 
   if (typeof req.user === 'undefined') {

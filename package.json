@@ -28,6 +28,7 @@
     "rethinkdbdash": "^2.0.11",
     "shortid": "^2.2.2",
     "socket.io": "^1.3.5",
+    "underscore": "^1.8.3",
     "util": "^0.10.3"
   }
 }
