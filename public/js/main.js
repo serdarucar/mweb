@@ -264,13 +264,6 @@ var mailApp = angular.module('mailApp', [])
     alert('Failed to load SESSIONs');
   });
 
-  $scope.orderByDate = function(item) {
-      var parts = item.date.toString().split(',');
-      var number = parseInt(parts[2] + parts[1] + parts[0]);
-
-      return -number;
-  };
-
 })
 .factory('sessionStorage', function ($http) {
 

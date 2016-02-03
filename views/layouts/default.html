@@ -107,16 +107,36 @@
             <div class="ui left aligned header">
               <div class="ui basic segment">
                 <div class="ui two column grid">
-                  <div class="ui right aligned column">
-                    <div id="show-sessions" style="cursor: pointer;">
+                  <div  ng-controller="sessionCtrl" class="ui right aligned column">
+                    <div class="ui simple dropdown">
                       <i class="tasks icon"></i>
-                      <div class="content">
+                      <div class="text">
                         Sessions
                       </div>
+                      <div class="ui vertical menu">
+                            <a ng-repeat="session in sessions" href="/{[{session.sid}]}" class="header item">
+                                <span class="description">
+                                    <div class="ui label count" data-content="test of date">{[{session.count}]}</div>
+                                </span>
+                                {[{session.subject}]}
+                            </a>
+                          <div class="header item">
+                              <a href="/path/to/user/sessions">See All Sessions</a>
+                          </div>
+                      </div>
+                        <!--<div class="ui vertical menu">-->
+                            <!--<a ng-repeat="(key, value) in sessions | groupBy: 'time'" href="/{[{session.sid}]}" class="header item">-->
+                                <!--<span class="description">-->
+                                    <!--{[{session.time | date:"dd.MM.yyyy HH:mm"}]}-->
+                                    <!--<div class="ui label">{[{session.count}]}</div>-->
+                                <!--</span>-->
+                                <!--{[{session.subject}]}-->
+                            <!--</a>-->
+                        <!--</div>-->
                     </div>
                   </div>
                   <div class="ui left aligned column">
-                      <div onclick="location.href='/lists';" style="cursor: pointer;">
+                      <div id="show-lists" style="cursor: pointer;">
                       <i class="users icon"></i>
                       <div class="content">
                         Lists
@@ -174,37 +194,89 @@
           </div>
         </div>
       </div>
-      <div ng-controller="sessionCtrl" class="ui left vertical menu sidebar">
-        <br>
-        <div id="hide-sessions" class="ui left aligned huge header" style="cursor: pointer;">
-          <div class="content">
-            <div class="ui basic segment">
-              MAIL SESSIONS
-            </div>
-          </div>
-        </div>
-        <hr>
-        <div class="ui accordion">
-          <div class="ui basic segment">
-            <div ng-repeat="session in sessions | orderBy: orderByDate" id="sessionBox">
-              <div class="ui left aligned large header title">
-                &nbsp;
-                <i class="calendar icon"></i>
-                {[{session.date.toString().replace(",","/").replace(",","/")}]}
+      <div class="ui bottom sidebar ui segment">
+          <!--<div class="ui container">-->
+              <div id="hide-lists" class="ui center aligned container" style="cursor: pointer;">
+                  <i class="center aligned chevron down icon"></i>
               </div>
-              <div class="content">
-                <div ng-repeat="session in session.session track by $index" id="sessionBox">
-                  <a id="session-subject" class="item" href="/{[{session.sid}]}" data-content="{[{session.time}]}" data-position="right center">
-                    <div class="ui large header">
-                      {[{session.subject}]}
-                    </div>
-                  </a>
-                </div>
-                <br>
+              <br>
+              <div id="listBox" ng-controller="listCtrl" class="ui container">
+                  <div class="ui two column grid">
+                      <div class="ui left aligned column">
+                          <h2>MANAGE LISTS</h2>
+                      </div>
+                      <div class="ui right aligned column">
+                          <div class="ui right aligned icon input">
+                              <input ng-model="listQuery" type="text" placeholder="SEARCH MAILS">
+                              <i class="search icon"></i>
+                          </div>
+                      </div>
+                  </div>
+                  <br>
+                  <div class="ui top attached segment">
+                      <div class="ui two column grid">
+                          <div class="ui column">
+                              <div class="ui huge header">{[{listHeader}]}</div>
+                          </div>
+                          <div class="ui column">
+                              <p ng-hide="oldListObjects">&nbsp;</p>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="ui attached segment">
+                      <div class="ui two column grid">
+                          <div class="ui column">
+                              <div class="ui fluid input">
+                                  <input ng-model="listAdd" ng-focus="crateNewFocus()" ng-keyup="$event.keyCode == 13 && createNewList(listAdd)" type="text" autofocus="true" placeholder="{[{newListInputPh}]}">
+                                  <div class="massive ui button {[{newListInputBtnState}]}" ng-click="createNewList(listAdd)">CREATE</div>
+                              </div>
+                              <div class="ui big divided selection list" style="overflow-y:auto; height:296px;">
+                                  <div class="item" ng-repeat="list in lists track by $index" ng-mouseover="ListHoverIn()" ng-mouseleave="ListHoverOut()" ng-click="switchListMembers($index, list.id, list.name)">
+                                      <div class="right floated content">
+                                          <i class="square outline grey link icon" ng-show="hoverCheck" ng-click=""></i>
+                                          <i class="remove circle grey link icon" ng-show="hoverDelete" ng-click="removeList(list)"></i>
+                                      </div>
+                                      <div class="content">
+                                          {[{list.name}]}
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="ui column">
+                              <div class="ui fluid input" ng-show="oldListObjects">
+                                  <input ng-model="mailAdd" ng-keyup="$event.keyCode == 13 && addMailToList(mailAdd)" type="text" placeholder="ADD MAIL TO LIST">
+                                  <button class="massive ui button" ng-click="addMailToList(mailAdd)">ADD</button>
+                              </div>
+                              <div ng-show="oldList" class="ui big divided selection list" style="overflow-y:auto; height:296px;">
+                                  <div class="item" ng-repeat="member in listMembers | orderBy | filter: listQuery track by $index" ng-mouseover="ListHoverIn()" ng-mouseleave="ListHoverOut()">
+                                      <div class="right floated content">
+                                          <i class="square outline grey link icon" ng-show="hoverCheck" ng-click=""></i>
+                                          <i class="remove circle grey link icon" ng-show="hoverDelete" ng-click="removeMailFromList(member)"></i>
+                                      </div>
+                                      <div class="content">
+                                          {[{member}]}
+                                      </div>
+                                  </div>
+                              </div>
+                              <div ng-show="newList" class="ui form">
+                                  <div class="field">
+                                      <textarea ng-init="multiMailAdd = multiMailAdd = null ? [] : multiMailAdd" ng-model="multiMailAdd" rows=13 style="resize:none;font-size: 19px;" placeholder="Enter mail addresses..."></textarea>
+                                  </div>
+                                  <div class="ui small basic right floated icon buttons">
+                                      <button class="ui disabled button"><i class="file icon"></i></button>
+                                      <button class="ui disabled button"><i class="save icon"></i></button>
+                                      <button class="ui disabled button"><i class="upload icon"></i></button>
+                                      <button class="ui disabled button"><i class="download icon"></i></button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div id="listMemberCount" class="ui basic right aligned segment">
+                      Mails on this List:&nbsp;{[{listMemberCount}]}
+                  </div>
               </div>
-            </div>
-          </div>
-        </div>
+          <!--</div>-->
       </div>
       {{{ body }}}
     </body>

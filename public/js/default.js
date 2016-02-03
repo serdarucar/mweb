@@ -10,11 +10,11 @@
 $(document).ready(function() {
 
   //semantic-ui accordion
-  $('.ui.accordion')
-    .accordion();
+  //$('.ui.accordion')
+  //  .accordion();
 
-  $('#session-subject')
-  .popup();
+  //$('.ui.label.count')
+  //  .popup();
 
 //   $('#dp3').datepicker({
 //     autoclose: true,
@@ -52,33 +52,33 @@ $(document).ready(function() {
 // });
 
 // // semantic-ui sidebars
-// $('#show-lists').click(function () {
-//   $('.bottom.sidebar')
-//   .sidebar('setting', {
-//       dimPage             : false,
-//       transition          : 'overlay',
-//       mobileTransition    : 'overlay'})
-//   .sidebar('toggle');
-// });
+ $('#show-lists').click(function () {
+   $('.bottom.sidebar')
+   .sidebar('setting', {
+       dimPage             : false,
+       transition          : 'overlay',
+       mobileTransition    : 'overlay'})
+   .sidebar('toggle');
+ });
+
+ $('#hide-lists').click(function () {
+   $('.bottom.sidebar')
+   .sidebar('toggle');
+ });
+
+//$('#show-sessions').click(function () {
+//  $('.left.sidebar')
+//  .sidebar('setting', {
+//      dimPage             : true,
+//      transition          : 'uncover',
+//      mobileTransition    : 'uncover'})
+//  .sidebar('toggle');
+//});
 //
-// $('#hide-lists').click(function () {
-//   $('.bottom.sidebar')
-//   .sidebar('toggle');
-// });
-
-$('#show-sessions').click(function () {
-  $('.left.sidebar')
-  .sidebar('setting', {
-      dimPage             : true,
-      transition          : 'uncover',
-      mobileTransition    : 'uncover'})
-  .sidebar('toggle');
-});
-
-$('#hide-sessions').click(function () {
-  $('.left.sidebar')
-  .sidebar('toggle');
-});
+//$('#hide-sessions').click(function () {
+//  $('.left.sidebar')
+//  .sidebar('toggle');
+//});
 
 // $('#dp3').on('click', function(e) {
 //   e.preventDefault();

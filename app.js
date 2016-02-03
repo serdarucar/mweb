@@ -239,83 +239,84 @@ app.post('/mailsender', function(req, res) {
 
 });
 
-app.get('/lists', function (req, res) {
-  if (typeof req.user === 'undefined') {
-    res.redirect('/');
-  } else {
-    res.render('listen', { user: req.user });
-  }
-    //  res.render('listen', { user: req.user });
-});
-
-app.get('/list', function (req, res) {
-  if (typeof req.user === 'undefined') {
-    res.redirect('/');
-  } else {
-    res.render('list', { user: req.user });
-  }
-});
-
-app.get('/list2', function (req, res) {
-  if (typeof req.user === 'undefined') {
-    res.redirect('/');
-  } else {
-    res.render('list2', { user: req.user });
-  }
-});
-
-app.post('/savelist', function(req, res) {
-
-  var newlist = {
-    id: shortid.generate(),
-    name: req.body.listname,
-    members: req.body.listdata,
-    count: req.body.listcount
-  }
-
-  db.saveMailList(req.user.id, newlist);
-
-});
-
-app.post('/savelist2', function(req, res) {
-
-  var newlist = {
-    name: req.body.listname,
-    members: req.body.listdata,
-    count: req.body.listcount
-  }
-
-  db.saveMailList2(req.user.id, newlist);
-
-});
-
-app.post('/updatelist', function(req, res) {
-
-  var updlist = {
-    id: shortid.generate(),
-    name: req.body.listname,
-    members: req.body.listdata,
-    count: req.body.listcount
-  }
-
-  db.saveMailList(req.user.id, updlist);
-  db.deleteMailList(req.user.id, req.body.listdelid);
-
-});
-
-app.post('/deletelist', function(req, res) {
-
-  req.body.listdelete.forEach(function(listid) {
-    db.deleteMailList(req.user.id, listid);
-  });
-
-});
-
-app.post('/deletelast', function(req, res) {
-
-    db.deleteMailList(req.user.id, req.body.listdelid);
-
-});
+// OBSOLETE AFTER ANGULAR //
+//app.get('/lists', function (req, res) {
+//  if (typeof req.user === 'undefined') {
+//    res.redirect('/');
+//  } else {
+//    res.render('listen', { user: req.user });
+//  }
+//    //  res.render('listen', { user: req.user });
+//});
+//
+//app.get('/list', function (req, res) {
+//  if (typeof req.user === 'undefined') {
+//    res.redirect('/');
+//  } else {
+//    res.render('list', { user: req.user });
+//  }
+//});
+//
+//app.get('/list2', function (req, res) {
+//  if (typeof req.user === 'undefined') {
+//    res.redirect('/');
+//  } else {
+//    res.render('list2', { user: req.user });
+//  }
+//});
+//
+//app.post('/savelist', function(req, res) {
+//
+//  var newlist = {
+//    id: shortid.generate(),
+//    name: req.body.listname,
+//    members: req.body.listdata,
+//    count: req.body.listcount
+//  }
+//
+//  db.saveMailList(req.user.id, newlist);
+//
+//});
+//
+//app.post('/savelist2', function(req, res) {
+//
+//  var newlist = {
+//    name: req.body.listname,
+//    members: req.body.listdata,
+//    count: req.body.listcount
+//  }
+//
+//  db.saveMailList2(req.user.id, newlist);
+//
+//});
+//
+//app.post('/updatelist', function(req, res) {
+//
+//  var updlist = {
+//    id: shortid.generate(),
+//    name: req.body.listname,
+//    members: req.body.listdata,
+//    count: req.body.listcount
+//  }
+//
+//  db.saveMailList(req.user.id, updlist);
+//  db.deleteMailList(req.user.id, req.body.listdelid);
+//
+//});
+//
+//app.post('/deletelist', function(req, res) {
+//
+//  req.body.listdelete.forEach(function(listid) {
+//    db.deleteMailList(req.user.id, listid);
+//  });
+//
+//});
+//
+//app.post('/deletelast', function(req, res) {
+//
+//    db.deleteMailList(req.user.id, req.body.listdelid);
+//
+//});
 
 // app.get('/:date', function(req, res) { //@todo: not logged in user is looping here on a date (not anymore with user control; ensureAuthenticated caused this. investigate.)
 //   if (typeof req.user === 'undefined') {
@@ -371,6 +372,9 @@ app.get('/admin/sessions', function (req, res) {
 
 //The REST routes for "list".
 app.route('/api/rest/session')
+  .get(lastUserSessions);
+
+app.route('/api/rest/sessions')
   .get(allUserSessions);
 
 app.route('/api/rest/list')
@@ -395,7 +399,7 @@ app.use(handle404);
 app.use(handleError);
 
 /*
- * Get a sessions of a user.
+ * Get all sessions of a user.
  */
 function allUserSessions(req, res, next) {
 
@@ -403,12 +407,36 @@ function allUserSessions(req, res, next) {
     res.render('404', { url: req.url });
   } else {
     r.table('session').getAll(req.user.id, {index: 'owner'}).orderBy(r.desc('time')).pluck('time','sid','subject')
-    .group([r.row('time').day(), r.row('time').month(), r.row('time').year()]).ungroup().map(function(doc){
+      .group([r.row('time').day(), r.row('time').month(), r.row('time').year()]).ungroup().map(function(doc){
       return {
         date: doc('group'),
         session: doc('reduction')
       }
     }).run(req.app._rdbConn, function(err, result) {
+      if(err) {
+        return next(err);
+      }
+
+      res.json(result);
+    });
+  }
+}
+
+/*
+ * Get last 10 sessions of a user.
+ */
+function lastUserSessions(req, res, next) {
+
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
+  } else {
+    r
+    .table('session')
+    .getAll(req.user.id, {index: 'owner'})
+    .orderBy(r.desc('time'))
+    .pluck('time','sid','subject','count')
+    .limit(10)
+    .run(req.app._rdbConn, function(err, result) {
       if(err) {
         return next(err);
       }
