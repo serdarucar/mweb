@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-  <html ng-app="mailApp" lang="en" data-framework="angularjs">
+  <html lang="en">
   <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
   <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
   <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
@@ -15,31 +15,8 @@
       <!-- Prevent favicon to be requested -->
       <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 
-      <!-- FA -->
-      <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-
-      <!-- Socket.IO related scripts -->
-      <script src="/socket.io/socket.io.js"></script>
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js"></script>
-      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"></script>
-      <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>-->
-
-      <!--<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
-      <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-responsive.min.css" rel="stylesheet">
-      <link href="//netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
-      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-      <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
-    -->
-
       <link href="/ext/semantic/ui/dist/semantic.min.css" rel="stylesheet" type="text/css">
-      <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"rel="stylesheet">
-      <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.4/yeti/bootstrap.min.css" rel="stylesheet">
-      <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker.css" rel="stylesheet">
-      <!-- <link rel="stylesheet" href="bower_components/todomvc-common/base.css"> -->
       <script src="/ext/semantic/ui/dist/semantic.min.js"></script>
-      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.js"></script>
-      <script src="//cdn.ckeditor.com/4.5.3/full-all/ckeditor.js"></script>
 
       <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
       <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -47,40 +24,6 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
       <![endif]-->
-      <style>
-        .mail-sent {
-          color: #5cb85c;
-        }
-        .mail-deferred {
-          color: #eea236;
-        }
-        .mail-bounced {
-          color: #d44a45;
-        }
-        .datepicker.dropdown-menu table  {
-          background-color: #303030;
-          color: #fff;
-          border-bottom-color: #303030;
-        }
-        .navbar-center
-        {
-          position: absolute;
-          width: 100%;
-          left: 0;
-          text-align: center;
-          margin: auto;
-        }
-        .alert-center
-        {
-          position: absolute;
-          width: 100%;
-          left: 0;
-          text-align: center;
-          margin: auto;
-          margin-top: 46px;
-        }
-      </style>
-  		<style>[ng-cloak] { display: none; }</style>
     </head>
     <body>
       <!--[if lt IE 7]>
@@ -88,240 +31,71 @@
       <![endif]-->
 
       <div class="ui basic segment">
-        <!-- <br><br><br> -->
         <div class="ui one column grid">
           <div class="ui center aligned column">
           </div>
         </div>
-        <div class="ui three column grid">
-          <div class="ui left aligned column">
-            {{#if user}}
-            <div class="ui left aligned header">
-              <div class="ui basic segment">
-                <div class="ui two column grid">
-                  <div  ng-controller="sessionCtrl" class="ui right aligned column">
-                    <div class="ui simple dropdown">
-                      <i class="tasks icon"></i>
-                      <div class="text">
-                        Sessions
-                      </div>
-                      <div class="ui vertical menu">
-                            <a ng-repeat="session in sessions" href="/{[{session.sid}]}" class="header item">
-                                <span class="description">
-                                    <div class="ui label count" data-content="test of date">{[{session.count}]}</div>
-                                </span>
-                                {[{session.subject}]}
-                            </a>
-                          <div class="header item">
-                              <a href="/path/to/user/sessions">See All Sessions</a>
-                          </div>
-                      </div>
-                        <!--<div class="ui vertical menu">-->
-                            <!--<a ng-repeat="(key, value) in sessions | groupBy: 'time'" href="/{[{session.sid}]}" class="header item">-->
-                                <!--<span class="description">-->
-                                    <!--{[{session.time | date:"dd.MM.yyyy HH:mm"}]}-->
-                                    <!--<div class="ui label">{[{session.count}]}</div>-->
-                                <!--</span>-->
-                                <!--{[{session.subject}]}-->
-                            <!--</a>-->
-                        <!--</div>-->
-                    </div>
-                  </div>
-                  <div class="ui left aligned column">
-                      <div id="show-lists" style="cursor: pointer;">
-                      <i class="users icon"></i>
-                      <div class="content">
-                        Lists
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {{/if}}
-          </div>
+        <div class="ui one column grid">
           <div class="ui center aligned column" onclick="location.href='/';" style="cursor: pointer;">
             <div class="ui huge header">
               MAILSENDER
               <div class="sub header">by steminorder.com</div>
             </div>
-            {{#if user}}
-              <i class="mail outline icon"></i>
-              {{user.email}}
-            {{/if}}
-          </div>
-          <div class="ui right aligned column">
-            <div class="ui right aligned header">
-              <div class="ui basic segment">
-                <div class="ui two column grid">
-                  <div class="ui right aligned column">
-                    {{#if user}}
-                    <div onclick="location.href='/new';" style="cursor: pointer;">
-                      <i class="edit icon"></i>
-                      <div class="content">
-                        New Mail
-                      </div>
-                    </div>
-                    {{/if}}
-                  </div>
-                  <div class="ui left aligned column">
-                    {{#if user}}
-                    <div onclick="location.href='/logout';" style="cursor: pointer;">
-                      <i class="sign out icon"></i>
-                      <div class="content">
-                        Logout
-                      </div>
-                    </div>
-                    <!-- <div id="login-btn" style="cursor: pointer;">
-                      <i class="sign in icon"></i>
-                      <div class="content">
-                        Login
-                      </div>
-                    </div> -->
-                    {{/if}}
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
-      </div>
-      <div class="ui bottom sidebar ui segment">
-          <!--<div class="ui container">-->
-              <div id="hide-lists" class="ui center aligned container" style="cursor: pointer;">
-                  <i class="center aligned chevron down icon"></i>
-              </div>
-              <br>
-              <div id="listBox" ng-controller="listCtrl" class="ui container">
-                  <div class="ui two column grid">
-                      <div class="ui left aligned column">
-                          <h2>MANAGE LISTS</h2>
-                      </div>
-                      <div class="ui right aligned column">
-                          <div class="ui right aligned icon input">
-                              <input ng-model="listQuery" type="text" placeholder="SEARCH MAILS">
-                              <i class="search icon"></i>
-                          </div>
-                      </div>
-                  </div>
-                  <br>
-                  <div class="ui top attached segment">
-                      <div class="ui two column grid">
-                          <div class="ui column">
-                              <div class="ui huge header">{[{listHeader}]}</div>
-                          </div>
-                          <div class="ui column">
-                              <p ng-hide="oldListObjects">&nbsp;</p>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="ui attached segment">
-                      <div class="ui two column grid">
-                          <div class="ui column">
-                              <div class="ui fluid input">
-                                  <input ng-model="listAdd" ng-focus="crateNewFocus()" ng-keyup="$event.keyCode == 13 && createNewList(listAdd)" type="text" autofocus="true" placeholder="{[{newListInputPh}]}">
-                                  <div class="massive ui button {[{newListInputBtnState}]}" ng-click="createNewList(listAdd)">CREATE</div>
-                              </div>
-                              <div class="ui big divided selection list" style="overflow-y:auto; height:296px;">
-                                  <div class="item" ng-repeat="list in lists track by $index" ng-mouseover="ListHoverIn()" ng-mouseleave="ListHoverOut()" ng-click="switchListMembers($index, list.id, list.name)">
-                                      <div class="right floated content">
-                                          <i class="square outline grey link icon" ng-show="hoverCheck" ng-click=""></i>
-                                          <i class="remove circle grey link icon" ng-show="hoverDelete" ng-click="removeList(list)"></i>
-                                      </div>
-                                      <div class="content">
-                                          {[{list.name}]}
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="ui column">
-                              <div class="ui fluid input" ng-show="oldListObjects">
-                                  <input ng-model="mailAdd" ng-keyup="$event.keyCode == 13 && addMailToList(mailAdd)" type="text" placeholder="ADD MAIL TO LIST">
-                                  <button class="massive ui button" ng-click="addMailToList(mailAdd)">ADD</button>
-                              </div>
-                              <div ng-show="oldList" class="ui big divided selection list" style="overflow-y:auto; height:296px;">
-                                  <div class="item" ng-repeat="member in listMembers | orderBy | filter: listQuery track by $index" ng-mouseover="ListHoverIn()" ng-mouseleave="ListHoverOut()">
-                                      <div class="right floated content">
-                                          <i class="square outline grey link icon" ng-show="hoverCheck" ng-click=""></i>
-                                          <i class="remove circle grey link icon" ng-show="hoverDelete" ng-click="removeMailFromList(member)"></i>
-                                      </div>
-                                      <div class="content">
-                                          {[{member}]}
-                                      </div>
-                                  </div>
-                              </div>
-                              <div ng-show="newList" class="ui form">
-                                  <div class="field">
-                                      <textarea ng-init="multiMailAdd = multiMailAdd = null ? [] : multiMailAdd" ng-model="multiMailAdd" rows=13 style="resize:none;font-size: 19px;" placeholder="Enter mail addresses..."></textarea>
-                                  </div>
-                                  <div class="ui small basic right floated icon buttons">
-                                      <button class="ui disabled button"><i class="file icon"></i></button>
-                                      <button class="ui disabled button"><i class="save icon"></i></button>
-                                      <button class="ui disabled button"><i class="upload icon"></i></button>
-                                      <button class="ui disabled button"><i class="download icon"></i></button>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-                  <div id="listMemberCount" class="ui basic right aligned segment">
-                      Mails on this List:&nbsp;{[{listMemberCount}]}
-                  </div>
-              </div>
-          <!--</div>-->
-      </div>
 
 	  <!-- Card Payment Form Start -->
 
-	  <form class="ui form">
-		  <h4 class="ui dividing header">Payment Information</h4>
-		  <div class="field">
-			<label>Name on Card</label>
-			<div class="field">
+		  <form class="ui form">
+			  <h4 class="ui dividing header">Payment Information</h4>
 			  <div class="field">
-				<input type="text" name="card[name]" placeholder="">
-			  </div>
-			</div>
-		  </div>
-		  <div class="fields">
-			<div class="seven wide field">
-			  <label>Card Number</label>
-			  <input type="text" name="card[number]" maxlength="16" placeholder="Card #">
-			</div>
-			<div class="three wide field">
-			  <label>CVC</label>
-			  <input type="text" name="card[cvv]" maxlength="3" placeholder="CVV">
-			</div>
-			<div class="six wide field">
-			  <label>Expiration</label>
-			  <div class="two fields">
+				<label>Name on Card</label>
 				<div class="field">
-				  <select class="ui fluid search dropdown" name="card[expire-month]">
-					<option value="">Month</option>
-					<option value="1">January</option>
-					<option value="2">February</option>
-					<option value="3">March</option>
-					<option value="4">April</option>
-					<option value="5">May</option>
-					<option value="6">June</option>
-					<option value="7">July</option>
-					<option value="8">August</option>
-					<option value="9">September</option>
-					<option value="10">October</option>
-					<option value="11">November</option>
-					<option value="12">December</option>
-				  </select>
-				</div>
-				<div class="field">
-				  <input type="text" name="card[expire-year]" maxlength="4" placeholder="Year">
+				  <div class="field">
+					<input type="text" name="card[name]" placeholder="">
+				  </div>
 				</div>
 			  </div>
-			</div>
-		  </div>
-		  <div class="ui button" tabindex="0">Submit Order</div>
-	  </form>
+			  <div class="fields">
+				<div class="seven wide field">
+				  <label>Card Number</label>
+				  <input type="text" name="card[number]" maxlength="16" placeholder="Card #">
+				</div>
+				<div class="three wide field">
+				  <label>CVC</label>
+				  <input type="text" name="card[cvv]" maxlength="3" placeholder="CVV">
+				</div>
+				<div class="six wide field">
+				  <label>Expiration</label>
+				  <div class="two fields">
+					<div class="field">
+					  <select class="ui fluid search dropdown" name="card[expire-month]">
+						<option value="">Month</option>
+						<option value="1">January</option>
+						<option value="2">February</option>
+						<option value="3">March</option>
+						<option value="4">April</option>
+						<option value="5">May</option>
+						<option value="6">June</option>
+						<option value="7">July</option>
+						<option value="8">August</option>
+						<option value="9">September</option>
+						<option value="10">October</option>
+						<option value="11">November</option>
+						<option value="12">December</option>
+					  </select>
+					</div>
+					<div class="field">
+					  <input type="text" name="card[expire-year]" maxlength="4" placeholder="Year">
+					</div>
+				  </div>
+				</div>
+			  </div>
+			  <div class="ui button" tabindex="0">Submit Order</div>
+		  </form>
 
 	  <!-- Card Payment Form End -->
+    </div>
 
     </body>
     <script type="text/javascript" src="/js/main.js"></script>
