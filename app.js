@@ -141,7 +141,7 @@ app.get('/', function(req, res) {
     if (message.length < 1) {
       message = false;
     }
-    res.redirect('/login.html');
+    res.redirect('/homepage.html');
   }
 });
 
