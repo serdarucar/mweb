@@ -240,14 +240,14 @@ app.post('/mailsender', function(req, res) {
 });
 
 // OBSOLETE AFTER ANGULAR //
-//app.get('/lists', function (req, res) {
-//  if (typeof req.user === 'undefined') {
-//    res.redirect('/');
-//  } else {
-//    res.render('listen', { user: req.user });
-//  }
-//    //  res.render('listen', { user: req.user });
-//});
+app.get('/lists', function (req, res) {
+ if (typeof req.user === 'undefined') {
+   res.redirect('/');
+ } else {
+   res.render('listen', { user: req.user });
+ }
+   //  res.render('listen', { user: req.user });
+});
 //
 //app.get('/list', function (req, res) {
 //  if (typeof req.user === 'undefined') {

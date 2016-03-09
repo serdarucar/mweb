@@ -136,7 +136,8 @@
                     </div>
                   </div>
                   <div class="ui left aligned column">
-                      <div id="show-lists" style="cursor: pointer;">
+                      <!--<div id="show-lists" style="cursor: pointer;">-->
+                      <div onclick="location.href='/lists';" style="cursor: pointer;">
                       <i class="users icon"></i>
                       <div class="content">
                         Lists
@@ -194,13 +195,137 @@
           </div>
         </div>
       </div>
-      <div class="ui bottom sidebar ui segment">
+      <!--<div class="ui bottom sidebar ui segment">-->
           <!--<div class="ui container">-->
-              <div id="hide-lists" class="ui center aligned container" style="cursor: pointer;">
+              <!--<div id="hide-lists" class="ui center aligned container" style="cursor: pointer;">
                   <i class="center aligned chevron down icon"></i>
               </div>
               <br>
               <div id="listBox" ng-controller="listCtrl" class="ui container">
+                <div class="ui two column grid">
+                  <div class="ui left aligned column">
+                    <h2>MANAGE LISTS</h2>
+                  </div>
+                  <div class="ui right aligned column">
+                    <div class="ui right aligned icon input">
+                      <input ng-model="listQuery" type="text" placeholder="SEARCH MAILS" />
+                    </div>
+                  </div>
+                </div>
+                <br />
+                <div class="ui top attached segment">
+                  <div class="ui two column grid">
+                    <div class="ui column">
+                      <div class="ui huge header">{[{listHeader}]}</div>
+                    </div>
+                    <div class="ui column">
+                      <p ng-hide="oldListObjects">&#160;</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="ui attached segment">
+                  <div class="ui two column grid">
+                    <div class="ui column">
+                      <div class="ui fluid input">
+                        <input ng-model="listAdd" ng-focus="crateNewFocus()" ng-keyup="$event.keyCode == 13 &amp;&amp; createNewList(listAdd)" type="text" autofocus="true"
+                        placeholder="{[{newListInputPh}]}" />
+                        <div class="massive ui button {[{newListInputBtnState}]}" ng-click="createNewList(listAdd)">CREATE</div>
+                      </div>
+                      <div class="ui big divided selection list" style="overflow-y:auto; height:296px;">
+                        <div ng-show="oldListObjects">
+                          <input type="checkbox" ng-model="allListsSelected" ng-click="selectAllLists()">&nbsp&nbspSelect All</input>
+                        </div>
+                        <br/>
+                        <div class="item" ng-repeat="list in lists track by $index" ng-mouseover="ListHoverIn()" ng-mouseleave="ListHoverOut()" >
+                          <div class="right floated content">
+                            <i class="square outline grey link icon ng-hide" ng-show="hoverCheck" ng-click=""></i>
+                            <i class="remove circle grey link icon ng-hide" ng-show="hoverDelete" ng-click="removeList(list)"></i>
+                          </div>
+                          <div class="left floated content">
+                            <input type="checkbox" ng-model="list.selected" ng-change="selectList(list)">
+                          </div>
+                          <div class="content" ng-click="switchListMembers($index, list.id, list.name)">{[{list.name}]}</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="ui column">
+                      <div class="ui fluid input" ng-show="oldListObjects">
+                        <input ng-model="mailAdd" ng-keyup="$event.keyCode == 13 &amp;&amp; addMailToList(mailAdd)" type="text" placeholder="ADD MAIL TO LIST" />
+                        <button class="massive ui button" ng-click="addMailToList(mailAdd)">ADD</button>
+                      </div>
+                      <div ng-show="oldList" class="ui big divided selection list" style="overflow-y:auto; height:296px;">
+                        <div>
+                          <input type="checkbox" ng-model="lists[listIdx].allAddressesSelected" ng-click="selectAllAddresses()" ng-disabled="lists[listIdx].members.length<1">&nbsp&nbspSelect All</input>
+                        </div><br/>
+                        <div class="item" ng-repeat="member in listMembers | orderBy | filter: listQuery track by $index" ng-mouseover="ListHoverIn()" ng-mouseleave="ListHoverOut()">
+                          <div class="right floated content">
+                            <i class="square outline grey link icon ng-hide" ng-show="hoverCheck" ng-click=""></i>
+                            <i class="remove circle grey link icon ng-hide" ng-show="hoverDelete" ng-click="removeMailFromList(member)"></i>
+                          </div>
+                          <div class="left floated content">
+                            <input type="checkbox" ng-checked="selectedAddresses.indexOf(member)>-1" ng-click="selectAddress(member)">
+                          </div>
+                          <div class="content">{[{member}]}</div>
+                        </div>
+                      </div>
+                      <div ng-show="newList" class="ui form">
+                        <div class="field">
+                          <textarea ng-init="multiMailAdd = multiMailAdd = null ? [] : multiMailAdd" ng-model="multiMailAdd" rows="13" style="resize:none;font-size: 19px;" placeholder="Enter mail addresses..."></textarea>
+                        </div>
+                        <div class="ui small basic right floated icon buttons">-->
+                        <!-- IMPORT BUTTONS HERE -->
+                        <!--</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ui two column grid" >
+                    <div class="ui column" ng-show="isBothChecked()">
+                          <div class="ui left aligned huge button" ng-click="addToSelected()">ADD TO LIST(S)</div>
+                          <div class="ui right aligned huge button" ng-click="removeFromSelected()">REMOVE FROM LIST(S)</div>-->
+                      <!--
+                      <div class="ui fluid input">
+                        <div class="left floated content">
+                          <div id="selectedListCount" class="ui basic left aligned segment">Selected Lists:&#160;{[{selectedListsCount}]}, Selected Mails:&#160;{[{selectedAddresses.length}]}</div>
+                        </div>
+                      </div>
+                      -->
+
+                    <!--</div>
+
+                    <div class="ui column">-->
+                          <!--
+                          <button style="float:right;" ng-click="addToSelected()">Add to selected</button>&nbsp&nbsp
+                          <button style="float:right;" ng-click="removeFromSelected()">Remove from selected</button>
+                          -->
+                    <!--</div>
+                  </div>
+                </div>
+                <div class="ui two column grid" >
+                  <div class="ui column">-->
+                    <!--
+                    <div class="ui basic left aligned segment">
+                      Import emails or list from
+                      <label for="excel-upload" class="custom-file-upload" title="Excel (XLS,XLSX) and CSV file(s)" style="cursor:pointer">
+                        <i class="fa fa-file-excel-o fa-2x"></i>
+                      </label>
+                      <excel-import onread="excelRead" onerror="excelReadError" oncsvread="csvRead" id="excel-upload"></excel-import>
+                      <label for="text-upload" class="custom-file-upload" title="Text (.txt) file(s)" style="cursor:pointer">
+                        <i class="fa fa-file-text-o fa-2x"></i>
+                      </label>
+                      <text-import onread="csvRead" id="text-upload"></text-import>
+                      <label for="docx-upload" class="custom-file-upload" title="Word (.docx) file(s)" style="cursor:pointer">
+                        <i class="fa fa-file-word-o fa-2x"></i>
+                      </label>
+                      <docx-import onread="docxRead" id="docx-upload"></docx-import>
+                    </div>
+                    -->
+                  <!--</div>
+                  <div class="ui column">
+                    <div id="listMemberCount" class="ui basic right aligned segment">Mails on this List:&#160;{[{listMemberCount}]}</div>
+                  </div>
+                </div>
+              </div>-->
+              <!--<div id="listBox" ng-controller="listCtrl" class="ui container">
                   <div class="ui two column grid">
                       <div class="ui left aligned column">
                           <h2>MANAGE LISTS</h2>
@@ -275,9 +400,9 @@
                   <div id="listMemberCount" class="ui basic right aligned segment">
                       Mails on this List:&nbsp;{[{listMemberCount}]}
                   </div>
-              </div>
+              </div>-->
           <!--</div>-->
-      </div>
+      <!--</div>-->
       {{{ body }}}
     </body>
     <script type="text/javascript" src="/js/main.js"></script>

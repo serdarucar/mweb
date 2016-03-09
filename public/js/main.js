@@ -30,14 +30,22 @@ var mailApp = angular.module('mailApp', [])
   $rootScope.sessions = [];
 
 })
-.controller('listCtrl', function listCtrl($scope, listStorage, $rootScope) {
+.controller('listCtrl', function listCtrl($scope, listStorage, $rootScope,$http) {
 
   $scope.lists = [];
   $scope.listMembers = [];
   $scope.listMemberCount = 0;
-  $scope.listid = [];
+    
+  $scope.selectedAddresses=[];
+  $scope.allListsSelected=false;
+  
+  $scope.selectedListsCount=0;
 
   listStorage.get().success(function(lists) {
+  	angular.forEach(lists,function(list){
+  		list.selected=false;
+  		list.allAddressesSelected=false;
+  	});
     $scope.lists = lists;
 
     if ($scope.lists.length > 0) {
@@ -54,11 +62,103 @@ var mailApp = angular.module('mailApp', [])
     //this.hoverCheck = true;
   };
 
+  $scope.selectList=function(l){
+	  $scope.selectedListsCount+=l.selected ? 1:-1;
+	  $scope.allListsSelected=$scope.lists.every(function(list){
+		  return list.selected;
+	  })	  
+  }
+  
+  $scope.selectAllLists=function(){
+	  var toggleStatus = $scope.allListsSelected;
+	  angular.forEach($scope.lists,function(list){
+		  $scope.selectedListsCount=toggleStatus?$scope.lists.length:0;
+		  list.selected=toggleStatus;
+	  });
+  }
+
   $scope.ListHoverOut = function () {
       this.hoverDelete = false;
-      //this.hoverCheck = false;
+  };
+  
+  $scope.selectAllAddresses=function(){
+  	var toggle=$scope.lists[$rootScope.listIdx].allAddressesSelected;
+  	angular.forEach($scope.listMembers, function (member) {
+  		var index = $scope.selectedAddresses.indexOf(member);
+  		if(toggle){
+  			if(index==-1)
+  				$scope.selectedAddresses.push(member);
+  		}
+  		else{
+  			if(index>-1)
+  				$scope.selectedAddresses.splice(index,1);
+  		}
+  	});
+  }
+  
+  $scope.checkAllAddressesSelected=function(){
+	 var list=$scope.lists[$rootScope.listIdx];
+   if(list.members.length==0)
+    list.allAddressesSelected= false;
+    return;
+   list.allAddressesSelected=list.members.every(function(member){
+     return $scope.selectedAddresses.indexOf(member)>-1;
+   });
+  };
+  
+  $scope.selectAddress=function(address){
+  	var index = $scope.selectedAddresses.indexOf(address);
+  	if (index == -1) {
+  		$scope.selectedAddresses.push(address);
+  	}
+  	else{
+  		$scope.selectedAddresses.splice(index,1);
+  	}
+  	$scope.checkAllAddressesSelected();
+  }
+  
+  $scope.isBothChecked=function(){
+	  if($scope.selectedListsCount>0 && $scope.selectedAddresses.length>0)
+		  return true;
+	  return false;
+  }
+  
+  $scope.addToSelected=function(){
+  	for(var listIdx=0;listIdx<$scope.lists.length;listIdx++){
+  		var list=$scope.lists[listIdx];
+  		if(list.selected){
+  			var listId=list.id;
+
+  			$rootScope.listId = listId;
+  			$rootScope.listIdx=listIdx;
+  			$rootScope.listArray=list.members;
+
+        $scope.addMultiMailToList($scope.selectedAddresses);  
+        list.selected=false;
+        list.allAddressesSelected=false;		  
+  		}
+  	}
+    $scope.allListsSelected=false;
+    $scope.selectedAddresses=[];
   };
 
+  $scope.removeFromSelected=function(){
+  	for(var listIdx=0;listIdx<$scope.lists.length;listIdx++){
+  		var list=$scope.lists[listIdx];
+  		if(list.selected){
+  			var listId=list.id;
+
+  			$rootScope.listId = listId;
+  			$rootScope.listIdx=listIdx;
+  			$rootScope.listArray=list.members;
+
+  			$scope.removeMultiMailFromList($scope.selectedAddresses);
+        list.selected=false;
+  		}
+  	}
+    $scope.selectedAddresses=[];
+  };
+  
   $scope.crateNewFocus = function () {
 
     $rootScope.newList = true;
@@ -72,14 +172,101 @@ var mailApp = angular.module('mailApp', [])
     listCountScope.listMemberCount = 0;
   };
 
+  $scope.excelRead = function (sheets,name) {
+    var emailList=[];
+	  angular.forEach(sheets,function(sheet){
+		 angular.forEach(sheet,function(cell){
+			 if(cell[0]!=="!"){
+				 if(cell.t==="s"){
+            var cellValue=cell.w.trim();
+					 if($scope.isEmail(cellValue) && emailList.indexOf(cellValue)<0)
+						 emailList.push(cellValue);
+				 }
+			 }
+		 }) ;
+	  });
+
+    $scope.addFromFile(name,emailList);
+  };
+
+  $scope.excelReadError = function (e) {
+	 alert("Couldn't read Excel file");
+   console.log(e);
+  };
+
+  $scope.csvRead=function(data,name){
+    var emailList=$scope.rawDataToEmailList(data);
+    $scope.addFromFile(name,emailList);
+  };
+
+  $scope.docxRead=function(data,name){
+    var rawContent="";
+    angular.forEach(data.DOM,function(node){
+      rawContent+=node.innerText+"\n";
+    });
+    var emailList=$scope.rawDataToEmailList(rawContent);
+    $scope.addFromFile(name,emailList);
+  };
+
+  $scope.checkListExists=function(listName){
+    for(var idx=0;idx<$scope.lists.length;idx++){
+      if($scope.lists[idx].name.toLowerCase()===listName.toLowerCase()){
+        $rootScope.listId = $scope.lists[idx].id;
+        $rootScope.listIdx=idx;
+        $rootScope.listArray=$scope.lists[idx].members;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  $scope.addFromFile=function(name,emailList){
+    if($scope.checkListExists(name)){
+      $scope.addMultiMailToList(emailList);
+    }
+    else{
+      $scope.createNewList(name,emailList);
+    }
+  }
+
+  $scope.rawDataToEmailList=function(data){
+    var emailList=[];
+
+    data = data.replace(/\s+/g, ',');
+    data = data.replace(/;+/g, ',');
+    data = data.replace(/:+/g, ',');
+    data = data.replace(/\|+/g, ',');
+    data = data.replace(/\>+/g, ',');
+    data = data.replace(/\<+/g, ',');
+    data = data.replace(/,+/g, ',');
+
+    var list = [];
+    list = data.split(",");
+
+    angular.forEach(list,function(listItem){
+      var item=listItem.trim();
+      if($scope.isEmail(item) && emailList.indexOf(item)<0){
+        emailList.push(item);
+      }
+    });
+
+    return emailList;
+  }
+
   $scope.switchListMembers = function (idx, listid, listname) {
+	var linkify=function(text) {
+		var urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+		return text.replace(urlRegex,url);
+	}
+	$http.get("http://myapi.mobiroller.com//JSON/GetJSOn/?accountScreenID=292241").success(function(data){
+		console.log(linkify(data.contentHtml));
+	});
     $scope.listMembers = [];
     var members = [];
     members = $scope.lists[idx].members;
     for (var i = 0; i < members.length; i++) {
       $scope.listMembers.push(members[i]);
     }
-    $scope.listId = listid;
     $scope.listMemberCount = $scope.listMembers.length;
 
     $rootScope.newList = false;
@@ -91,47 +278,56 @@ var mailApp = angular.module('mailApp', [])
     $rootScope.newListInputPh = 'NEW LIST';
     $rootScope.newListInputBtnState = 'disabled';
     $rootScope.listArray = $scope.listMembers;
+	  $scope.checkAllAddressesSelected();
   };
+  
+  $scope.isEmail=function(email) {
+  	var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+  	return regex.test(email);
+  }
 
-  $scope.createNewList = function (listname) {
-
+  $scope.createNewList = function (listname,emailList) {
+    var emailarray=[];
     if ( listname ) {
-
-      if ( $scope.multiMailAdd ) {
-        var rawlist = $scope.multiMailAdd;
-      } else {
-        var rawlist = '';
+      if(emailList){
+        emailarray=emailList;
       }
-
-      var name = $.trim(listname);
-
-      if ( name.length === 0 ) {
-        return;
-      }
-
-      rawlist = rawlist.replace(/\s+/g, ',');
-      rawlist = rawlist.replace(/;+/g, ',');
-      rawlist = rawlist.replace(/:+/g, ',');
-      rawlist = rawlist.replace(/\|+/g, ',');
-      rawlist = rawlist.replace(/\>+/g, ',');
-      rawlist = rawlist.replace(/\<+/g, ',');
-      rawlist = rawlist.replace(/,+/g, ',');
-
-      var list = [];
-      list = rawlist.split(",");
-
-      function IsEmail(email) {
-        var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-        return regex.test(email);
-      }
-
-      var emailarray = [];
-
-      $.each(list, function(idx, obj) {
-        if ( IsEmail(obj) ) {
-          emailarray.push(obj);
+      else{
+        if ( $scope.multiMailAdd ) {
+          var rawlist = $scope.multiMailAdd;
+        } else {
+          var rawlist = '';
         }
-      });
+
+        var name = $.trim(listname);
+
+        if ( name.length === 0 ) {
+          return;
+        }
+        /*
+        rawlist = rawlist.replace(/\s+/g, ',');
+        rawlist = rawlist.replace(/;+/g, ',');
+        rawlist = rawlist.replace(/:+/g, ',');
+        rawlist = rawlist.replace(/\|+/g, ',');
+        rawlist = rawlist.replace(/\>+/g, ',');
+        rawlist = rawlist.replace(/\<+/g, ',');
+        rawlist = rawlist.replace(/,+/g, ',');
+
+        var list = [];
+        list = rawlist.split(",");
+
+
+
+        var emailarray = [];
+
+        $.each(list, function(idx, obj) {
+          if ( $scope.isEmail(obj) ) {
+            emailarray.push(obj);
+          }
+        });
+        */
+        emailarray=$scope.rawDataToEmailList(rawlist);
+      }
 
       var newlist = {
         'listname'          : name,
@@ -163,17 +359,12 @@ var mailApp = angular.module('mailApp', [])
     var listArray = $rootScope.listArray;
     var listBoxScope = angular.element($("#listBox")).scope();
 
-    if ( IsEmail(mail) ) {
+    if ( $scope.isEmail(mail) ) {
       var mailChkd = mail;
     } else {
       return;
     }
-
-    function IsEmail(email) {
-      var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-      return regex.test(email);
-    }
-
+	
     listArray.push(mailChkd);
 
     listStorage.update(listId, listArray).success(function() {
@@ -183,6 +374,25 @@ var mailApp = angular.module('mailApp', [])
       alert('Failed to add this MEMBER');
     });
   };
+
+  $scope.addMultiMailToList=function(emails){
+    var listId = $rootScope.listId;
+    var listIdx = $rootScope.listIdx;
+    var listArray = $rootScope.listArray;
+    //var listBoxScope = angular.element($("#listBox")).scope();
+
+    angular.forEach(emails,function(email){
+      if(listArray.indexOf(email)<0)
+        listArray.push(email);
+    });
+
+    listStorage.update(listId, listArray).success(function() {
+      //listBoxScope.listMemberCount = listBoxScope.listMembers.length;
+      $scope.lists[listIdx].members=listArray;
+    }).error(function() {
+      alert('Failed to add this MEMBER');
+    });
+  }
 
   $scope.removeMailFromList = function (mail) {
     var listId = $rootScope.listId;
@@ -210,8 +420,45 @@ var mailApp = angular.module('mailApp', [])
     });
   };
 
-  $scope.removeList = function (list) {
+  $scope.removeMultiMailFromList = function (emails) {
+    var listId = $rootScope.listId;
+    var listIdx = $rootScope.listIdx;
+    var listArray = $rootScope.listArray;
 
+    var tmpEmails=emails;
+
+
+    for(var i=tmpEmails.length-1;i>=0;i--){
+      var idx=listArray.indexOf(tmpEmails[i]);
+      if(idx>-1){
+        listArray.splice(idx,1);
+      }
+      else{
+        tmpEmails.splice(i,1);
+      }
+    }
+    
+    var garbage = {
+      list: listId,
+      member: tmpEmails
+    };
+
+    listStorage.update(listId, listArray).success(function() {
+      $scope.listMembers=listArray;
+      $scope.lists[listIdx].members = listArray;
+      $scope.listMemberCount = $scope.listMembers.length;
+      listStorage.recycle(garbage); // @todo: success/error callback.
+
+      var switchListId = $scope.lists[listIdx].id;
+      var switchListName = $scope.lists[listIdx].name;
+
+      $scope.switchListMembers(listIdx, switchListId, switchListName);
+    }).error(function() {
+      alert('Failed to remove this MEMBER');
+    });
+  };
+
+  $scope.removeList = function (list) {
     listStorage.delete(list.id).success(function() {
       $scope.lists.splice($scope.lists.indexOf(list), 1);
       $scope.listMembers = [];
@@ -264,6 +511,13 @@ var mailApp = angular.module('mailApp', [])
     alert('Failed to load SESSIONs');
   });
 
+  $scope.orderByDate = function(item) {
+      var parts = item.date.toString().split(',');
+      var number = parseInt(parts[2] + parts[1] + parts[0]);
+
+      return -number;
+  };
+
 })
 .factory('sessionStorage', function ($http) {
 
@@ -295,4 +549,129 @@ var mailApp = angular.module('mailApp', [])
     }
   };
 
+})
+.directive('excelImport', function () {
+  return {
+    restrict: 'E',
+    template: '<input type="file" style="display:none;" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />',
+    replace: true,
+    link: function (scope, element, attrs) {
+
+      function handleSelect() {
+        var files = this.files;
+        for (var i = 0, f = files[i]; i != files.length; ++i) {
+          var reader = new FileReader();
+          var fullName = f.name.trim();
+
+          var dotndex=fullName.lastIndexOf('.');
+
+          var name=fullName.substring(0,dotndex).trim();
+          var fileExt=fullName.substring(dotndex+1);
+
+          reader.onload = function(e) {
+            var data = e.target.result;
+
+            if(fileExt.toLowerCase()==='csv'){
+              var handleCsvRead=scope[attrs.oncsvread];
+              if(typeof handleCsvRead ==='function'){
+                handleCsvRead(data,name);
+              }
+            }
+            else{
+              try {
+                var workbook = XLSX.read(data, {type: 'binary'});
+
+                if (attrs.onread) {
+                  var handleRead = scope[attrs.onread];
+                  if (typeof handleRead === "function") {
+                    handleRead(workbook.Sheets,name);
+                  }
+                }
+              } catch(e) {
+                if (attrs.onerror) {
+                  var handleError = scope[attrs.onerror];
+                  if (typeof handleError === "function") {
+                    handleError(e);
+                  }
+                }
+              }
+            }
+            // Clear input file
+            element.val('');
+          };
+          
+          reader.readAsBinaryString(f);
+        }
+      }
+
+      element.on('change', handleSelect);
+    }
+  };
+})
+.directive('textImport',function(){
+  return {
+    restrict: 'E',
+    template: '<input type="file" style="display:none;" accept="text/plain" />',
+    replace: true,
+    link: function (scope, element, attrs) {
+
+      function handleSelect() {
+        var files = this.files;
+        for (var i = 0, f = files[i]; i != files.length; ++i) {
+          var reader = new FileReader();
+          var fullName = f.name.trim();
+
+          var dotndex=fullName.lastIndexOf('.');
+          var name=fullName.substring(0,dotndex).trim();
+
+          reader.onload = function(e) {
+            var data = e.target.result;
+            var handleTxtRead=scope[attrs.onread];
+            if(typeof handleTxtRead ==='function'){
+                handleTxtRead(data,name);
+            }
+            element.val('');
+          };
+          
+          reader.readAsBinaryString(f);
+        }
+      }
+
+      element.on('change', handleSelect);
+    }
+  };
+})
+.directive('docxImport',function(){
+  return {
+    restrict: 'E',
+    template: '<input type="file" style="display:none;" accept="application/pdf,application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document" />',
+    replace: true,
+    link: function (scope, element, attrs) {
+
+      function handleSelect() {
+        var files = this.files;
+        for (var i = 0, f = files[i]; i != files.length; ++i) {
+          var reader = new FileReader();
+          var fullName = f.name.trim();
+
+          var dotndex=fullName.lastIndexOf('.');
+          var name=fullName.substring(0,dotndex).trim();
+
+          reader.onload = function(e) {
+            var data = e.target.result;
+            var handleDocxRead=scope[attrs.onread];
+            if(typeof handleDocxRead ==='function'){
+              var doc=docx(btoa(data));
+              handleDocxRead(doc,name);
+            }
+            element.val('');
+          };
+          
+          reader.readAsBinaryString(f);
+        }
+      }
+
+      element.on('change', handleSelect);
+    }
+  };
 });
