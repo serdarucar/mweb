@@ -331,7 +331,7 @@ var mailApp = angular.module('mailApp', [])
       }
 
       var newlist = {
-        'listname'          : name,
+        'listname'          : listname,
         'listdata'          : emailarray,
         'listcount'         : emailarray.length
       };
