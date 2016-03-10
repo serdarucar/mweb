@@ -14,7 +14,7 @@
 
       <!-- Prevent favicon to be requested -->
       <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-
+	  <script src="http://code.jquery.com/jquery-2.2.1.min.js"></script>
       <link href="/ext/semantic/ui/dist/semantic.min.css" rel="stylesheet" type="text/css">
       <script src="/ext/semantic/ui/dist/semantic.min.js"></script>
 
@@ -60,7 +60,7 @@
 			<!-- Membership Choose Start -->
 
 			<div class="ui cards centered">
-			  <a class="card" href="#">
+			  <a class="card" href="#" id="simpleplan">
 				<div class="content">
 				  <div class="header">SIMPLE</div>
 				  <br>
@@ -76,7 +76,7 @@
 				  FREE
 				</div>
 			  </a>
-			  <a class="card" href="#">
+			  <a class="card" href="#" id="basicplan">
 				<div class="content">
 				  <div class="header">BASIC</div>
 				  <br>
@@ -92,7 +92,7 @@
 				  $ 25/mo
 				</div>
 			  </a>
-			  <a class="card" href="#">
+			  <a class="card" href="#" id="plusplan">
 				<div class="content">
 				  <div class="header">PLUS</div>
 				  <br>
@@ -118,58 +118,62 @@
         <div class="ui three column grid">
           <div class="ui column">
 		  </div>
-          <div class="ui column">
+          <div class="ui column" id="formSegment" style="display:none;">
 			<div class="ui padded container segment">
 			
 			<!-- Card Payment Form Start -->
 
-			  <form class="ui form">
-				  <h4 class="ui header" name="payment[amount]" value="25">Amount: <b>$ 25</b></h4>
-				  <h4 class="ui dividing header">Payment Information</h4>
-				  <div class="field">
-					<label>Name on Card</label>
-					<div class="field">
-					  <div class="field">
-						<input type="text" name="card[name]" placeholder="">
-					  </div>
-					</div>
-				  </div>
-				  <div class="fields">
-					<div class="seven wide field">
-					  <label>Card Number</label>
-					  <input type="text" name="card[number]" maxlength="16" placeholder="Card #">
-					</div>
-					<div class="three wide field">
-					  <label>CVC</label>
-					  <input type="text" name="card[cvv]" maxlength="3" placeholder="CVV">
-					</div>
-					<div class="six wide field">
-					  <label>Expiration</label>
-					  <div class="two fields">
-						<div class="field">
-						  <select class="ui fluid search dropdown" name="card[expire-month]">
-							<option value="">MM</option>
-							<option value="1">01</option>
-							<option value="2">02</option>
-							<option value="3">03</option>
-							<option value="4">04</option>
-							<option value="5">05</option>
-							<option value="6">06</option>
-							<option value="7">07</option>
-							<option value="8">08</option>
-							<option value="9">09</option>
-							<option value="10">10</option>
-							<option value="11">11</option>
-							<option value="12">12</option>
-						  </select>
-						</div>
-						<div class="field">
-						  <input type="text" name="card[expire-year]" maxlength="4" placeholder="YYYY">
-						</div>
-					  </div>
-					</div>
-				  </div>
-				  <div class="ui fluid button" tabindex="0">Submit Order</div>
+			  <form class="ui form" id="paymentForm" action="destination-url" method="POST">
+				  <h4 class="ui header" name="payment[amount]"></h4>
+                  <input type="hidden" name="payment[amount]" value="0">
+                  <div id="cardSegment" style="display:none;">
+                    <h4 class="ui dividing header">Payment Information</h4>
+                    <div class="field">
+                        <label>Name on Card</label>
+                        <div class="field">
+                        <div class="field">
+                            <input type="text" name="card[name]" placeholder="" autocomplete="off">
+                        </div>
+                        </div>
+                    </div>
+                    <div class="fields">
+                        <div class="seven wide field">
+                        <label>Card Number</label>
+                        <input type="text" name="card[number]" maxlength="16" placeholder="Card #" autocomplete="off">
+                        </div>
+                        <div class="three wide field">
+                        <label>CVC</label>
+                        <input type="text" name="card[cvv]" maxlength="3" placeholder="CVV" autocomplete="off">
+                        </div>
+                        <div class="six wide field">
+                        <label>Expiration</label>
+                        <div class="two fields">
+                            <div class="field">
+                            <select class="ui fluid search dropdown" name="card[expire-month]">
+                                <option value="">MM</option>
+                                <option value="1">01</option>
+                                <option value="2">02</option>
+                                <option value="3">03</option>
+                                <option value="4">04</option>
+                                <option value="5">05</option>
+                                <option value="6">06</option>
+                                <option value="7">07</option>
+                                <option value="8">08</option>
+                                <option value="9">09</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                            </select>
+                            </div>
+                            <div class="field">
+                            <input type="text" name="card[expire-year]" maxlength="4" placeholder="YYYY" autocomplete="off">
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <br/>
+                  </div>
+				  <div class="ui fluid button" id="submit" tabindex="0">Submit Order</div>
 			  </form>
 
 		  <!-- Card Payment Form End -->
@@ -183,6 +187,80 @@
     </div>
 
     </body>
-    <script type="text/javascript" src="/js/main.js"></script>
-    <script type="text/javascript" src="/js/default.js"></script>
+    <script>
+        $(document).ready(function(){
+           $(".card").click(function(){
+               $("#formSegment").show();
+               $(".card").css("transform","").css("background-color","#F0F0F0").removeClass("selectedPlan");
+            
+               var id=this.id;
+              
+               $("#"+id).css("transform","translateY(-6px)").css("background-color","#33FF66");
+               $("#"+id).addClass("selectedPlan");
+               var h4=$("h4[name*='payment[amount]']");               
+               switch(id){
+                   case 'simpleplan':
+                    $("input[name*='payment[amount]']").val(0);
+                    h4.html('Amount: <b>FREE!</b>');
+                    $("#cardSegment").hide();
+                    break;
+                   case 'basicplan':
+                    $("input[name*='payment[amount]']").val(25);
+                    h4.html('Amount: <b>$ 25</b>');
+                    $("#cardSegment").show();
+                    break;
+                   case 'plusplan':
+                    $("input[name*='payment[amount]']").val(75);
+                    h4.html('Amount: <b>$ 75</b>');
+                    $("#cardSegment").show();
+                    break;
+               }
+           }) ;
+           
+           $("#submit").click(function(){
+               var plan=$(".selectedPlan").attr("id");
+               
+               switch(plan){
+                   case 'simpleplan':
+                    return;
+                    break;
+                   case 'basicplan':
+                    $("input[name*='payment[amount]']").val(25);
+                    break;
+                   case 'plusplan':
+                    $("input[name*='payment[amount]']").val(75);
+                    break;
+                   default:
+                    return;
+                    break;
+               }
+               
+               if(!$("input[name*='payment[amount]']").val() || $("input[name*='payment[amount]']").val()===''){
+                alert("Amount must be given");
+                return;
+               }
+               if(!$("input[name*='card[name]']").val() || $("input[name*='card[name]']").val()===''){
+                alert("Name on card must be given.");
+                return;
+               }
+               if(!$("input[name*='card[number]']").val() || $("input[name*='card[number]']").val()===''){
+                alert("Card number must be given");
+                return;
+               }
+               if(!$("input[name*='card[cvv]']").val() || $("input[name*='card[cvv]']").val()===''){
+                alert("Card CVV must be given");
+                return;
+               }
+               if(!$("select[name*='card[expire-month]']").val() || $("select[name*='card[expire-month]']").val()===''){
+                alert("Card expire month must be given");
+                return;
+               }
+               if(!$("input[name*='card[expire-year]']").val() || $("input[name*='card[expire-year]']").val()===''){
+                alert("Card expire year must be given");          
+                return;
+               }    
+               $("#paymentForm").submit();
+           });
+        });
+    </script>
 </html>
