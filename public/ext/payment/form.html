@@ -60,7 +60,7 @@
 			<!-- Membership Choose Start -->
 
 			<div class="ui cards centered">
-			  <a class="card" href="#" id="simpleplan">
+			  <!-- <a class="card" href="#" id="simpleplan">
 				<div class="content">
 				  <div class="header">SIMPLE</div>
 				  <br>
@@ -75,7 +75,7 @@
 				  <i class="add icon"></i>
 				  FREE
 				</div>
-			  </a>
+			  </a> -->
 			  <a class="card" href="#" id="basicplan">
 				<div class="content">
 				  <div class="header">BASIC</div>
@@ -142,7 +142,7 @@
                         <input type="text" name="card[number]" maxlength="16" placeholder="Card #" autocomplete="off">
                         </div>
                         <div class="three wide field">
-                        <label>CVC</label>
+                        <label>CVV</label>
                         <input type="text" name="card[cvv]" maxlength="3" placeholder="CVV" autocomplete="off">
                         </div>
                         <div class="six wide field">
@@ -191,19 +191,19 @@
         $(document).ready(function(){
            $(".card").click(function(){
                $("#formSegment").show();
-               $(".card").css("transform","").css("background-color","#F0F0F0").removeClass("selectedPlan");
+               $(".card").css("transform","").css("background-color","#FFFFFF").removeClass("selectedPlan");
 
                var id=this.id;
 
-               $("#"+id).css("transform","translateY(-6px)").css("background-color","#009999");
+               $("#"+id).css("transform","translateY(-6px)").css("background-color","#000000");
                $("#"+id).addClass("selectedPlan");
                var h4=$("h4[name*='payment[amount]']");
                switch(id){
-                   case 'simpleplan':
-                    $("input[name*='payment[amount]']").val(0);
-                    h4.html('Amount: <b>FREE!</b>');
-                    $("#cardSegment").hide();
-                    break;
+                  //  case 'simpleplan':
+                  //   $("input[name*='payment[amount]']").val(0);
+                  //   h4.html('Amount: <b>FREE!</b>');
+                  //   $("#cardSegment").hide();
+                  //   break;
                    case 'basicplan':
                     $("input[name*='payment[amount]']").val(25);
                     h4.html('Amount: <b>$ 25</b>');
@@ -221,9 +221,9 @@
                var plan=$(".selectedPlan").attr("id");
 
                switch(plan){
-                   case 'simpleplan':
-                    return;
-                    break;
+                  //  case 'simpleplan':
+                  //   return;
+                  //   break;
                    case 'basicplan':
                     $("input[name*='payment[amount]']").val(25);
                     break;

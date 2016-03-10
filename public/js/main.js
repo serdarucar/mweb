@@ -35,10 +35,10 @@ var mailApp = angular.module('mailApp', [])
   $scope.lists = [];
   $scope.listMembers = [];
   $scope.listMemberCount = 0;
-    
+
   $scope.selectedAddresses=[];
   $scope.allListsSelected=false;
-  
+
   $scope.selectedListsCount=0;
 
   listStorage.get().success(function(lists) {
@@ -66,9 +66,9 @@ var mailApp = angular.module('mailApp', [])
 	  $scope.selectedListsCount+=l.selected ? 1:-1;
 	  $scope.allListsSelected=$scope.lists.every(function(list){
 		  return list.selected;
-	  })	  
+	  })
   }
-  
+
   $scope.selectAllLists=function(){
 	  var toggleStatus = $scope.allListsSelected;
 	  angular.forEach($scope.lists,function(list){
@@ -80,7 +80,7 @@ var mailApp = angular.module('mailApp', [])
   $scope.ListHoverOut = function () {
       this.hoverDelete = false;
   };
-  
+
   $scope.selectAllAddresses=function(){
   	var toggle=$scope.lists[$rootScope.listIdx].allAddressesSelected;
   	angular.forEach($scope.listMembers, function (member) {
@@ -95,17 +95,18 @@ var mailApp = angular.module('mailApp', [])
   		}
   	});
   }
-  
+
   $scope.checkAllAddressesSelected=function(){
 	 var list=$scope.lists[$rootScope.listIdx];
-   if(list.members.length==0)
+   if(list.members.length==0){
     list.allAddressesSelected= false;
-    return;
+	return;
+	}
    list.allAddressesSelected=list.members.every(function(member){
      return $scope.selectedAddresses.indexOf(member)>-1;
    });
   };
-  
+
   $scope.selectAddress=function(address){
   	var index = $scope.selectedAddresses.indexOf(address);
   	if (index == -1) {
@@ -116,13 +117,13 @@ var mailApp = angular.module('mailApp', [])
   	}
   	$scope.checkAllAddressesSelected();
   }
-  
+
   $scope.isBothChecked=function(){
 	  if($scope.selectedListsCount>0 && $scope.selectedAddresses.length>0)
 		  return true;
 	  return false;
   }
-  
+
   $scope.addToSelected=function(){
   	for(var listIdx=0;listIdx<$scope.lists.length;listIdx++){
   		var list=$scope.lists[listIdx];
@@ -133,9 +134,9 @@ var mailApp = angular.module('mailApp', [])
   			$rootScope.listIdx=listIdx;
   			$rootScope.listArray=list.members;
 
-        $scope.addMultiMailToList($scope.selectedAddresses);  
+        $scope.addMultiMailToList($scope.selectedAddresses);
         list.selected=false;
-        list.allAddressesSelected=false;		  
+        list.allAddressesSelected=false;
   		}
   	}
     $scope.allListsSelected=false;
@@ -158,7 +159,7 @@ var mailApp = angular.module('mailApp', [])
   	}
     $scope.selectedAddresses=[];
   };
-  
+
   $scope.crateNewFocus = function () {
 
     $rootScope.newList = true;
@@ -280,7 +281,7 @@ var mailApp = angular.module('mailApp', [])
     $rootScope.listArray = $scope.listMembers;
 	  $scope.checkAllAddressesSelected();
   };
-  
+
   $scope.isEmail=function(email) {
   	var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
   	return regex.test(email);
@@ -364,7 +365,7 @@ var mailApp = angular.module('mailApp', [])
     } else {
       return;
     }
-	
+
     listArray.push(mailChkd);
 
     listStorage.update(listId, listArray).success(function() {
@@ -380,18 +381,21 @@ var mailApp = angular.module('mailApp', [])
     var listIdx = $rootScope.listIdx;
     var listArray = $rootScope.listArray;
     //var listBoxScope = angular.element($("#listBox")).scope();
-
+	var isChanged=false;
     angular.forEach(emails,function(email){
-      if(listArray.indexOf(email)<0)
-        listArray.push(email);
+      if(listArray.indexOf(email)<0){
+		  listArray.push(email);
+		  isChanged=true;
+	  }
     });
-
-    listStorage.update(listId, listArray).success(function() {
+	if(isChanged){
+		listStorage.update(listId, listArray).success(function() {
       //listBoxScope.listMemberCount = listBoxScope.listMembers.length;
-      $scope.lists[listIdx].members=listArray;
-    }).error(function() {
-      alert('Failed to add this MEMBER');
-    });
+			$scope.lists[listIdx].members=listArray;
+		}).error(function() {
+			alert('Failed to add this MEMBER');
+		});
+	}
   }
 
   $scope.removeMailFromList = function (mail) {
@@ -437,7 +441,7 @@ var mailApp = angular.module('mailApp', [])
         tmpEmails.splice(i,1);
       }
     }
-    
+
     var garbage = {
       list: listId,
       member: tmpEmails
@@ -599,7 +603,7 @@ var mailApp = angular.module('mailApp', [])
             // Clear input file
             element.val('');
           };
-          
+
           reader.readAsBinaryString(f);
         }
       }
@@ -632,7 +636,7 @@ var mailApp = angular.module('mailApp', [])
             }
             element.val('');
           };
-          
+
           reader.readAsBinaryString(f);
         }
       }
@@ -666,7 +670,7 @@ var mailApp = angular.module('mailApp', [])
             }
             element.val('');
           };
-          
+
           reader.readAsBinaryString(f);
         }
       }

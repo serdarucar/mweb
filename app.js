@@ -93,21 +93,18 @@ app.use(function(req, res, next) {
 
 /* Redirect to membership form if not selected */
 
-app.use(function(req, res, next) {
-  if (typeof req.user !== 'undefined') {
-    if (req.user.plan === 0) {
-      console.log('XX');
-      res.redirect('/ext/payment/form.html');
-      next();
-    } else {
-      console.log('XY');
-      next();
-    }
-  } else {
-    console.log('XZ');
-    next();
-  }
-});
+// app.use(function(req, res, next) {
+//   if (typeof req.user !== 'undefined') {
+//     if (req.user.plan === -1) {
+//       res.redirect('/ext/payment/form.html');
+//       next();
+//     } else {
+//       next();
+//     }
+//   } else {
+//     next();
+//   }
+// });
 
 // PASSPORT INTEGRATION START
 //
