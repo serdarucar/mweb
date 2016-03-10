@@ -18,7 +18,7 @@
                 {{#lists}}
                 <b><input type="checkbox" class="rcptList" value="{{id}}" list-data="{{name}}" count-data="{{count}}">&nbsp;{{name}}&nbsp;</b>({{count}})<b>&nbsp;&nbsp;&nbsp;</b>
                 {{else}}
-                <div id="show-lists" style="cursor: pointer;">Create A List</div>
+                <div onclick="location.href='/lists';" style="cursor: pointer;">Create A List</div>
                 {{/lists}}
               </h5>
               <!-- <h6><a href="/list">Manage Lists</a></h6> -->

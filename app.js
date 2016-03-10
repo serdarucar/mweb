@@ -91,6 +91,24 @@ app.use(function(req, res, next) {
 });
 */
 
+/* Redirect to membership form if not selected */
+
+app.use(function(req, res, next) {
+  if (typeof req.user !== 'undefined') {
+    if (req.user.plan === 0) {
+      console.log('XX');
+      res.redirect('/ext/payment/form.html');
+      next();
+    } else {
+      console.log('XY');
+      next();
+    }
+  } else {
+    console.log('XZ');
+    next();
+  }
+});
+
 // PASSPORT INTEGRATION START
 //
 //
@@ -133,7 +151,11 @@ app.get('/', function(req, res) {
   if (typeof req.user !== 'undefined') {
     // User is logged in.
     db.getLatestMail(req.user.id, function (err, result) {
-      res.redirect('/' + result);
+      if (result.length !== 0) {
+        res.redirect('/' + result);
+      } else {
+        res.redirect('/lists');
+      }
     });
   }
   else {

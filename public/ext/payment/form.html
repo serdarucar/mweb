@@ -50,13 +50,13 @@
 
 		        <div class="ui one column grid">
           <div class="ui center aligned column">
-			
+
 			<div class="ui header">
 				CHOOSE YOUR MEMBERSHIP
 			</div>
-			
+
 				<br>
-				
+
 			<!-- Membership Choose Start -->
 
 			<div class="ui cards centered">
@@ -111,16 +111,16 @@
 			</div>
 
 		  <!-- Membership Choose End -->
-		  
+
 			</div>
 		</div>
-		
+
         <div class="ui three column grid">
           <div class="ui column">
 		  </div>
           <div class="ui column" id="formSegment" style="display:none;">
 			<div class="ui padded container segment">
-			
+
 			<!-- Card Payment Form Start -->
 
 			  <form class="ui form" id="paymentForm" action="destination-url" method="POST">
@@ -177,9 +177,9 @@
 			  </form>
 
 		  <!-- Card Payment Form End -->
-		  
+
 			</div>
-	  
+
 		  </div>
           <div class="ui column">
 		  </div>
@@ -192,12 +192,12 @@
            $(".card").click(function(){
                $("#formSegment").show();
                $(".card").css("transform","").css("background-color","#F0F0F0").removeClass("selectedPlan");
-            
+
                var id=this.id;
-              
-               $("#"+id).css("transform","translateY(-6px)").css("background-color","#33FF66");
+
+               $("#"+id).css("transform","translateY(-6px)").css("background-color","#009999");
                $("#"+id).addClass("selectedPlan");
-               var h4=$("h4[name*='payment[amount]']");               
+               var h4=$("h4[name*='payment[amount]']");
                switch(id){
                    case 'simpleplan':
                     $("input[name*='payment[amount]']").val(0);
@@ -216,10 +216,10 @@
                     break;
                }
            }) ;
-           
+
            $("#submit").click(function(){
                var plan=$(".selectedPlan").attr("id");
-               
+
                switch(plan){
                    case 'simpleplan':
                     return;
@@ -234,7 +234,7 @@
                     return;
                     break;
                }
-               
+
                if(!$("input[name*='payment[amount]']").val() || $("input[name*='payment[amount]']").val()===''){
                 alert("Amount must be given");
                 return;
@@ -256,9 +256,9 @@
                 return;
                }
                if(!$("input[name*='card[expire-year]']").val() || $("input[name*='card[expire-year]']").val()===''){
-                alert("Card expire year must be given");          
+                alert("Card expire year must be given");
                 return;
-               }    
+               }
                $("#paymentForm").submit();
            });
         });
