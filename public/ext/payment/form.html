@@ -126,7 +126,7 @@
 			  <form class="ui form" id="paymentForm" action="destination-url" method="POST">
 				  <h4 class="ui header" name="payment[amount]"></h4>
                   <input type="hidden" name="payment[amount]" value="0">
-                  <div id="cardSegment" style="display:none;">
+                  <div id="cardSegment">
                     <h4 class="ui dividing header">Payment Information</h4>
                     <div class="field">
                         <label>Name on Card</label>
@@ -195,7 +195,7 @@
 
                var id=this.id;
 
-               $("#"+id).css("transform","translateY(-6px)").css("background-color","#000000");
+               $("#"+id).css("transform","translateY(-6px)").css("background-color","#F0F0F0");
                $("#"+id).addClass("selectedPlan");
                var h4=$("h4[name*='payment[amount]']");
                switch(id){
