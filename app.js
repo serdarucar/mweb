@@ -95,7 +95,7 @@ app.use(function(req, res, next) {
 
 // app.use(function(req, res, next) {
 //   if (typeof req.user !== 'undefined') {
-//     if (req.user.plan === -1) {
+//     if (req.user.plan === 99) {
 //       res.redirect('/ext/payment/form.html');
 //       next();
 //     } else {
@@ -151,7 +151,11 @@ app.get('/', function(req, res) {
       if (result.length !== 0) {
         res.redirect('/' + result);
       } else {
-        res.redirect('/lists');
+        if (req.user.plan === 99) {
+          res.redirect('/ext/payment/form.html');
+        } else {
+          res.redirect('/lists');
+        }
       }
     });
   }
@@ -266,6 +270,21 @@ app.get('/lists', function (req, res) {
    res.render('listen', { user: req.user });
  }
    //  res.render('listen', { user: req.user });
+});
+
+app.get('/freedom', function (req, res) {
+  if (typeof req.user !== 'undefined') {
+    if (req.user.plan === 99) {
+      r.db('mailsender').table('user').get(req.user.id).update({'plan':0})
+      .run(req.app._rdbConn, function(err, result) {
+        if(err) {
+          return (err);
+        } else {
+          res.redirect('/');
+        }
+      });
+    }
+  }
 });
 //
 //app.get('/list', function (req, res) {
@@ -612,7 +631,7 @@ function recycleListMember(req, res, next) {
   if (typeof req.user === 'undefined') {
     res.render('404', { url: req.url });
   } else {
-    r.table('trash').insert(trash).run(req.app._rdbConn, function(err, result) {
+    r.db('mailsender').table('trash').insert(trash).run(req.app._rdbConn, function(err, result) {
       if(err) {
         return next(err);
       }
