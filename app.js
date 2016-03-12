@@ -232,7 +232,8 @@ app.get('/new', function (req, res) {
     res.redirect('/');
   } else {
     db.getUsersActiveLists(req.user.id, function (err, result) {
-      res.render('new', { lists: result, user: req.user });
+      res.render('new', { lists: result, user: req.user, oldmail: req.session.mail });
+      req.session.mail = null;
     })
   }
 });
@@ -386,6 +387,7 @@ app.get('/:sid', function(req, res) {
   } else {
     db.getMailBySID(req.params.sid, function(err, result) {
       if (result) {
+        req.session.mail = result;
         res.render('index', {
           result: result,
           date: result.time,
