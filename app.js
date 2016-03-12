@@ -415,6 +415,12 @@ app.route('/api/rest/session')
 app.route('/api/rest/sessions')
   .get(allUserSessions);
 
+app.route('/api/rest/delivery/main/:sid/:scode')
+  .get(getDeliveryList);
+
+app.route('/api/rest/delivery/detail/:qid/:addr')
+  .get(getDeliveryDetail);
+
 app.route('/api/rest/list')
   .get(allListItems)
   .post(createListItem);
@@ -607,7 +613,7 @@ function updateListItem(req, res, next) {
   if (typeof req.user === 'undefined') {
     res.render('404', { url: req.url });
   } else {
-    r.db('mailsender').table('list').get(listItemID)
+    r.table('list').get(listItemID)
       .update(function () {
         return { members: listMembers }
       }, {returnChanges: true}).run(req.app._rdbConn, function(err, result) {
@@ -631,12 +637,79 @@ function recycleListMember(req, res, next) {
   if (typeof req.user === 'undefined') {
     res.render('404', { url: req.url });
   } else {
-    r.db('mailsender').table('trash').insert(trash).run(req.app._rdbConn, function(err, result) {
+    r.table('trash').insert(trash).run(req.app._rdbConn, function(err, result) {
       if(err) {
         return next(err);
       }
 
       res.json({success: true});
+    });
+  }
+}
+
+/*
+ * Get delivery list by statusCode [0: sent, 1: defer, 2: bounce]
+ */
+function getDeliveryList(req, res, next) {
+
+  var sessionID = req.params.sid;
+  var statusCode = req.params.scode;
+  var statFilter = {};
+
+  switch (statusCode) {
+    case 'sent':
+      statFilter = {'status':'sent'};
+      break;
+
+    case 'retry':
+      statFilter = {'status':'deferred'};
+      break;
+
+    case 'unsent':
+      statFilter = {'status':'bounced'};
+      break;
+  }
+
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
+  } else {
+    r.table('mail').getAll(sessionID, {index: 'sid'})
+    .hasFields('status').filter(statFilter).pluck('to','uid').default(null)
+    .run(req.app._rdbConn, function(err, cursor) {
+      if(err) {
+        return next(err);
+      }
+
+      //Retrieve all the lists in an array.
+      cursor.toArray(function(err, result) {
+        if(err) {
+          return next(err);
+        }
+
+        res.json(result);
+      });
+    });
+  }
+}
+
+/*
+ * Get delivery detail by QID & ADDRESS
+ */
+function getDeliveryDetail(req, res, next) {
+
+  var uniqueID = req.params.qid + '/' + req.params.addr;
+
+  if (typeof req.user === 'undefined') {
+    res.render('404', { url: req.url });
+  } else {
+    r.table('mail')
+    .get(uniqueID).default(null)
+    .run(req.app._rdbConn, function(err, result) {
+      if(err) {
+        return next(err);
+      }
+
+      res.json(result);
     });
   }
 }
