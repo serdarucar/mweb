@@ -1,8 +1,8 @@
 module.exports = {
   rethinkdb: {
-    host: 'mdbs1-priv',
-    port: 28015,
+    host: process.env.RDB_HOST || 'mdbs1-priv',
+    port: parseInt(process.env.RDB_PORT) || 28015,
     authKey: '',
-    db: 'mailsender'
+    db: process.env.RDB_DB || 'mailsender'
   }
 };
