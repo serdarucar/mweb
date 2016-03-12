@@ -554,6 +554,90 @@ var mailApp = angular.module('mailApp', [])
   };
 
 })
+.controller('deliveryCtrl', function deliveryCtrl($scope, deliveryStorage, $rootScope) {
+
+  $scope.delivery = [];
+  $scope.deliveryTotal = [];
+  $scope.deliverySent = [];
+  $scope.deliveryDefer = [];
+  $scope.deliveryBounce = [];
+  $scope.mailContent = false;
+  $scope.totalContent = true;
+  $scope.sentContent = true;
+  $scope.deferContent = true;
+  $scope.bounceContent = true;
+
+  $scope.showMail = function () {
+    $scope.mailContent = false;
+    $scope.totalContent = true;
+    $scope.sentContent = true;
+    $scope.deferContent = true;
+    $scope.bounceContent = true;
+  };
+
+  $scope.showTotal = function () {
+    deliveryStorage.get($scope.sid, 'all').success(function(deliveryTotal) {
+      $scope.deliveryTotal = deliveryTotal;
+      $scope.mailContent = true;
+      $scope.totalContent = false;
+      $scope.sentContent = true;
+      $scope.deferContent = true;
+      $scope.bounceContent = true;
+    }).error(function() {
+      alert('Failed to deliver Total');
+    });
+  };
+
+  $scope.showSent = function () {
+    deliveryStorage.get($scope.sid, 'sent').success(function(deliverySent) {
+      $scope.deliverySent = deliverySent;
+      $scope.mailContent = true;
+      $scope.totalContent = true;
+      $scope.sentContent = false;
+      $scope.deferContent = true;
+      $scope.bounceContent = true;
+    }).error(function() {
+      alert('Failed to deliver Sent');
+    });
+  };
+
+  $scope.showDefer = function () {
+    deliveryStorage.get($scope.sid, 'retry').success(function(deliveryDefer) {
+      $scope.deliveryDefer = deliveryDefer;
+      $scope.mailContent = true;
+      $scope.totalContent = true;
+      $scope.sentContent = true;
+      $scope.deferContent = false;
+      $scope.bounceContent = true;
+    }).error(function() {
+      alert('Failed to deliver Defer');
+    });
+  };
+
+  $scope.showBounce = function () {
+    deliveryStorage.get($scope.sid, 'unsent').success(function(deliveryBounce) {
+      $scope.deliveryBounce = deliveryBounce;
+      $scope.mailContent = true;
+      $scope.totalContent = true;
+      $scope.sentContent = true;
+      $scope.deferContent = true;
+      $scope.bounceContent = false;
+    }).error(function() {
+      alert('Failed to deliver Bounce');
+    });
+  };
+
+})
+.factory('deliveryStorage', function ($http) {
+
+  return {
+    get: function (sid, scode) {
+      var url = '/api/rest/delivery/main/' + sid + '/' + scode;
+      return $http.get(url);
+    }
+  };
+
+})
 .directive('excelImport', function () {
   return {
     restrict: 'E',

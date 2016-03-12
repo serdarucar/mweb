@@ -1,93 +1,91 @@
 <div class="ui container">
-  <div class="row">
-    <div class="col-lg-12">
-      {{#if nomail}}
-      <div class="row">
-        <h3 align="center">THERE ARE NO MAILS SENT FOR THIS DAY.</h3>
-      </div>
-      <div id="session-id" style="display: none;">0</div>
-      <div id="0:total" style="display: none;"></div>
-      <div id="0:sent" style="display: none;"></div>
-      <div id="0:deferred" style="display: none;"></div>
-      <div id="0:bounced" style="display: none;"></div>
-      <div id="0:sprog" style="display: none; width: 0%"></div>
-      <div id="0:dprog" style="display: none; width: 0%"></div>
-      <div id="0:bprog" style="display: none; width: 0%"></div>
-      {{else}}
-      <div class="panel panel-default">
-        <!--<div class="panel-heading">-->
-          <!--<h2 align="center">MAIL PROGRESS</h2>-->
-        <!--</div>-->
-        <div class="panel-body">
-          <div class="well">
-            <h5 align="left">
-              <b>Subject: </b><i>{{result.subject}}</i><br>
-            </h5>
-            <h5 align="left">
-              <b>Sender / Recipients:</b> {{result.sender}} / {{#each result.rcpt}}{{this}}, {{/each}}<br>
-            </h5>
-            <h5 align="left">
-              <b>Date/Time:</b> {{prettifyDate result.time}} / {{prettifyTime result.time}}<br>
-            </h5>
-            <h5 align="left">
-              <b>Total Mail Received:</b> {{result.count}}<br>
-            </h5>
-          </div>
-          <div class="ui four huge statistics">
-            <div class="grey huge statistic">
-              <div id="{{result.sid}}:process" class="value mail-process">
-                {{result.process}}
-              </div>
-              <div class="label">
-                TOTAL
-              </div>
-            </div>
-            <div class="green huge statistic">
-              <div id="{{result.sid}}:sent" class="value mail-sent">
-                {{result.sent}}
-              </div>
-              <div class="label">
-                SENT
-              </div>
-            </div>
-            <div class="yellow huge statistic">
-              <div id="{{result.sid}}:deferred" class="value mail-deferred">
-                {{result.deferred}}
-              </div>
-              <div class="label">
-                RETRY
-              </div>
-            </div>
-            <div class="red huge statistic">
-              <div id="{{result.sid}}:bounced" class="value mail-bounced">
-                {{result.bounced}}
-              </div>
-              <div class="label">
-                UNSENT
-              </div>
-            </div>
-          </div>
-          <br>
-          </div>
-          <div class="progress mail-prog-bar">
-            <div id="{{result.sid}}:sprog" class="progress-bar progress-bar-success sent-mail-prog-bar" style="width: 0%"></div>
-            <div id="{{result.sid}}:dprog" class="progress-bar progress-bar-warning defer-mail-prog-bar" style="width: 0%"></div>
-            <div id="{{result.sid}}:bprog" class="progress-bar progress-bar-danger bounce-mail-prog-bar" style="width: 0%"></div>
-          </div>
-          <!--<div id="mailButton" class="btn btn-default btn-block" onclick="toggleMailBody()"><b>SHOW MAIL CONTENT</b></div>-->
+  <div class="ui container" ng-controller="deliveryCtrl">
+    <div class="ui four huge statistics">
+      <div ng-click="showTotal()" class="grey huge statistic" style="cursor:pointer">
+        <div id="{{result.sid}}:process" class="value mail-process">
+          {{result.process}}
+        </div>
+        <div class="label">
+          TOTAL
         </div>
       </div>
-      <h4><b>MAIL BODY:</b></h4>
-      <div id="mail-content" class="well" style="display: block;">
-        {{{result.mbody}}}
+      <div ng-click="showSent()" class="green huge statistic" style="cursor:pointer">
+        <div id="{{result.sid}}:sent" class="value mail-sent">
+          {{result.sent}}
+        </div>
+        <div class="label">
+          SENT
+        </div>
       </div>
-      <div id="session-id" style="display: none;">{{result.sid}}</div>
-      <div id="{{result.sid}}:total" style="display: none;">{{result.count}}</div>
-      {{/if}}
+      <div ng-click="showDefer()" class="yellow huge statistic" style="cursor:pointer">
+        <div id="{{result.sid}}:deferred" class="value mail-deferred">
+          {{result.deferred}}
+        </div>
+        <div class="label">
+          RETRY
+        </div>
+      </div>
+      <div ng-click="showBounce()" class="red huge statistic" style="cursor:pointer">
+        <div id="{{result.sid}}:bounced" class="value mail-bounced">
+          {{result.bounced}}
+        </div>
+        <div class="label">
+          UNSENT
+        </div>
+      </div>
     </div>
+    <br>
+    <div class="progress mail-prog-bar">
+      <div id="{{result.sid}}:sprog" class="progress-bar progress-bar-success sent-mail-prog-bar" style="width: 0%"></div>
+      <div id="{{result.sid}}:dprog" class="progress-bar progress-bar-warning defer-mail-prog-bar" style="width: 0%"></div>
+      <div id="{{result.sid}}:bprog" class="progress-bar progress-bar-danger bounce-mail-prog-bar" style="width: 0%"></div>
+    </div>
+    <div class="well">
+      <div class="ui two column grid">
+        <div class="ui left aligned column">
+          <h3><b>{{result.subject}}</b></h3>
+        </div>
+        <div class="ui right aligned column">
+          <h3>{{prettifyDate result.time}} {{prettifyTime result.time}}</h3>
+        </div>
+      </div>
+      <div class="ui two column grid">
+        <div class="ui left aligned column">
+          {{#each result.rcpt}}
+          <span class="ui big basic black label">{{this}}</span>
+          {{/each}}
+        </div>
+        <div class="ui right aligned column">
+          {{result.count}} mails received by server
+        </div>
+      </div>
+    </div>
+    <div ng-hide="mailContent" ng-init="sid='{{result.sid}}'" id="mail-content" class="well" style="display: block;">
+      <h4><b>MAIL BODY:</b></h4>
+      <hr>
+      {{{result.mbody}}}
+    </div>
+    <div ng-show="mailContent" class="well">
+      <div class="ui two column grid">
+        <div class="ui left aligned column">
+          <div class="ui massive button" ng-click="showMail()"><  MAIL BODY</div>
+        </div>
+        <div class="ui right aligned column">
+          <div class="ui icon input">
+            <input ng-model="mailQuery" type="text" placeholder="SEARCH" />
+          </div>
+        </div>
+      </div>
+      <hr>
+      <span class="ui medium basic grey label" ng-hide="totalContent" ng-repeat="mail in deliveryTotal | filter: mailQuery" style="cursor:pointer">{[{mail.to}]}</span>
+      <span class="ui medium basic green label" ng-hide="sentContent" ng-repeat="mail in deliverySent | filter: mailQuery" style="cursor:pointer">{[{mail.to}]}</span>
+      <span class="ui medium basic yellow label" ng-hide="deferContent" ng-repeat="mail in deliveryDefer | filter: mailQuery" style="cursor:pointer">{[{mail.to}]}</span>
+      <span class="ui basic red label" ng-hide="bounceContent" ng-repeat="mail in deliveryBounce | filter: mailQuery" style="cursor:pointer">{[{mail.to}]}</span>
+    </div>
+    <div id="session-id" style="display: none;">{{result.sid}}</div>
+    <div id="{{result.sid}}:total" style="display: none;">{{result.count}}</div>
   </div>
 </div>
-
 <script>
 
   $(document).ready(function() {
@@ -145,37 +143,5 @@
     // console.log('sent %: ' + sentPerc + ' - defer %: ' + deferPerc + ' - bounce %: ' + bouncePerc + ' - proc %:' + procPerc);
 
   });
-
-  function toggleMailBody() {
-    var myMail = document.getElementById('mail-content');
-    var displaySetting = myMail.style.display;
-    var mailButton = document.getElementById('mailButton');
-
-    if (displaySetting == 'block') {
-      myMail.style.display = 'none';
-      mailButton.innerHTML = '<b>SHOW MAIL CONTENT</b>';
-    }
-    else {
-      myMail.style.display = 'block';
-      mailButton.innerHTML = '<b>HIDE MAIL CONTENT</b>';
-    }
-  }
-
-  function toggleMailDetails() {
-    var myDetail = document.getElementById('mail-detail');
-    var displaySetting = myDetail.style.display;
-    var detailLink = document.getElementById('mailDetails');
-
-    if (displaySetting == 'block') {
-      myDetail.style.display = 'none';
-      detailLink.innerHTML = 'More Details';
-    }
-    else {
-      myDetail.style.display = 'block';
-      detailLink.innerHTML = 'Hide Details';
-    }
-  }
-
-  this.$('.mail-detail-btn').css('cursor', 'pointer');
 
 </script>
