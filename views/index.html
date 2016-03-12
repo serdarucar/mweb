@@ -77,10 +77,10 @@
         </div>
       </div>
       <hr>
-      <span class="ui medium basic grey label" ng-hide="totalContent" ng-repeat="mail in deliveryTotal | filter: mailQuery" style="cursor:pointer">{[{mail.to}]}</span>
-      <span class="ui medium basic green label" ng-hide="sentContent" ng-repeat="mail in deliverySent | filter: mailQuery" style="cursor:pointer">{[{mail.to}]}</span>
-      <span class="ui medium basic yellow label" ng-hide="deferContent" ng-repeat="mail in deliveryDefer | filter: mailQuery" style="cursor:pointer">{[{mail.to}]}</span>
-      <span class="ui basic red label" ng-hide="bounceContent" ng-repeat="mail in deliveryBounce | filter: mailQuery" style="cursor:pointer">{[{mail.to}]}</span>
+      <span ng-class="{'ui basic green label': mail.status === 'sent', 'ui basic yellow label': mail.status === 'deferred', 'ui basic red label': mail.status === 'bounced'}" ng-hide="totalContent" ng-repeat="mail in deliveryTotal | filter: mailQuery track by $index" style="cursor:pointer">{[{mail.to}]}</span>
+      <span class="ui basic green label" ng-hide="sentContent" ng-repeat="mail in deliverySent | filter: mailQuery track by $index" style="cursor:pointer">{[{mail.to}]}</span>
+      <span class="ui basic yellow label" ng-hide="deferContent" ng-repeat="mail in deliveryDefer | filter: mailQuery track by $index" style="cursor:pointer">{[{mail.to}]}</span>
+      <span class="ui basic red label" ng-hide="bounceContent" ng-repeat="mail in deliveryBounce | filter: mailQuery track by $index" style="cursor:pointer">{[{mail.to}]}</span>
     </div>
     <div id="session-id" style="display: none;">{{result.sid}}</div>
     <div id="{{result.sid}}:total" style="display: none;">{{result.count}}</div>

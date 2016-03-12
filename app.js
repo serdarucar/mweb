@@ -676,7 +676,7 @@ function getDeliveryList(req, res, next) {
     res.render('404', { url: req.url });
   } else {
     r.table('mail').getAll(sessionID, {index: 'sid'})
-    .hasFields('status').filter(statFilter).pluck('to','uid').default(null)
+    .hasFields('status').filter(statFilter).pluck('uid','to','status').default(null)
     .run(req.app._rdbConn, function(err, cursor) {
       if(err) {
         return next(err);
