@@ -12,12 +12,12 @@
       </div>
     </div>
     <div class="ui divided list">
-      <div class="item" ng-repeat="mailsession in activity | filter: activityQuery track by $index" onClick="location.href='/{[{mailsession.sid}]}'">
+      <div class="item" ng-repeat="mailsession in activity | filter: activityQuery track by $index">
         <div class="right floated content">
           {[{mailsession.time}]}
         </div>
         <div class="content">
-          {[{mailsession.sender}]} / {[{mailsession.subject}]} / {[{mailsession.count}]}
+          {[{mailsession.sid}]} / {[{mailsession.sender}]} / {[{mailsession.subject}]} / {[{mailsession.count}]}
         </div>
       </div>
     </div>
