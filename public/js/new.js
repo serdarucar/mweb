@@ -17,6 +17,19 @@ CKEDITOR.replace( 'mailBody' , {
   language: 'en'
 });
 
+$(document).ready(function () {
+    $('.maillist').click(function (ev) {
+        var id = ev.currentTarget.id;
+        var elem = $('#' + id);
+        
+        if (elem.hasClass('selected'))
+            elem.removeClass('selected').removeClass('green').addClass('gray');
+        else
+            elem.addClass('selected').removeClass('gray').addClass('green');
+
+    });
+});
+
 // process mailsender form
 $('.btn-mailsender').click(function(event) {
 
@@ -24,14 +37,17 @@ $('.btn-mailsender').click(function(event) {
 
   var checkedAtLeastOne = false;
   var subjectIsEmpty = false;
-  // var mailCount = 0;
+    // var mailCount = 0;
 
-  $('input[type="checkbox"].rcptList').each(function() {
-    if ($(this).is(":checked")) {
-      checkedAtLeastOne = true;
-      // mailCount = mailCount + parseInt($(this).attr('count-data'));
-    }
-  });
+  //$('input[type="checkbox"].rcptList').each(function() {
+  //  if ($(this).is(":checked")) {
+  //    checkedAtLeastOne = true;
+  //    // mailCount = mailCount + parseInt($(this).attr('count-data'));
+  //  }
+    //});
+    
+    if ($('div .selected').length > 0)
+        checkedAtLeastOne = true;
 
   if ( $('input[name="inputSubject"]').val().length === 0 ) {
     subjectIsEmpty = true;
@@ -39,11 +55,11 @@ $('.btn-mailsender').click(function(event) {
 
   if (checkedAtLeastOne && !subjectIsEmpty) {
 
-    var lists = $('input[type="checkbox"].rcptList:checked').map(function() {
-      return $(this).val();
+    var lists = $('div .selected').map(function() {
+      return $(this).attr('value');
     }).toArray();
 
-    var lists2 = $('input[type="checkbox"].rcptList:checked').map(function() {
+    var lists2 = $('div .selected').map(function() {
       return $(this).attr('list-data');
     }).toArray();
 
