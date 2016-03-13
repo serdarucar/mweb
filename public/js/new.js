@@ -21,11 +21,11 @@ $(document).ready(function () {
     $('.maillist').click(function (ev) {
         var id = ev.currentTarget.id;
         var elem = $('#' + id);
-        
+
         if (elem.hasClass('selected'))
-            elem.removeClass('selected').removeClass('green').addClass('gray');
+            elem.removeClass('selected').removeClass('grey');
         else
-            elem.addClass('selected').removeClass('gray').addClass('green');
+            elem.addClass('selected').addClass('grey');
 
     });
 });
@@ -45,7 +45,7 @@ $('.btn-mailsender').click(function(event) {
   //    // mailCount = mailCount + parseInt($(this).attr('count-data'));
   //  }
     //});
-    
+
     if ($('div .selected').length > 0)
         checkedAtLeastOne = true;
 
