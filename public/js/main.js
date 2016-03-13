@@ -508,18 +508,31 @@ var mailApp = angular.module('mailApp', [])
 
   $scope.sessions = [];
 
-  sessionStorage.get().success(function(sessions) {
+  sessionStorage.get(10).success(function(sessions) {
     $scope.sessions = sessions;
-    // $scope.sessions.date = $scope.sessions.date.replace(/,/,"/");
   }).error(function(error) {
     alert('Failed to load SESSIONs');
   });
 
-  $scope.orderByDate = function(item) {
-      var parts = item.date.toString().split(',');
-      var number = parseInt(parts[2] + parts[1] + parts[0]);
+})
+.controller('allsessionCtrl', function sessionCtrl($scope, sessionStorage, $rootScope) {
 
-      return -number;
+  $scope.sessions = [];
+
+  sessionStorage.get(0).success(function(sessions) {
+    $scope.sessions = sessions;
+  }).error(function(error) {
+    alert('Failed to load SESSIONs');
+  });
+
+})
+.factory('sessionStorage', function ($http) {
+
+  return {
+    get: function (last) {
+      var url = '/api/rest/session/' + last;
+      return $http.get(url);
+    }
   };
 
 })
@@ -529,16 +542,6 @@ var mailApp = angular.module('mailApp', [])
         $scope.user = user;
     }
 
-
-})
-.factory('sessionStorage', function ($http) {
-
-  return {
-    get: function (id) {
-      var url = '/api/rest/session';
-      return $http.get(url);
-    }
-  };
 
 })
 .controller('activityCtrl', function activityCtrl($scope, activityStorage, $rootScope) {

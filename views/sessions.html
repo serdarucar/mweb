@@ -11,16 +11,29 @@
         </div>
       </div>
     </div>
-    <div class="ui divided list">
-      <div class="item" ng-repeat="mailsession in activity | filter: activityQuery track by $index">
-        <div class="right floated content">
-          {[{mailsession.time}]}
-        </div>
-        <div class="content">
-          {[{mailsession.sid}]} / {[{mailsession.sender}]} / {[{mailsession.subject}]} / {[{mailsession.count}]}
-        </div>
-      </div>
-    </div>
+    <table class="ui single line table">
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Sent</th>
+                <th>Retrying</th>
+                <th>Unsent</th>
+                <th>Total</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="mailsession in activity | filter: activityQuery track by $index">
+                <td><a ng-href="/{[{mailsession.sid}]}">{[{mailsession.subject}]}</a></td>
+                <td>{[{mailsession.sent}]}</td>
+                <td>{[{mailsession.deferred}]}</td>
+                <td>{[{mailsession.bounced}]}</td>
+                <td>{[{mailsession.count}]}</td>
+                <td>{[{mailsession.time}]}</td>
+            </tr>
+        </tbody>
+    </table>
+    <br><br>
   </div>
 </div>
 

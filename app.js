@@ -283,7 +283,7 @@ app.get('/profile', function (req, res) {
     if (typeof req.user === 'undefined') {
         res.redirect('/');
     } else {
-        res.render('userprofile', { user: JSON.stringify(req.user) });
+        res.render('userprofile', { user: req.user, nguser: JSON.stringify(req.user) });
     }
 });
 
@@ -332,11 +332,8 @@ app.get('/admin/sessions', function (req, res) {
 });
 
 //The REST routes for "list".
-app.route('/api/rest/session')
-  .get(lastUserSessions);
-
-app.route('/api/rest/sessions')
-  .get(allUserSessions);
+app.route('/api/rest/session/:last')
+  .get(userSessions);
 
 app.route('/api/rest/delivery/main/:sid/:scode')
   .get(getDeliveryList);
@@ -366,50 +363,42 @@ app.use(handle404);
 app.use(handleError);
 
 /*
- * Get all sessions of a user.
+ * Get sessions of a user.
  */
-function allUserSessions(req, res, next) {
+function userSessions(req, res, next) {
+  var last = parseInt(req.params.last);
 
   if (typeof req.user === 'undefined') {
     res.render('404', { url: req.url });
   } else {
-    r.table('session').getAll(req.user.id, {index: 'owner'}).orderBy(r.desc('time')).pluck('time','sid','subject')
-      .group([r.row('time').day(), r.row('time').month(), r.row('time').year()]).ungroup().map(function(doc){
-      return {
-        date: doc('group'),
-        session: doc('reduction')
-      }
-    }).run(req.app._rdbConn, function(err, result) {
-      if(err) {
-        return next(err);
-      }
+    if (last === 0) {
+      r
+      .table('session')
+      .getAll(req.user.id, {index: 'owner'})
+      .orderBy(r.desc('time'))
+      .without('body','owner','sender')
+      .run(req.app._rdbConn, function(err, result) {
+        if(err) {
+          return next(err);
+        }
 
-      res.json(result);
-    });
-  }
-}
+        res.json(result);
+      });
+    } else {
+      r
+      .table('session')
+      .getAll(req.user.id, {index: 'owner'})
+      .orderBy(r.desc('time'))
+      .limit(last)
+      .without('body','owner','sender')
+      .run(req.app._rdbConn, function(err, result) {
+        if(err) {
+          return next(err);
+        }
 
-/*
- * Get last 10 sessions of a user.
- */
-function lastUserSessions(req, res, next) {
-
-  if (typeof req.user === 'undefined') {
-    res.render('404', { url: req.url });
-  } else {
-    r
-    .table('session')
-    .getAll(req.user.id, {index: 'owner'})
-    .orderBy(r.desc('time'))
-    .pluck('time','sid','subject','count')
-    .limit(10)
-    .run(req.app._rdbConn, function(err, result) {
-      if(err) {
-        return next(err);
-      }
-
-      res.json(result);
-    });
+        res.json(result);
+      });
+    }
   }
 }
 

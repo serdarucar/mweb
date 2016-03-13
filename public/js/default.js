@@ -9,6 +9,9 @@
 
 $(document).ready(function() {
 
+  //semantic-ui menu
+  // $('.menu').menu();
+
   //semantic-ui accordion
   //$('.ui.accordion')
   //  .accordion();

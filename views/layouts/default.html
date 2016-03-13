@@ -179,12 +179,22 @@
                   </div>
                   <div class="ui left aligned column">
                     {{#if user}}
-                      <div class="ui simple dropdown">
+                      <div class="ui simple dropdown item">
                           <i class="user icon"></i>
                           <div class="text">
                               User
                           </div>
-                          <div class="ui vertical menu">
+                          <div class="menu">
+                              <div class="header item">{{memberShip user.plan}} MEMBER</div>
+                              {{#if user.admin}}
+                              <div class="ui dropdown header item">
+                                  Admin
+                                  <div class="menu">
+                                      <a href="/admin" class="header item">Home</a>
+                                      <a href="/admin/sessions" class="header item">Sessions</a>
+                                  </div>
+                              </div>
+                              {{/if}}
                               <div onclick="location.href='/profile';" style="cursor: pointer;" class="header item">
                                   <i class="user icon"></i>
                                   <div class="content">

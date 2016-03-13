@@ -1,8 +1,8 @@
 <div class="ui container">
-  <div id="activityBox" ng-controller="sessionCtrl" class="ui container">
+  <div id="activityBox" ng-controller="allsessionCtrl" class="ui container">
     <div class="ui two column grid">
       <div class="ui left aligned column">
-        <h2>ALL SESSIONS</h2>
+        <h2>MY SESSIONS</h2>
       </div>
       <div class="ui right aligned column">
         <div class="ui right aligned icon input">
@@ -14,32 +14,27 @@
     <table class="ui single line table">
         <thead>
             <tr>
-                <th>Session ID</th>
                 <th>Subject</th>
-                <th>Count</th>
+                <th>Sent</th>
+                <th>Retrying</th>
+                <th>Unsent</th>
+                <th>Total</th>
                 <th>Timestamp</th>
             </tr>
         </thead>
         <tbody>
             <tr ng-repeat="mailsession in sessions | filter: activityQuery track by $index">
-                <td>{[{mailsession.sid}]}</td>
-                <td>{[{mailsession.subject}]}</td>
+                <td><a ng-href="/{[{mailsession.sid}]}">{[{mailsession.subject}]}</a></td>
+                <td>{[{mailsession.sent}]}</td>
+                <td>{[{mailsession.deferred}]}</td>
+                <td>{[{mailsession.bounced}]}</td>
                 <td>{[{mailsession.count}]}</td>
                 <td>{[{mailsession.time}]}</td>
             </tr>
         </tbody>
     </table>
-          <!--<div class="ui divided list">
-          <div class="item" ng-repeat="mailsession in sessions | filter: activityQuery track by $index">
-            <div class="right floated content">
-              {[{mailsession.time}]}
-            </div>
-            <div class="content">
-              {[{mailsession.sid}]} / {[{mailsession.subject}]} / {[{mailsession.count}]}
-            </div>
-          </div>
-        </div>-->
-</div>
+    <br><br>
+  </div>
 </div>
 
 <script type="text/javascript" src="/js/main.js"></script>
