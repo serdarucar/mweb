@@ -273,6 +273,15 @@ app.get('/lists', function (req, res) {
    //  res.render('listen', { user: req.user });
 });
 
+app.get('/sessions', function (req, res) {
+    if (typeof req.user === 'undefined') {
+        res.redirect('/');
+    } else {
+        res.render('sessions', { user: req.user });
+    }
+   //  res.render('listen', { user: req.user });
+});
+
 app.get('/freedom', function (req, res) {
   if (typeof req.user !== 'undefined') {
     if (req.user.plan === 99) {
