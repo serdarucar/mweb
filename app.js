@@ -227,6 +227,37 @@ app.post('/admin', function(req, res){
   });
 });
 
+// process the signup form
+app.post('/passwd', function(req, res){
+  if (req.body.password !== req.body.password2) {
+    // 2 different passwords!
+    req.flash('error', 'Passwords does not match!');
+    res.redirect('/profile');
+    return;
+  }
+
+  var password = bcrypt.hashSync(req.body.password, 8);
+
+	db.updateUserPwd(req.user.id, password, function(err, updated) {
+    console.log("[DEBUG][/passwd][updateUserPwd] %s", updated);
+    if(err) {
+      console.log(err);
+      req.flash('error', 'There was an error changing the password. Please try again later');
+      res.redirect('/profile');
+    }
+    if(updated) {
+      req.flash('info', 'Password Changed.');
+      console.log("[DEBUG][/passwd][updateUserPwd] User Password Changed.");
+      res.redirect('/profile');
+    }
+    else {
+      req.flash('error', 'The password wasn\'t changed');
+      console.log("[DEBUG][/passwd][updateUserPwd] Unknown problem on updating password");
+      res.redirect('/profile');
+    }
+  });
+});
+
 app.get('/new', function (req, res) {
   if (typeof req.user === 'undefined') {
     res.redirect('/');
