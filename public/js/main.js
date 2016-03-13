@@ -523,6 +523,14 @@ var mailApp = angular.module('mailApp', [])
   };
 
 })
+.controller('profileCtrl', function profileCtrl($scope, $rootScope){
+    $scope.user = {};
+    $scope.loadUser=function(user) {
+        $scope.user = user;
+    }
+
+
+})
 .factory('sessionStorage', function ($http) {
 
   return {

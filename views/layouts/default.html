@@ -179,12 +179,27 @@
                   </div>
                   <div class="ui left aligned column">
                     {{#if user}}
-                    <div onclick="location.href='/logout';" style="cursor: pointer;">
-                      <i class="sign out icon"></i>
-                      <div class="content">
-                        Logout
+                      <div class="ui simple dropdown">
+                          <i class="user icon"></i>
+                          <div class="text">
+                              User
+                          </div>
+                          <div class="ui vertical menu">
+                              <div onclick="location.href='/profile';" style="cursor: pointer;" class="header item">
+                                  <i class="user icon"></i>
+                                  <div class="content">
+                                      Profile
+                                  </div>
+                              </div>
+                              <div onclick="location.href='/logout';" style="cursor: pointer;" class="header item">
+                                  <i class="sign out icon"></i>
+                                  <div class="content">
+                                      Logout
+                                  </div>
+                              </div>
+                          </div>
                       </div>
-                    </div>
+
                     <!-- <div id="login-btn" style="cursor: pointer;">
                       <i class="sign in icon"></i>
                       <div class="content">

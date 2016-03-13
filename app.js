@@ -279,6 +279,14 @@ app.get('/sessions', function (req, res) {
     }
 });
 
+app.get('/profile', function (req, res) {
+    if (typeof req.user === 'undefined') {
+        res.redirect('/');
+    } else {
+        res.render('userprofile', { user: JSON.stringify(req.user) });
+    }
+});
+
 app.get('/freedom', function (req, res) {
   if (typeof req.user !== 'undefined') {
     if (req.user.plan === 99) {
