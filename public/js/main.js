@@ -638,6 +638,19 @@ var mailApp = angular.module('mailApp', [])
   };
 
 })
+.controller('loginCtrl', function loginCtrl($scope) {
+
+  $scope.logIn = true;
+
+  $scope.showForgot = function () {
+    $scope.logIn = false;
+  };
+
+  $scope.showLogin = function () {
+    $scope.logIn = true;
+  };
+
+})
 .directive('excelImport', function () {
   return {
     restrict: 'E',

@@ -263,14 +263,12 @@ app.post('/mailsender', function(req, res) {
 
 });
 
-// OBSOLETE AFTER ANGULAR //
 app.get('/lists', function (req, res) {
- if (typeof req.user === 'undefined') {
-   res.redirect('/');
- } else {
-   res.render('listen', { user: req.user });
- }
-   //  res.render('listen', { user: req.user });
+  if (typeof req.user === 'undefined') {
+    res.redirect('/');
+  } else {
+    res.render('listen', { user: req.user });
+  }
 });
 
 app.get('/sessions', function (req, res) {
@@ -296,99 +294,6 @@ app.get('/freedom', function (req, res) {
     }
   }
 });
-//
-//app.get('/list', function (req, res) {
-//  if (typeof req.user === 'undefined') {
-//    res.redirect('/');
-//  } else {
-//    res.render('list', { user: req.user });
-//  }
-//});
-//
-//app.get('/list2', function (req, res) {
-//  if (typeof req.user === 'undefined') {
-//    res.redirect('/');
-//  } else {
-//    res.render('list2', { user: req.user });
-//  }
-//});
-//
-//app.post('/savelist', function(req, res) {
-//
-//  var newlist = {
-//    id: shortid.generate(),
-//    name: req.body.listname,
-//    members: req.body.listdata,
-//    count: req.body.listcount
-//  }
-//
-//  db.saveMailList(req.user.id, newlist);
-//
-//});
-//
-//app.post('/savelist2', function(req, res) {
-//
-//  var newlist = {
-//    name: req.body.listname,
-//    members: req.body.listdata,
-//    count: req.body.listcount
-//  }
-//
-//  db.saveMailList2(req.user.id, newlist);
-//
-//});
-//
-//app.post('/updatelist', function(req, res) {
-//
-//  var updlist = {
-//    id: shortid.generate(),
-//    name: req.body.listname,
-//    members: req.body.listdata,
-//    count: req.body.listcount
-//  }
-//
-//  db.saveMailList(req.user.id, updlist);
-//  db.deleteMailList(req.user.id, req.body.listdelid);
-//
-//});
-//
-//app.post('/deletelist', function(req, res) {
-//
-//  req.body.listdelete.forEach(function(listid) {
-//    db.deleteMailList(req.user.id, listid);
-//  });
-//
-//});
-//
-//app.post('/deletelast', function(req, res) {
-//
-//    db.deleteMailList(req.user.id, req.body.listdelid);
-//
-//});
-
-// app.get('/:date', function(req, res) { //@todo: not logged in user is looping here on a date (not anymore with user control; ensureAuthenticated caused this. investigate.)
-//   if (typeof req.user === 'undefined') {
-//     res.redirect('/');
-//   } else {
-//     var m = moment(req.params.date, 'YYYYMMDD');
-//
-//     var year = parseInt(req.params.date.substring(0, 4));
-//     var month = parseInt(req.params.date.substring(4, 6));
-//     var day = parseInt(req.params.date.substring(6, 8));
-//
-//     if (m.isValid()) {
-//       db.getLatestMailByDate(req.user.id, year, month, day, function(err, result) {
-//         if (result.length > 0) {
-//           res.redirect('/' + req.params.date + '/' + result);
-//         } else {
-//           res.render('index', { nomail: true, date: moment(req.params.date, "YYYYMMDD"), user: req.user });
-//         }
-//       });
-//     } else {
-//       res.render('/', { url: req.url, title: 'Page Not Found', user: req.user });
-//     }
-//   }
-// });
 
 app.get('/:sid', function(req, res) {
   if (typeof req.user === 'undefined') {
