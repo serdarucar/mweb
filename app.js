@@ -80,7 +80,7 @@ db.mailStatChanges(function(err, cursor) {
     STMP is mail server which is responsible for sending and recieving email.
 */
 var smtpTransport = nodemailer.createTransport({
-  host: 'localhost',
+  host: 'mdbs1-priv',
   port: 25,
   secure: false,
   ignoreTLS: false,
