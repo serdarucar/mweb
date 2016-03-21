@@ -415,11 +415,11 @@ app.post('/register', function(req, res){
       req.flash('info', 'Account Created.');
       console.log("[DEBUG][/signup][saveUser] User Registered");
       rand = uuid.v4();;
-      host = req.get('host');
-      link = "http://" + req.get('host') + "/verify?id=" + rand;
+      host = 'mailer.steminorder.com';
+      link = "http://" + host + "/verify?id=" + rand;
       mailOptions = {
         to : req.body.email,
-        from: 'nobody@mailer.steminorder.com',
+        from: 'mailsender@steminorder.com',
         subject : "Please confirm your Email account",
         html : "Hello,<br> Please Click on the link to verify your email.<br><a href=" + link + ">Click here to verify</a>"
       };
