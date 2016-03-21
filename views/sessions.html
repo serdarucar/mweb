@@ -14,6 +14,7 @@
     <table class="ui single line table">
         <thead>
             <tr>
+                <th>Sender</th>
                 <th>Subject</th>
                 <th>Sent</th>
                 <th>Retrying</th>
@@ -24,6 +25,7 @@
         </thead>
         <tbody>
             <tr ng-repeat="mailsession in activity | filter: activityQuery track by $index">
+                <td>{[{mailsession.sender}]}</td>
                 <td><a ng-href="/{[{mailsession.sid}]}">{[{mailsession.subject}]}</a></td>
                 <td>{[{mailsession.sent}]}</td>
                 <td>{[{mailsession.deferred}]}</td>
