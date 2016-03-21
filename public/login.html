@@ -73,12 +73,44 @@
                 <button class="ui fluid huge button" type="submit">LOG IN</button>
               </form>
             </div>
-            <!-- <div class="ui center aligned grid"><a href="#" ng-click="showForgot()">Forgot your Password?</a></div> -->
+            <div class="ui center aligned grid"><a href="#" ng-click="showRegister()">New User? Register Here</a></div>
           </div>
           <div class="ui column"></div>
         </div>
       </div>
       <div ng-hide="logIn" class="ui basic segment">
+        <div class="ui three column grid">
+          <div class="ui column"></div>
+          <div class="ui column">
+            <div class="ui padded segment">
+              <form action="/register" method="POST" class="ui form">
+                <div class="field">
+                  <div class="ui centered large header">
+                    E-Mail
+                  </div>
+                  <input class="ui input" type="text" name="email">
+                </div>
+                <div class="field">
+                  <div class="ui centered medium header">
+                    Password
+                  </div>
+                  <input class="ui input" type="password" name="password">
+                </div>
+                <div class="field">
+                  <div class="ui centered medium header">
+                    Confirm Password
+                  </div>
+                  <input class="ui input" type="password" name="password2">
+                </div>
+                <button class="ui fluid huge button" type="submit">REGISTER</button>
+              </form>
+            </div>
+            <!-- <div class="ui center aligned grid"><a href="#" ng-click="showForgot()">Forgot your Password?</a></div> -->
+          </div>
+          <div class="ui column"></div>
+        </div>
+      </div>
+      <!-- <div ng-hide="logIn" class="ui basic segment">
         <div class="ui three column grid">
           <div class="ui column"></div>
           <div class="ui column">
@@ -92,12 +124,12 @@
                 </div>
                 <button class="ui fluid huge button" type="submit">RESET</button>
               </form>
-            </div>
+            </div> -->
             <!-- <div class="ui center aligned grid"><a href="#" ng-click="showLogin()">Log In</a></div> -->
-          </div>
+          <!-- </div>
           <div class="ui column"></div>
         </div>
-      </div>
+      </div> -->
     </div>
   </body>
   <script type="text/javascript" src="/js/main.js"></script>

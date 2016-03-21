@@ -26,9 +26,11 @@ var express = require('express'),
   bcrypt = require('bcryptjs'),
   _ = require('underscore'),
   math = require('mathjs'),
+  uuid = require('node-uuid'),
   moment = require('moment'),
   shortid = require('shortid'),
   request = require('request-json'),
+  nodemailer = require("nodemailer"),
   pmx = require('pmx');
 
 var config = require(__dirname + '/config.js');
@@ -70,6 +72,26 @@ db.mailStatChanges(function(err, cursor) {
     io.sockets.emit("mailstats", data);
   });
 });
+
+
+// NODEMAILER MAIL TRANSPORT
+/*
+    Here we are configuring our SMTP Server details.
+    STMP is mail server which is responsible for sending and recieving email.
+*/
+var smtpTransport = nodemailer.createTransport({
+  host: 'localhost',
+  port: 25,
+  secure: false,
+  ignoreTLS: false,
+  tls: {
+    rejectUnauthorized: false
+  },
+  maxConnections: 100,
+  maxMessages: Infinity
+});
+var rand, mailOptions, host, link;
+/*------------------SMTP Over-----------------------------*/
 
 // MIDDLEWARE (get user)
 /*
@@ -151,10 +173,14 @@ app.get('/', function(req, res) {
       if (result.length !== 0) {
         res.redirect('/' + result);
       } else {
-        if (req.user.plan === 99) {
-          res.redirect('/ext/payment/form.html');
+        if (req.user.verify === true) {
+          if (req.user.plan === 99) {
+            res.redirect('/ext/payment/form.html');
+          } else {
+            res.redirect('/lists');
+          }
         } else {
-          res.redirect('/lists');
+          res.redirect('/verify.html');
         }
       }
     });
@@ -321,7 +347,7 @@ app.get('/profile', function (req, res) {
 app.get('/freedom', function (req, res) {
   if (typeof req.user !== 'undefined') {
     if (req.user.plan === 99) {
-      r.db('mailsender').table('user').get(req.user.id).update({'plan':0})
+      r.db('mailsender').table('user').get(req.user.id).update({'plan':0, 'quota':1000})
       .run(req.app._rdbConn, function(err, result) {
         if(err) {
           return (err);
@@ -332,6 +358,125 @@ app.get('/freedom', function (req, res) {
     }
   }
 });
+
+/*
+Registration of User via confirmation mail - START
+*/
+app.get('/send',function(req,res) {
+  rand = uuid.v4();;
+  host = req.get('host');
+  link = "http://" + req.get('host') + "/verify?id=" + rand;
+  mailOptions = {
+    to : req.query.to,
+    from: 'nobody@mailer.steminorder.com',
+    subject : "Please confirm your Email account",
+    html : "Hello,<br> Please Click on the link to verify your email.<br><a href=" + link + ">Click here to verify</a>"
+  }
+  console.log(mailOptions);
+  smtpTransport.sendMail(mailOptions, function(error, response) {
+   if(error) {
+      console.log(error);
+      res.end("error");
+   } else {
+      console.log("Message sent: " + JSON.stringify(response));
+      res.redirect('/login.html');
+     }
+   });
+});
+
+// process the signup form
+app.post('/register', function(req, res){
+  if (!validateEmail(req.body.email)) {
+    // Probably not a good email address.
+    req.flash('error', 'Not a valid email address!');
+    res.redirect('/login.html');
+    return;
+  }
+  if (req.body.password !== req.body.password2) {
+    // 2 different passwords!
+    req.flash('error', 'Passwords does not match!');
+    res.redirect('/login.html');
+    return;
+  }
+
+  var user = {
+    email: req.body.email,
+    password: bcrypt.hashSync(req.body.password, 8)
+  };
+
+	db.saveUser(user, function(err, saved) {
+    console.log("[DEBUG][/signup][saveUser] %s", saved);
+    if(err) {
+      console.log(err);
+      req.flash('error', 'There was an error creating the account. Please try again later');
+      res.redirect('/login.html');
+    }
+    if(saved) {
+      req.flash('info', 'Account Created.');
+      console.log("[DEBUG][/signup][saveUser] User Registered");
+      rand = uuid.v4();;
+      host = req.get('host');
+      link = "http://" + req.get('host') + "/verify?id=" + rand;
+      mailOptions = {
+        to : req.body.email,
+        from: 'nobody@mailer.steminorder.com',
+        subject : "Please confirm your Email account",
+        html : "Hello,<br> Please Click on the link to verify your email.<br><a href=" + link + ">Click here to verify</a>"
+      };
+      smtpTransport.sendMail(mailOptions, function(error, response) {
+        if(error) {
+          console.log(error);
+        } else {
+        console.log("Message sent: " + JSON.stringify(response));
+        }
+      });
+      res.redirect('/login.html');
+    }
+    else {
+      req.flash('error', 'The account wasn\'t created');
+      console.log("[DEBUG][/signup][saveUser] Unknown problem on creating account");
+      res.redirect('/login.html');
+    }
+  });
+});
+
+app.get('/verify',function(req,res) {
+  console.log(req.protocol + "://" + req.get('host'));
+  if((req.protocol + "://" + req.get('host')) == ("http://" + host)) {
+    console.log("Domain is matched. Information is from Authentic email");
+    if(req.query.id == rand)
+    {
+    	db.verifyUser(req.user.id, function(err, verified) {
+        //console.log("[DEBUG][/passwd][updateUserPwd] %s", updated);
+        if(err) {
+          console.log(err);
+          //req.flash('error', 'There was an error changing the password. Please try again later');
+          res.redirect('/');
+        }
+        if(verified) {
+          //req.flash('info', 'Password Changed.');
+          console.log("[DEBUG][/verify][verifyUser] User Verified.");
+          res.redirect('/');
+        }
+        else {
+          //req.flash('error', 'The password wasn\'t changed');
+          console.log("[DEBUG][/verify][verifyUser] Unknown problem on verifying user");
+          res.redirect('/');
+        }
+      });
+      console.log("email is verified");
+      //res.end("<h1>Email " + mailOptions.to + " is been Successfully verified");
+    } else {
+      console.log("email is not verified");
+      res.end("<h1>Bad Request</h1>");
+    }
+  } else {
+      res.end("<h1>Request is from unknown source");
+  }
+});
+/*
+Registration of User via confirmation mail - END
+*/
 
 app.get('/:sid', function(req, res) {
   if (typeof req.user === 'undefined') {

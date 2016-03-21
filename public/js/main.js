@@ -653,7 +653,7 @@ var mailApp = angular.module('mailApp', [])
 
   $scope.logIn = true;
 
-  $scope.showForgot = function () {
+  $scope.showRegister = function () {
     $scope.logIn = false;
   };
 
