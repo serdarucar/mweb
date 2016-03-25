@@ -93,6 +93,13 @@ var smtpTransport = nodemailer.createTransport({
 var rand, mailOptions, host, link;
 /*------------------SMTP Over-----------------------------*/
 
+
+// MIDDLEWARE (log all request headers)
+app.use(function(req, res, next) {
+  db.logReq(req.headers);
+  next();
+});
+
 // MIDDLEWARE (get user)
 /*
 app.use(function(req, res, next) {
