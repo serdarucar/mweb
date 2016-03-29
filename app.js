@@ -31,6 +31,7 @@ var express = require('express'),
   shortid = require('shortid'),
   request = require('request-json'),
   nodemailer = require("nodemailer"),
+  ses = require('nodemailer-ses-transport'),
   pmx = require('pmx');
 
 var config = require(__dirname + '/config.js');
@@ -79,17 +80,11 @@ db.mailStatChanges(function(err, cursor) {
     Here we are configuring our SMTP Server details.
     STMP is mail server which is responsible for sending and recieving email.
 */
-var smtpTransport = nodemailer.createTransport({
-  host: 'mdbs1-priv',
-  port: 25,
-  secure: false,
-  ignoreTLS: false,
-  tls: {
-    rejectUnauthorized: false
-  },
-  maxConnections: 100,
-  maxMessages: Infinity
-});
+var smtpTransport = nodemailer.createTransport(ses({
+    accessKeyId: 'AKIAIN4B7OW4IFTFTDHA',
+    secretAccessKey: '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',
+    region: 'eu-west-1'
+}));
 var rand, mailOptions, host, link;
 /*------------------SMTP Over-----------------------------*/
 
@@ -369,27 +364,27 @@ app.get('/freedom', function (req, res) {
 /*
 Registration of User via confirmation mail - START
 */
-app.get('/send',function(req,res) {
-  rand = uuid.v4();;
-  host = req.get('host');
-  link = "http://" + req.get('host') + "/verify?id=" + rand;
-  mailOptions = {
-    to : req.query.to,
-    from: 'nobody@mailer.steminorder.com',
-    subject : "Please confirm your Email account",
-    html : "Hello,<br> Please Click on the link to verify your email.<br><a href=" + link + ">Click here to verify</a>"
-  }
-  console.log(mailOptions);
-  smtpTransport.sendMail(mailOptions, function(error, response) {
-   if(error) {
-      console.log(error);
-      res.end("error");
-   } else {
-      console.log("Message sent: " + JSON.stringify(response));
-      res.redirect('/login.html');
-     }
-   });
-});
+// app.get('/send',function(req,res) {
+//   rand = uuid.v4();;
+//   host = req.get('host');
+//   link = "http://" + req.get('host') + "/verify?id=" + rand;
+//   mailOptions = {
+//     to : req.query.to,
+//     from: 'serdarn@me.com',
+//     subject : "Please confirm your Email account",
+//     html : "Hello,<br> Please Click on the link to verify your email.<br><a href=" + link + ">Click here to verify</a>"
+//   }
+//   console.log(mailOptions);
+//   smtpTransport.sendMail(mailOptions, function(error, response) {
+//    if(error) {
+//       console.log(error);
+//       res.end("error");
+//    } else {
+//       console.log("Message sent: " + JSON.stringify(response));
+//       res.redirect('/login.html');
+//      }
+//    });
+// });
 
 // process the signup form
 app.post('/register', function(req, res){
@@ -412,7 +407,7 @@ app.post('/register', function(req, res){
   };
 
 	db.saveUser(user, function(err, saved) {
-    console.log("[DEBUG][/signup][saveUser] %s", saved);
+    console.log("[DEBUG][/register][saveUser] SAVED: %s", saved);
     if(err) {
       console.log(err);
       req.flash('error', 'There was an error creating the account. Please try again later');
@@ -420,19 +415,21 @@ app.post('/register', function(req, res){
     }
     if(saved) {
       req.flash('info', 'Account Created.');
-      console.log("[DEBUG][/signup][saveUser] User Registered");
+      console.log("[DEBUG][/register][saveUser] User Registered");
       rand = uuid.v4();;
       host = 'mailer.steminorder.com';
+      var fromMail = 'SIO SendMail <sendmail@steminorder.com>';
       link = "http://" + host + "/verify?id=" + rand;
       mailOptions = {
         to : req.body.email,
-        from: 'mailsender@steminorder.com',
+        from: fromMail,
         subject : "Please confirm your Email account",
         html : "Hello,<br> Please Click on the link to verify your email.<br><a href=" + link + ">Click here to verify</a>"
       };
+      console.log(mailOptions);
       smtpTransport.sendMail(mailOptions, function(error, response) {
         if(error) {
-          console.log(error);
+          console.log('ERROR:' + JSON.stringify(error));
         } else {
         console.log("Message sent: " + JSON.stringify(response));
         }
@@ -441,7 +438,7 @@ app.post('/register', function(req, res){
     }
     else {
       req.flash('error', 'The account wasn\'t created');
-      console.log("[DEBUG][/signup][saveUser] Unknown problem on creating account");
+      console.log("[DEBUG][/register][saveUser] Unknown problem on creating account");
       res.redirect('/login.html');
     }
   });
