@@ -13,13 +13,14 @@
       <div class="ui top attached segment">
         <div class="ui two column grid">
           <div class="ui column">
-              <span>To:  &nbsp;</span>
               <div class="ui huge labels" style="display:inline;">
                   {{#lists}}
+                  <span>To:  &nbsp;</span>
                   <div style="cursor: pointer;" id="{{id}}" class="ui gray label maillist" value="{{id}}" list-data="{{name}}" count-data="{{count}}"><b>&nbsp;{{name}}&nbsp;</b>({{count}})&nbsp;</div>
                   <!--<b><input type="checkbox" class="rcptList" value="{{id}}" list-data="{{name}}" count-data="{{count}}">&nbsp;{{name}}&nbsp;</b>({{count}})<b>&nbsp;&nbsp;&nbsp;</b>-->
                   {{else}}
-                  <div onclick="location.href='/lists';" style="cursor: pointer;">Create A List</div>
+                  <span>To:  &nbsp;</span>
+                  <a onclick="location.href='/lists';" style="cursor: pointer;">Create A List</a>
                   {{/lists}}
               </div>
               <!-- <h6><a href="/list">Manage Lists</a></h6> -->

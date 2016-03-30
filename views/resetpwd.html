@@ -1,0 +1,33 @@
+<div class="ui container">
+  <div class="ui basic segment">
+    <div class="ui three column grid">
+      <div class="ui column"></div>
+      <div class="ui column">
+        <div class="ui padded segment">
+          <form action="/reset" method="POST" class="ui form">
+            <input type="hidden" name="token" value="{{token}}">
+            <input type="hidden" name="username" value="{{email}}">
+            <div class="ui centered large header">
+              {{email}}
+            </div>
+            <div class="ui divider"></div>
+            <div class="field">
+              <div class="ui centered medium header">
+                Password
+              </div>
+              <input class="ui input" type="password" name="password">
+            </div>
+            <div class="field">
+              <div class="ui centered medium header">
+                Confirm Password
+              </div>
+              <input class="ui input" type="password" name="password2">
+            </div>
+            <button class="ui fluid huge button" type="submit">RESET</button>
+          </form>
+        </div>
+      </div>
+      <div class="ui column"></div>
+    </div>
+  </div>
+</div>

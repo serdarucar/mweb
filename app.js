@@ -305,7 +305,7 @@ app.post('/admin', function(req, res){
   });
 });
 
-// process the signup form
+// process the password change form
 app.post('/passwd', function(req, res){
   if (req.body.password !== req.body.password2) {
     // 2 different passwords!
@@ -484,8 +484,8 @@ app.post('/register', function(req, res){
           console.log('ERROR:' + JSON.stringify(error));
           usrlog.error({err:error, module:"register", submodule:"sendVerifyMail"}, "verification mail in error");
         } else {
-        console.log("Message sent: " + JSON.stringify(response));
-        usrlog.info({smtp:response, module:"register", submodule:"sendVerifyMail"}, "verification mail sent");
+          console.log("Message sent: " + JSON.stringify(response));
+          usrlog.info({smtp:response, module:"register", submodule:"sendVerifyMail"}, "verification mail sent");
         }
       });
       passport.authenticate('local')(req, res, function () {
@@ -538,6 +538,126 @@ app.get('/verify', function(req,res) {
 });
 /*
 Registration of User via confirmation mail - END
+*/
+
+
+
+// process the password reset form
+app.post('/forgot', function(req, res){
+  if (!validateEmail(req.body.username)) {
+    // Probably not a good email address.
+    req.flash('error', 'Not a valid email address!');
+    res.redirect('/login.html');
+    return;
+  }
+
+  var token = uuid.v4();
+
+  // var user = {
+  //   username: req.body.username,
+  //   email: req.body.username,
+  //   password: bcrypt.hashSync(req.body.password, 8),
+  //   token: uuid.v4()
+  // };
+
+	db.pwdResetOne(token, req.body.username, function(err, reset) {
+    console.log("[DEBUG][/forgot][pwdResetOne] RESET: %s", reset);
+    if(err) {
+      console.log(err);
+      usrlog.error({err:err, module:"forgot", submodule:"pwdResetOne"}, "password cannot be reset");
+      req.flash('error', 'There was an error resetting the password. Please try again later');
+      res.redirect('/login.html');
+    }
+    if(reset) {
+      req.flash('info', 'Password has been reset. Please check your mail for further instructions.');
+      console.log("[DEBUG][/forgot][saveUser] Password Reset");
+      usrlog.info({email:req.body.username, module:"forgot", submodule:"pwdResetOne"}, "password reset");
+      host = 'mailer.steminorder.com';
+      link = "http://" + host + "/reset?token=" + token + "&email=" + req.body.username;
+      mailOptions = {
+        to : req.body.username,
+        from: 'SIO SendMail <sendmail@steminorder.com>',
+        subject : "Reset your password",
+        html : '<a href=' + link + '><h2>Click here to reset your password</h2><img src="https://d2rhu5ympob2ao.cloudfront.net/email-key-960x272.jpg"></a>'
+      };
+      // console.log(mailOptions);
+      smtpTransport.sendMail(mailOptions, function(error, response) {
+        if(error) {
+          console.log('ERROR:' + JSON.stringify(error));
+          usrlog.error({err:error, module:"forgot", submodule:"sendResetMail"}, "password reset mail in error");
+        } else {
+          console.log("Message sent: " + JSON.stringify(response));
+          usrlog.info({smtp:response, module:"forgot", submodule:"sendResetMail"}, "password reset mail sent");
+          res.redirect('/reset.html');
+        }
+      });
+    } else {
+      req.flash('error', 'The email is not found');
+      console.log("[DEBUG][/register][saveUser] There is no such mail registered.");
+      usrlog.info({email:req.body.username, module:"forgot", submodule:"pwdResetOne"}, "unregistered mail address");
+      res.redirect('/login.html');
+    }
+  });
+});
+
+app.get('/reset', function(req,res) {
+	db.pwdResetTwo(req.query.token, req.query.email, function(err, valid) {
+    if(err) {
+      console.log(err);
+      usrlog.error({err:err, module:"reset", submodule:"pwdResetTwo"}, "there is an error on database");
+      //req.flash('error', 'There was an error changing the password. Please try again later');
+      res.redirect('/');
+    }
+    if(valid) {
+      //req.flash('info', 'Password Changed.');
+      console.log("[DEBUG][/reset][pwdResetTwo] Reset Credentials Are Valid.");
+      usrlog.info({email:req.query.email, module:"reset", submodule:"pwdResetTwo"}, "credentials validated");
+      res.render('resetpwd', {token: req.query.token, email: req.query.email});
+    } else {
+      //req.flash('error', 'The password wasn\'t changed');
+      console.log("[DEBUG][/reset][pwdResetTwo] Reset Credentials Are Not Valid.");
+      usrlog.info({email:req.query.email, module:"reset", submodule:"pwdResetTwo"}, "credentials not validated");
+      res.redirect('/');
+    }
+  });
+});
+
+// process the password change form
+app.post('/reset', function(req, res){
+  if (req.body.password !== req.body.password2) {
+    // 2 different passwords!
+    req.flash('error', 'Passwords does not match!');
+    console.log(req.body);
+    res.redirect('/reset?token=' + req.body.token + '&email=' + req.body.username);
+    return;
+  }
+
+  var password = bcrypt.hashSync(req.body.password, 8);
+
+	db.pwdResetThree(req.body.token, req.body.username, password, function(err, pwdreset) {
+    console.log("[DEBUG][/reset][pwdResetThree] %s", pwdreset);
+    if(err) {
+      console.log(err);
+      usrlog.error({err:err, module:"reset", submodule:"pwdResetThree"}, "there is an error on database");
+      req.flash('error', 'There was an error resetting the password. Please try again.');
+      res.redirect('/reset?token=' + req.body.token + 'email=' + req.body.username);
+    }
+    if(pwdreset) {
+      req.flash('info', 'Password has been reset.');
+      usrlog.info({email:req.query.email, module:"reset", submodule:"pwdResetThree"}, "password reset");
+      console.log("[DEBUG][/reset][pwdResetThree] User Password Reset.");
+      res.redirect('/profile');
+    }
+    else {
+      req.flash('error', 'The password couldn\'t reset');
+      usrlog.info({email:req.query.email, module:"reset", submodule:"pwdResetThree"}, "password cannot be reset");
+      console.log("[DEBUG][/reset][pwdResetThree] Unknown problem on resetting password");
+      res.redirect('/profile');
+    }
+  });
+});
+/*
+Reset of User Password via confirmation mail - END
 */
 
 app.get('/:sid', function(req, res) {

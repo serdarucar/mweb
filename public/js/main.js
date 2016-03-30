@@ -23,7 +23,7 @@ var mailApp = angular.module('mailApp', [])
   $rootScope.listHeader = null;
   $rootScope.newList = true;
   $rootScope.oldList = false;
-  $rootScope.oldListObjects = true;
+  $rootScope.oldListObjects = false;
   $rootScope.newListInputPh = 'NEW LIST';
   $rootScope.newListInputBtnState = null;
 
