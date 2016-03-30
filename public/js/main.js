@@ -651,14 +651,26 @@ var mailApp = angular.module('mailApp', [])
 })
 .controller('loginCtrl', function loginCtrl($scope) {
 
-  $scope.logIn = true;
+  $scope.login = true;
+  $scope.register = false;
+  $scope.reset = false;
 
   $scope.showRegister = function () {
-    $scope.logIn = false;
+    $scope.login = false;
+    $scope.register = true;
+    $scope.reset = false;
+  };
+
+  $scope.showReset = function () {
+    $scope.login = false;
+    $scope.register = false;
+    $scope.reset = true;
   };
 
   $scope.showLogin = function () {
-    $scope.logIn = true;
+    $scope.login = true;
+    $scope.register = false;
+    $scope.reset = false;
   };
 
 })

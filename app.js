@@ -388,7 +388,7 @@ Registration of User via confirmation mail - START
 
 // process the signup form
 app.post('/register', function(req, res){
-  if (!validateEmail(req.body.email)) {
+  if (!validateEmail(req.body.username)) {
     // Probably not a good email address.
     req.flash('error', 'Not a valid email address!');
     res.redirect('/login.html');
@@ -402,8 +402,10 @@ app.post('/register', function(req, res){
   }
 
   var user = {
-    email: req.body.email,
-    password: bcrypt.hashSync(req.body.password, 8)
+    username: req.body.username,
+    email: req.body.username,
+    password: bcrypt.hashSync(req.body.password, 8),
+    token: uuid.v4()
   };
 
 	db.saveUser(user, function(err, saved) {
@@ -416,17 +418,15 @@ app.post('/register', function(req, res){
     if(saved) {
       req.flash('info', 'Account Created.');
       console.log("[DEBUG][/register][saveUser] User Registered");
-      rand = uuid.v4();;
       host = 'mailer.steminorder.com';
-      var fromMail = 'SIO SendMail <sendmail@steminorder.com>';
-      link = "http://" + host + "/verify?id=" + rand;
+      link = "http://" + host + "/verify?token=" + user.token + "&email=" + user.email;
       mailOptions = {
-        to : req.body.email,
-        from: fromMail,
-        subject : "Please confirm your Email account",
-        html : "Hello,<br> Please Click on the link to verify your email.<br><a href=" + link + ">Click here to verify</a>"
+        to : user.email,
+        from: 'SIO SendMail <sendmail@steminorder.com>',
+        subject : "Please confirm your mail account",
+        html : '<a href=' + link + '><h2>Click here to confirm</h2><img src="https://s3.eu-central-1.amazonaws.com/smailer-s3-fra-001/resource/cdn/image/mailsender/email-key-960x272.jpg"></a>'
       };
-      console.log(mailOptions);
+      // console.log(mailOptions);
       smtpTransport.sendMail(mailOptions, function(error, response) {
         if(error) {
           console.log('ERROR:' + JSON.stringify(error));
@@ -434,9 +434,10 @@ app.post('/register', function(req, res){
         console.log("Message sent: " + JSON.stringify(response));
         }
       });
-      res.redirect('/login.html');
-    }
-    else {
+      passport.authenticate('local')(req, res, function () {
+        res.redirect('/');
+      });
+    } else {
       req.flash('error', 'The account wasn\'t created');
       console.log("[DEBUG][/register][saveUser] Unknown problem on creating account");
       res.redirect('/login.html');
@@ -444,39 +445,38 @@ app.post('/register', function(req, res){
   });
 });
 
-app.get('/verify',function(req,res) {
-  console.log(req.protocol + "://" + req.get('host'));
-  if((req.protocol + "://mailer.steminorder.com") == ("http://" + host)) {
-    console.log("Domain is matched. Information is from Authentic email");
-    if(req.query.id == rand)
-    {
-    	db.verifyUser(req.user.id, function(err, verified) {
-        //console.log("[DEBUG][/passwd][updateUserPwd] %s", updated);
-        if(err) {
-          console.log(err);
-          //req.flash('error', 'There was an error changing the password. Please try again later');
-          res.redirect('/');
-        }
-        if(verified) {
-          //req.flash('info', 'Password Changed.');
-          console.log("[DEBUG][/verify][verifyUser] User Verified.");
-          res.redirect('/');
-        }
-        else {
-          //req.flash('error', 'The password wasn\'t changed');
-          console.log("[DEBUG][/verify][verifyUser] Unknown problem on verifying user");
-          res.redirect('/');
-        }
-      });
-      console.log("email is verified");
-      //res.end("<h1>Email " + mailOptions.to + " is been Successfully verified");
-    } else {
-      console.log("email is not verified");
-      res.end("<h1>Bad Request</h1>");
+app.get('/verify', function(req,res) {
+  // console.log(req.protocol + "://" + req.get('host'));
+  // if((req.protocol + "://mailer.steminorder.com") == ("http://" + host)) {
+  //   console.log("Domain is matched. Information is from Authentic email");
+    // if(req.query.token == token)
+    // {
+	db.verifyUser(req.query.token, req.query.email, function(err, verified) {
+    //console.log("[DEBUG][/passwd][updateUserPwd] %s", updated);
+    if(err) {
+      console.log(err);
+      //req.flash('error', 'There was an error changing the password. Please try again later');
+      res.redirect('/');
     }
-  } else {
-      res.end("<h1>Request is from unknown source");
-  }
+    if(verified) {
+      //req.flash('info', 'Password Changed.');
+      console.log("[DEBUG][/verify][verifyUser] User Verified.");
+      res.redirect('/');
+    } else {
+      //req.flash('error', 'The password wasn\'t changed');
+      console.log("[DEBUG][/verify][verifyUser] Unknown problem on verifying user");
+      res.redirect('/');
+    }
+  });
+  // console.log("email is verified");
+      //res.end("<h1>Email " + mailOptions.to + " is been Successfully verified");
+    // } else {
+    //   console.log("email is not verified");
+    //   res.end("<h1>Bad Request</h1>");
+    // }
+  // } else {
+  //     res.end("<h1>Request is from unknown source");
+  // }
 });
 /*
 Registration of User via confirmation mail - END
