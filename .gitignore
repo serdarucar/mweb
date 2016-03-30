@@ -1,6 +1,9 @@
 npm-debug.log
 node_modules/
 
+AWS Service Configurations
+.aws/
+
 ### SublimeText ###
 # workspace files are user-specific
 *.sublime-workspace

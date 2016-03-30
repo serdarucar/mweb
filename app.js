@@ -31,7 +31,10 @@ var express = require('express'),
   shortid = require('shortid'),
   request = require('request-json'),
   nodemailer = require("nodemailer"),
+  AWS = require('aws-sdk'),
   ses = require('nodemailer-ses-transport'),
+  bunyan = require('bunyan'),
+  createCWStream = require('bunyan-cloudwatch'),
   pmx = require('pmx');
 
 var config = require(__dirname + '/config.js');
@@ -88,6 +91,52 @@ var smtpTransport = nodemailer.createTransport(ses({
 var rand, mailOptions, host, link;
 /*------------------SMTP Over-----------------------------*/
 
+// AWS Cloudwatch IAM Hardcoded - Should be removed.
+AWS.config.update({
+    accessKeyId: "AKIAITVTU5BJI5PR45RA",
+    secretAccessKey: "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"
+});
+
+/*------------------LOGGER Start-----------------------------*/
+
+// BUNYAN USER LOGGER TO AWS CLOUDWATCH
+var usrstream = createCWStream({
+  logGroupName: 'smailer-lg-fra-001',
+  logStreamName: 'mweb-user-lgs-001',
+  cloudWatchLogsOptions: {
+    region: 'eu-central-1'
+  }
+});
+
+var usrlog = bunyan.createLogger({
+  name: 'user-logs',
+  streams: [
+    {
+      stream: usrstream,
+      type: 'raw'
+    }
+  ]
+});
+
+// BUNYAN USER LOGGER TO AWS CLOUDWATCH
+var usrstream = createCWStream({
+  logGroupName: 'smailer-lg-fra-001',
+  logStreamName: 'mweb-user-lgs-001',
+  cloudWatchLogsOptions: {
+    region: 'eu-central-1'
+  }
+});
+
+var usrlog = bunyan.createLogger({
+  name: 'user-logs',
+  streams: [
+    {
+      stream: usrstream,
+      type: 'raw'
+    }
+  ]
+});
+/*------------------LOGGER Over-----------------------------*/
 
 // MIDDLEWARE (log all request headers)
 app.use(function(req, res, next) {
@@ -156,6 +205,7 @@ passport.use(new local(
 
 passport.serializeUser(function(user, done) {
   console.log("[DEBUG][passport][serializeUser] %j", user.id);
+  usrlog.info({id:user.id, module:"passport", submodule:"serializeUser"}, "User Serialized.");
   done(null, user.id);
 });
 
@@ -412,12 +462,14 @@ app.post('/register', function(req, res){
     console.log("[DEBUG][/register][saveUser] SAVED: %s", saved);
     if(err) {
       console.log(err);
+      usrlog.error({err:err, module:"register", submodule:"saveUser"}, "user cannot be saved to database");
       req.flash('error', 'There was an error creating the account. Please try again later');
       res.redirect('/login.html');
     }
     if(saved) {
       req.flash('info', 'Account Created.');
       console.log("[DEBUG][/register][saveUser] User Registered");
+      usrlog.info({email:user.email, module:"register", submodule:"saveUser"}, "user registered");
       host = 'mailer.steminorder.com';
       link = "http://" + host + "/verify?token=" + user.token + "&email=" + user.email;
       mailOptions = {
@@ -430,8 +482,10 @@ app.post('/register', function(req, res){
       smtpTransport.sendMail(mailOptions, function(error, response) {
         if(error) {
           console.log('ERROR:' + JSON.stringify(error));
+          usrlog.error({err:error, module:"register", submodule:"sendVerifyMail"}, "verification mail in error");
         } else {
         console.log("Message sent: " + JSON.stringify(response));
+        usrlog.info({smtp:response, module:"register", submodule:"sendVerifyMail"}, "verification mail sent");
         }
       });
       passport.authenticate('local')(req, res, function () {
@@ -440,6 +494,7 @@ app.post('/register', function(req, res){
     } else {
       req.flash('error', 'The account wasn\'t created');
       console.log("[DEBUG][/register][saveUser] Unknown problem on creating account");
+      usrlog.info({email:user.email, module:"register", submodule:"saveUser"}, "unknown problem on creating account");
       res.redirect('/login.html');
     }
   });
@@ -455,16 +510,19 @@ app.get('/verify', function(req,res) {
     //console.log("[DEBUG][/passwd][updateUserPwd] %s", updated);
     if(err) {
       console.log(err);
+      usrlog.error({err:err, module:"verify", submodule:"verifyUser"}, "email cannot verified");
       //req.flash('error', 'There was an error changing the password. Please try again later');
       res.redirect('/');
     }
     if(verified) {
       //req.flash('info', 'Password Changed.');
       console.log("[DEBUG][/verify][verifyUser] User Verified.");
+      usrlog.info({email:req.query.email, module:"verify", submodule:"verifyUser"}, "email verified");
       res.redirect('/');
     } else {
       //req.flash('error', 'The password wasn\'t changed');
       console.log("[DEBUG][/verify][verifyUser] Unknown problem on verifying user");
+      usrlog.info({email:req.query.email, module:"verify", submodule:"verifyUser"}, "unknown problem on verifying user");
       res.redirect('/');
     }
   });
