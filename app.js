@@ -424,7 +424,7 @@ app.post('/register', function(req, res){
         to : user.email,
         from: 'SIO SendMail <sendmail@steminorder.com>',
         subject : "Please confirm your mail account",
-        html : '<a href=' + link + '><h2>Click here to confirm</h2><img src="https://s3.eu-central-1.amazonaws.com/smailer-s3-fra-001/resource/cdn/image/mailsender/email-key-960x272.jpg"></a>'
+        html : '<a href=' + link + '><h2>Click here to confirm</h2><img src="https://d2rhu5ympob2ao.cloudfront.net/email-key-960x272.jpg"></a>'
       };
       // console.log(mailOptions);
       smtpTransport.sendMail(mailOptions, function(error, response) {
