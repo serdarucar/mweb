@@ -61,14 +61,14 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(methodOverride());
-app.use(cookieParser());
+app.use(cookieParser('janalicibaqishlary'));
+app.use(session({ secret: 'janalicibaqishlary', resave: true, saveUninitialized: true })); // session secret
+app.use(flash()); // connect-flash messages
 app.use(express.static(path.join(__dirname, 'public')));
 
 // passport initialization
-app.use(session({ secret: 'janalicibaqishlary', resave: true, saveUninitialized: true })); // session secret
 app.use(passport.initialize());
 app.use(passport.session()); // make login sessions persistent
-app.use(flash()); // connect-flash messages
 
 // SOCKET.IO EMITTERS
 db.mailStatChanges(function(err, cursor) {
@@ -592,9 +592,9 @@ app.post('/forgot', function(req, res){
         }
       });
     } else {
-      req.flash('error', 'The email is not found');
       console.log("[DEBUG][/register][saveUser] There is no such mail registered.");
       usrlog.info({email:req.body.username, module:"forgot", submodule:"pwdResetOne"}, "unregistered mail address");
+      req.flash('error', 'The email is not found');
       res.redirect('/login.html');
     }
   });
